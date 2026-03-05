@@ -20,6 +20,7 @@ import GruposTrabajo from '@/pages/GruposTrabajo';
 import Noticias from '@/pages/Noticias';
 import NoticiaIndividual from '@/pages/NoticiaIndividual';
 import Eventos from '@/pages/Eventos';
+import EventoDetalle from '@/pages/EventoDetalle';
 import Convenios from '@/pages/Convenios';
 import ConvenioDetalle from '@/pages/ConvenioDetalle';
 import Contacto from '@/pages/Contacto';
@@ -68,6 +69,7 @@ function App() {
           <Route path="/noticias" element={<Noticias />} />
           <Route path="/noticias/:slug" element={<NoticiaIndividual />} />
           <Route path="/eventos" element={<Eventos />} />
+          <Route path="/eventos/:id" element={<EventoDetalle />} />
           <Route path="/convenios" element={<Convenios />} />
               <Route path="/convenios/:slug" element={<ConvenioDetalle />} />
           <Route path="/contacto" element={<Contacto />} />

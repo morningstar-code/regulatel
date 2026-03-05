@@ -27,7 +27,7 @@ export interface SiteSearchResult {
 }
 
 import { authorities } from "@/data/authorities";
-import { homeEvents } from "@/data/events";
+import { EVENTS_SEED } from "@/data/eventsSeed";
 import { gestionDocuments } from "@/data/gestion";
 import { noticiasData } from "@/pages/noticiasData";
 
@@ -72,15 +72,15 @@ function buildIndex(): SiteSearchDoc[] {
     });
   }
 
-  homeEvents.forEach((e, i) => {
+  EVENTS_SEED.forEach((e) => {
     docs.push({
-      id: `evento-${i}-${e.year}`,
+      id: `evento-${e.id}`,
       type: "evento",
       title: e.title,
-      url: e.href,
-      date: e.startDate ?? String(e.year),
-      content: [e.title, e.description, e.city, String(e.year)].filter(Boolean).join(" "),
-      tags: [e.city, String(e.year)],
+      url: `/eventos/${e.id}`,
+      date: e.startDate,
+      content: [e.title, e.description, e.organizer, e.location, String(e.year)].filter(Boolean).join(" "),
+      tags: [e.organizer, e.location, String(e.year)],
     });
   });
 

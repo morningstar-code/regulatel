@@ -1,23 +1,22 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Play, Pause } from "lucide-react";
-import { hasEventPassed, type HomeEventItem } from "@/data/events";
+import type { Event } from "@/types/event";
+import { formatEventDateRange } from "@/types/event";
 
 const EVENTS_IMAGE_FALLBACK = "/images/homepage/regulatel-portada.png";
 const OVERLAY_GRADIENT =
   "linear-gradient(90deg, rgba(0,0,0,.35) 0%, rgba(0,0,0,.15) 60%, rgba(0,0,0,.05) 100%)";
 
 interface FeaturedEventsCarouselProps {
-  events: HomeEventItem[];
+  events: Event[];
   autoplayIntervalMs?: number;
 }
 
-/**
- * Solo eventos que no han pasado (próximos). Orden por año ascendente. Máximo 8 slides.
- */
-function getFeaturedEvents(events: HomeEventItem[]): HomeEventItem[] {
-  const upcoming = events.filter((e) => e.status === "proxima");
-  return [...upcoming].sort((a, b) => a.year - b.year).slice(0, 8);
+/** Eventos destacados: isFeatured && upcoming, orden por startDate, máx 8. */
+function getFeaturedEvents(events: Event[]): Event[] {
+  const upcoming = events.filter((e) => e.status === "upcoming" && e.isFeatured);
+  return [...upcoming].sort((a, b) => a.startDate.localeCompare(b.startDate)).slice(0, 8);
 }
 
 export default function FeaturedEventsCarousel({
@@ -67,14 +66,8 @@ export default function FeaturedEventsCarousel({
 
   const event = featured[activeIndex];
   const imageUrl = event.imageUrl || EVENTS_IMAGE_FALLBACK;
-  const isProxima = event.status === "proxima";
-  const eventPassed = hasEventPassed(event);
-  const displayAsProxima = isProxima && !eventPassed;
-  const showRegistrarse = displayAsProxima;
-  const registerUrl = event.registrationUrl || "/eventos";
-  const dateLabel = event.dateLabel
-    ? `${event.city}, ${event.dateLabel}`
-    : `${event.city}, ${event.year}`;
+  const hasRegistrationUrl = Boolean(event.registrationUrl?.trim());
+  const dateLabel = `${event.location}, ${formatEventDateRange(event.startDate, event.endDate)}`;
 
   return (
     <section
@@ -83,7 +76,6 @@ export default function FeaturedEventsCarousel({
       onMouseLeave={() => setIsHovering(false)}
       aria-label="Eventos destacados"
     >
-      {/* Background del slide activo */}
       <div
         className="slide absolute inset-0 bg-cover bg-center transition-opacity duration-500"
         style={{
@@ -92,123 +84,73 @@ export default function FeaturedEventsCarousel({
           backgroundPosition: "center",
         }}
       />
-      <div
-        className="slideOverlay absolute inset-0 pointer-events-none"
-        style={{ background: OVERLAY_GRADIENT }}
-      />
+      <div className="slideOverlay absolute inset-0 pointer-events-none" style={{ background: OVERLAY_GRADIENT }} />
 
       <div
         className="relative z-10 mx-auto flex min-h-[260px] w-full max-w-[1280px] flex-col justify-end px-4 pb-6 pt-10 md:min-h-[300px] md:px-6 md:pb-8 md:pt-12 lg:min-h-[360px] lg:justify-center lg:pb-10 lg:pt-16"
         style={{ fontFamily: "var(--token-font-body)" }}
       >
-        {/* Card blanca flotante — alineada a la izquierda, max-width 560px */}
         <div
-          className="floatingCard mx-auto w-[90vw] max-w-[560px] flex-shrink-0 rounded-[16px] border border-black/[0.06] bg-white p-6 shadow-[0_10px_30px_rgba(0,0,0,.12)] md:ml-[8%] md:mr-auto md:p-7"
-          style={{ minWidth: "min(560px, 90vw)" }}
+          className="floatingCard mx-auto w-[90vw] max-w-[620px] flex-shrink-0 rounded-[16px] border border-black/[0.06] bg-white p-6 shadow-[0_10px_30px_rgba(0,0,0,.12)] md:ml-[8%] md:mr-auto md:p-7"
+          style={{ minWidth: "min(620px, 90vw)" }}
         >
           <div className="flex flex-col gap-4 sm:flex-row sm:items-flex-start sm:justify-between">
             <div className="min-w-0 flex-1">
-              {/* Meta: fecha a la izquierda, etiqueta PRÓXIMO / PASADO / EVENTOS a la derecha */}
               <div className="eventMeta flex flex-wrap items-center justify-between gap-2">
-                <span
-                  className="text-xs font-medium uppercase tracking-[0.12em]"
-                  style={{ color: "var(--regu-gray-500)" }}
-                >
+                <span className="text-xs font-medium uppercase tracking-[0.12em]" style={{ color: "var(--regu-gray-500)" }}>
                   {dateLabel}
                 </span>
-                <span
-                  className={
-                    eventPassed
-                      ? "text-[10px] font-medium uppercase tracking-wider opacity-80"
-                      : "text-xs font-semibold uppercase tracking-[0.12em]"
-                  }
-                  style={{
-                    color: eventPassed ? "var(--regu-gray-500)" : "var(--news-accent)",
-                  }}
-                >
-                  {displayAsProxima ? "PRÓXIMO" : eventPassed ? "Pasado" : "EVENTOS"}
+                <span className="text-xs font-semibold uppercase tracking-[0.12em]" style={{ color: "var(--news-accent)" }}>
+                  PRÓXIMO
                 </span>
               </div>
-              {/* Título (2 líneas máx) */}
               <h2
-                className="eventTitle mt-2 line-clamp-2 text-xl font-bold leading-tight md:text-2xl lg:text-[1.75rem]"
+                className="eventTitle mt-2 line-clamp-3 text-xl font-bold leading-tight md:text-2xl lg:text-[1.75rem]"
                 style={{ color: "var(--regu-gray-900)" }}
+                title={event.title}
               >
                 {event.title}
               </h2>
-              {/* Lugar y fecha en texto pequeño */}
-              <p
-                className="mt-1 text-sm"
-                style={{ color: "var(--regu-gray-500)" }}
-              >
-                {event.dateLabel ? `${event.city} · ${event.dateLabel}` : `${event.city}, ${event.year}`}
+              <p className="mt-1 text-sm" style={{ color: "var(--regu-gray-500)" }}>
+                {event.organizer} · {formatEventDateRange(event.startDate, event.endDate)}
               </p>
-              {/* CTAs: VER EVENTO (outline) + REGISTRARSE (filled) solo si upcoming y registrationUrl */}
               <div className="ctaRow mt-4 flex flex-wrap items-center gap-3">
-                {event.href.startsWith("http") ? (
+                <Link
+                  to={`/eventos/${event.id}`}
+                  className="inline-flex items-center justify-center rounded-lg border-2 px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] transition hover:bg-[var(--news-accent)] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--news-accent)] focus-visible:ring-offset-2"
+                  style={{
+                    borderColor: "var(--news-accent)",
+                    color: "var(--news-accent)",
+                  }}
+                >
+                  Leer más
+                </Link>
+                {hasRegistrationUrl ? (
                   <a
-                    href={event.href}
+                    href={event.registrationUrl!}
                     target="_blank"
-                    rel="noreferrer noopener"
-                    className="inline-flex items-center justify-center rounded-lg border-2 px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] transition hover:bg-[var(--news-accent)] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--news-accent)] focus-visible:ring-offset-2"
-                    style={{
-                      borderColor: "var(--news-accent)",
-                      color: "var(--news-accent)",
-                    }}
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] text-white transition hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2"
+                    style={{ backgroundColor: "var(--news-accent)" }}
+                    aria-label={`Registrarse a ${event.title}`}
                   >
-                    Ver evento
+                    Registrarse
                   </a>
                 ) : (
-                  <Link
-                    to={event.href}
-                    className="inline-flex items-center justify-center rounded-lg border-2 px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] transition hover:bg-[var(--news-accent)] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--news-accent)] focus-visible:ring-offset-2"
-                    style={{
-                      borderColor: "var(--news-accent)",
-                      color: "var(--news-accent)",
-                    }}
-                  >
-                    Ver evento
-                  </Link>
+                  <span className="text-xs font-medium uppercase text-[var(--regu-gray-500)]">Por definir</span>
                 )}
-                {showRegistrarse &&
-                  (registerUrl.startsWith("http") ? (
-                    <a
-                      href={registerUrl}
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      className="inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] text-white transition hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2"
-                      style={{ backgroundColor: "var(--news-accent)" }}
-                    >
-                      Registrarse
-                    </a>
-                  ) : (
-                    <Link
-                      to={registerUrl}
-                      className="inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] text-white transition hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2"
-                      style={{ backgroundColor: "var(--news-accent)" }}
-                    >
-                      Registrarse
-                    </Link>
-                  ))}
               </div>
             </div>
-            {/* Indicadores del carrusel (dashes/dots) — activo magenta */}
-            <div
-              className="dots flex items-center gap-2 sm:shrink-0"
-              aria-label="Slides"
-            >
+            <div className="dots flex items-center gap-2 sm:shrink-0" aria-label="Slides">
               {featured.slice(0, 8).map((ev, i) => (
                 <button
-                  key={`${ev.title}-${ev.year}-${i}`}
+                  key={ev.id}
                   type="button"
                   aria-label={`Ir al evento ${i + 1}`}
                   aria-current={i === activeIndex ? "true" : undefined}
-                  className={`h-1.5 w-6 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--news-accent)] focus-visible:ring-offset-2 ${i === activeIndex ? "dotActive" : ""}`}
+                  className="h-1.5 w-6 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--news-accent)] focus-visible:ring-offset-2"
                   style={{
-                    backgroundColor:
-                      i === activeIndex
-                        ? "var(--news-accent)"
-                        : "var(--regu-gray-100)",
+                    backgroundColor: i === activeIndex ? "var(--news-accent)" : "var(--regu-gray-100)",
                   }}
                   onClick={() => setActiveIndex(i)}
                 />
@@ -217,11 +159,7 @@ export default function FeaturedEventsCarousel({
           </div>
         </div>
 
-        {/* Controles: prev / play-pause / next — bottom-right, círculos blancos */}
-        <div
-          className="navArrow absolute bottom-4 right-4 flex items-center gap-2 md:bottom-6 md:right-6 lg:bottom-8 lg:right-8"
-          aria-label="Controles del carrusel"
-        >
+        <div className="navArrow absolute bottom-4 right-4 flex items-center gap-2 md:bottom-6 md:right-6 lg:bottom-8 lg:right-8" aria-label="Controles del carrusel">
           <button
             type="button"
             aria-label="Evento anterior"
@@ -236,11 +174,7 @@ export default function FeaturedEventsCarousel({
             className="flex h-10 w-10 items-center justify-center rounded-full border border-black/10 bg-white text-[var(--regu-gray-900)] shadow-md transition hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--news-accent)] focus-visible:ring-offset-2"
             onClick={() => setIsPaused((p) => !p)}
           >
-            {isPaused ? (
-              <Play className="h-5 w-5" />
-            ) : (
-              <Pause className="h-5 w-5" />
-            )}
+            {isPaused ? <Play className="h-5 w-5" /> : <Pause className="h-5 w-5" />}
           </button>
           <button
             type="button"

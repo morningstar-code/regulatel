@@ -1,204 +1,394 @@
-import { useState } from "react";
-import { useAdminData } from "@/contexts/AdminDataContext";
-import type { HomeEventItem } from "@/data/events";
-import { Pencil, Trash2, Plus } from "lucide-react";
+/**
+ * Panel Admin: gestionar TODOS los eventos (crear / editar / eliminar / duplicar).
+ * Source of truth: events en AdminDataContext (localStorage o seed).
+ * Añadir nuevos eventos o URLs: usar el formulario "Nuevo evento" o editar una fila.
+ */
 
-const emptyEvent: HomeEventItem = {
+import { useState, useMemo } from "react";
+import { useAdminData } from "@/contexts/AdminDataContext";
+import type { Event } from "@/types/event";
+import { getEventYear, slugifyEventId, EVENT_STATUS_LABEL } from "@/types/event";
+import { Pencil, Trash2, Plus, Copy, X } from "lucide-react";
+
+const emptyForm = {
   title: "",
-  city: "",
-  year: new Date().getFullYear(),
-  status: "proxima",
-  href: "",
+  organizer: "",
+  location: "",
+  startDate: "",
+  endDate: "",
+  registrationUrl: "",
+  detailsUrl: "",
+  isFeatured: false,
   description: "",
+  tags: [] as string[],
 };
 
-export default function AdminEventos() {
-  const { adminEvents, addEvent, updateEvent, deleteEvent } = useAdminData();
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [adding, setAdding] = useState(false);
-  const [form, setForm] = useState<HomeEventItem>(emptyEvent);
+function isValidUrl(s: string): boolean {
+  if (!s.trim()) return true;
+  try {
+    const u = new URL(s);
+    return u.protocol === "http:" || u.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
 
-  const resetForm = () => {
-    setForm({ ...emptyEvent, year: new Date().getFullYear() });
-    setEditingIndex(null);
+export default function AdminEventos() {
+  const { events, addEvent, updateEvent, deleteEvent, duplicateEvent } = useAdminData();
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [adding, setAdding] = useState(false);
+  const [form, setForm] = useState(emptyForm);
+  const [urlError, setUrlError] = useState<string | null>(null);
+
+  const sortedEvents = useMemo(
+    () => [...events].sort((a, b) => b.startDate.localeCompare(a.startDate)),
+    [events]
+  );
+
+  const openNew = () => {
+    setForm(emptyForm);
+    setAdding(true);
+    setEditingId(null);
+    setUrlError(null);
+  };
+
+  const openEdit = (e: Event) => {
+    setForm({
+      title: e.title,
+      organizer: e.organizer,
+      location: e.location,
+      startDate: e.startDate,
+      endDate: e.endDate ?? "",
+      registrationUrl: e.registrationUrl ?? "",
+      detailsUrl: e.detailsUrl ?? "",
+      isFeatured: e.isFeatured,
+      description: e.description ?? "",
+      tags: e.tags ?? [],
+    });
+    setEditingId(e.id);
     setAdding(false);
+    setUrlError(null);
+  };
+
+  const closeModal = () => {
+    setAdding(false);
+    setEditingId(null);
+    setForm(emptyForm);
+    setUrlError(null);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingIndex !== null) {
-      updateEvent(editingIndex, form);
-    } else {
-      addEvent(form);
+    if (!form.startDate.trim()) return;
+    if (form.registrationUrl.trim() && !isValidUrl(form.registrationUrl)) {
+      setUrlError("URL de registro debe ser http o https.");
+      return;
     }
-    resetForm();
-  };
-
-  const startEdit = (index: number) => {
-    setForm(adminEvents[index]);
-    setEditingIndex(index);
-    setAdding(false);
+    if (form.detailsUrl.trim() && !isValidUrl(form.detailsUrl)) {
+      setUrlError("URL de detalles debe ser http o https.");
+      return;
+    }
+    setUrlError(null);
+    const year = getEventYear(form.startDate);
+    if (editingId) {
+      updateEvent(editingId, {
+        title: form.title,
+        organizer: form.organizer,
+        location: form.location,
+        startDate: form.startDate,
+        endDate: form.endDate.trim() || null,
+        registrationUrl: form.registrationUrl.trim() || null,
+        detailsUrl: form.detailsUrl.trim() || null,
+        isFeatured: form.isFeatured,
+        description: form.description.trim() || undefined,
+        tags: form.tags,
+      });
+    } else {
+      addEvent({
+        id: slugifyEventId(form.title, year),
+        title: form.title,
+        organizer: form.organizer,
+        location: form.location,
+        startDate: form.startDate,
+        endDate: form.endDate.trim() || null,
+        registrationUrl: form.registrationUrl.trim() || null,
+        detailsUrl: form.detailsUrl.trim() || null,
+        isFeatured: form.isFeatured,
+        description: form.description.trim() || undefined,
+        tags: form.tags,
+      });
+    }
+    closeModal();
   };
 
   return (
-    <div>
+    <div style={{ fontFamily: "var(--token-font-body)" }}>
       <h1 className="mb-6 text-2xl font-bold" style={{ color: "var(--regu-gray-900)" }}>
         Eventos
       </h1>
+      <p className="mb-4 text-sm" style={{ color: "var(--regu-gray-600)" }}>
+        Gestionar todos los eventos que se muestran en la página pública y en el slider. El botón &quot;Registrarse&quot; usa la URL de registro configurada aquí.
+      </p>
 
-      {!adding && editingIndex === null && (
+      {!adding && !editingId && (
         <button
           type="button"
-          onClick={() => {
-            setAdding(true);
-            setForm({ ...emptyEvent, year: new Date().getFullYear() });
-          }}
+          onClick={openNew}
           className="mb-6 flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white"
           style={{ backgroundColor: "var(--regu-blue)" }}
         >
-          <Plus className="h-4 w-4" /> Añadir evento
+          <Plus className="h-4 w-4" /> Nuevo evento
         </button>
       )}
 
-      {(adding || editingIndex !== null) && (
-        <form
-          onSubmit={handleSubmit}
-          className="mb-8 rounded-xl border bg-white p-6 shadow-sm"
-          style={{ borderColor: "var(--regu-gray-100)" }}
+      {(adding || editingId) && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ backgroundColor: "rgba(0,0,0,0.4)" }}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-title"
         >
-          <h2 className="mb-4 font-bold" style={{ color: "var(--regu-gray-900)" }}>
-            {editingIndex !== null ? "Editar evento" : "Nuevo evento"}
-          </h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="md:col-span-2">
-              <label className="mb-1 block text-sm font-medium" style={{ color: "var(--regu-gray-700)" }}>Título *</label>
-              <input
-                type="text"
-                value={form.title}
-                onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-                className="w-full rounded-lg border px-3 py-2"
-                style={{ borderColor: "var(--regu-gray-100)" }}
-                required
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium" style={{ color: "var(--regu-gray-700)" }}>Ciudad</label>
-              <input
-                type="text"
-                value={form.city}
-                onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))}
-                className="w-full rounded-lg border px-3 py-2"
-                style={{ borderColor: "var(--regu-gray-100)" }}
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium" style={{ color: "var(--regu-gray-700)" }}>Año *</label>
-              <input
-                type="number"
-                value={form.year}
-                onChange={(e) => setForm((f) => ({ ...f, year: parseInt(e.target.value, 10) || 2025 }))}
-                min={2020}
-                max={2030}
-                className="w-full rounded-lg border px-3 py-2"
-                style={{ borderColor: "var(--regu-gray-100)" }}
-                required
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium" style={{ color: "var(--regu-gray-700)" }}>Estado</label>
-              <select
-                value={form.status}
-                onChange={(e) =>
-                  setForm((f) => ({
-                    ...f,
-                    status: e.target.value as "proxima" | "pasada",
-                  }))
-                }
-                className="w-full rounded-lg border px-3 py-2"
-                style={{ borderColor: "var(--regu-gray-100)" }}
-              >
-                <option value="proxima">Próxima</option>
-                <option value="pasada">Pasada</option>
-              </select>
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium" style={{ color: "var(--regu-gray-700)" }}>Enlace</label>
-              <input
-                type="url"
-                value={form.href}
-                onChange={(e) => setForm((f) => ({ ...f, href: e.target.value }))}
-                className="w-full rounded-lg border px-3 py-2"
-                style={{ borderColor: "var(--regu-gray-100)" }}
-              />
-            </div>
-            <div className="md:col-span-2">
-              <label className="mb-1 block text-sm font-medium" style={{ color: "var(--regu-gray-700)" }}>Descripción</label>
-              <textarea
-                value={form.description}
-                onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-                rows={3}
-                className="w-full rounded-lg border px-3 py-2"
-                style={{ borderColor: "var(--regu-gray-100)" }}
-              />
-            </div>
-          </div>
-          <div className="mt-4 flex gap-2">
-            <button
-              type="submit"
-              className="rounded-xl px-4 py-2 text-sm font-semibold text-white"
-              style={{ backgroundColor: "var(--regu-blue)" }}
-            >
-              {editingIndex !== null ? "Guardar" : "Añadir"}
-            </button>
-            <button
-              type="button"
-              onClick={resetForm}
-              className="rounded-xl border px-4 py-2 text-sm font-medium"
-              style={{ borderColor: "var(--regu-gray-100)", color: "var(--regu-gray-700)" }}
-            >
-              Cancelar
-            </button>
-          </div>
-        </form>
-      )}
-
-      <div className="space-y-3">
-        {adminEvents.map((e, i) => (
           <div
-            key={i}
-            className="flex items-center justify-between gap-4 rounded-xl border bg-white p-4 shadow-sm"
+            className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border bg-white p-6 shadow-xl"
             style={{ borderColor: "var(--regu-gray-100)" }}
           >
-            <div className="min-w-0">
-              <p className="font-semibold" style={{ color: "var(--regu-gray-900)" }}>{e.title}</p>
-              <p className="text-sm" style={{ color: "var(--regu-gray-500)" }}>{e.city} · {e.year}</p>
-            </div>
-            <div className="flex shrink-0 gap-2">
+            <div className="flex items-center justify-between mb-4">
+              <h2 id="modal-title" className="text-xl font-bold" style={{ color: "var(--regu-gray-900)" }}>
+                {editingId ? "Editar evento" : "Nuevo evento"}
+              </h2>
               <button
                 type="button"
-                onClick={() => startEdit(i)}
-                className="rounded-lg p-2 transition hover:bg-slate-100"
-                aria-label="Editar"
+                onClick={closeModal}
+                className="rounded-lg p-2 hover:bg-gray-100"
+                aria-label="Cerrar"
               >
-                <Pencil className="h-4 w-4" style={{ color: "var(--regu-blue)" }} />
-              </button>
-              <button
-                type="button"
-                onClick={() => deleteEvent(i)}
-                className="rounded-lg p-2 transition hover:bg-red-50"
-                aria-label="Eliminar"
-              >
-                <Trash2 className="h-4 w-4" style={{ color: "var(--regu-salmon)" }} />
+                <X className="h-5 w-5" />
               </button>
             </div>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {urlError && (
+                <p className="text-sm font-medium text-red-600" role="alert">
+                  {urlError}
+                </p>
+              )}
+              <div>
+                <label className="mb-1 block text-sm font-medium" style={{ color: "var(--regu-gray-700)" }}>
+                  Título *
+                </label>
+                <input
+                  type="text"
+                  value={form.title}
+                  onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+                  className="w-full rounded-lg border px-3 py-2 text-sm"
+                  style={{ borderColor: "var(--regu-gray-100)" }}
+                  required
+                />
+              </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <label className="mb-1 block text-sm font-medium" style={{ color: "var(--regu-gray-700)" }}>
+                    Organizador
+                  </label>
+                  <input
+                    type="text"
+                    value={form.organizer}
+                    onChange={(e) => setForm((f) => ({ ...f, organizer: e.target.value }))}
+                    className="w-full rounded-lg border px-3 py-2 text-sm"
+                    style={{ borderColor: "var(--regu-gray-100)" }}
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-sm font-medium" style={{ color: "var(--regu-gray-700)" }}>
+                    Lugar
+                  </label>
+                  <input
+                    type="text"
+                    value={form.location}
+                    onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))}
+                    className="w-full rounded-lg border px-3 py-2 text-sm"
+                    style={{ borderColor: "var(--regu-gray-100)" }}
+                  />
+                </div>
+              </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <label className="mb-1 block text-sm font-medium" style={{ color: "var(--regu-gray-700)" }}>
+                    Fecha inicio (YYYY-MM-DD) *
+                  </label>
+                  <input
+                    type="date"
+                    value={form.startDate}
+                    onChange={(e) => setForm((f) => ({ ...f, startDate: e.target.value }))}
+                    className="w-full rounded-lg border px-3 py-2 text-sm"
+                    style={{ borderColor: "var(--regu-gray-100)" }}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-sm font-medium" style={{ color: "var(--regu-gray-700)" }}>
+                    Fecha fin (opcional)
+                  </label>
+                  <input
+                    type="date"
+                    value={form.endDate}
+                    onChange={(e) => setForm((f) => ({ ...f, endDate: e.target.value }))}
+                    className="w-full rounded-lg border px-3 py-2 text-sm"
+                    style={{ borderColor: "var(--regu-gray-100)" }}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium" style={{ color: "var(--regu-gray-700)" }}>
+                  URL de registro (http/https)
+                </label>
+                <input
+                  type="url"
+                  value={form.registrationUrl}
+                  onChange={(e) => setForm((f) => ({ ...f, registrationUrl: e.target.value }))}
+                  placeholder="https://..."
+                  className="w-full rounded-lg border px-3 py-2 text-sm"
+                  style={{ borderColor: "var(--regu-gray-100)" }}
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium" style={{ color: "var(--regu-gray-700)" }}>
+                  URL de detalles (opcional)
+                </label>
+                <input
+                  type="url"
+                  value={form.detailsUrl}
+                  onChange={(e) => setForm((f) => ({ ...f, detailsUrl: e.target.value }))}
+                  placeholder="https://..."
+                  className="w-full rounded-lg border px-3 py-2 text-sm"
+                  style={{ borderColor: "var(--regu-gray-100)" }}
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium" style={{ color: "var(--regu-gray-700)" }}>
+                  Descripción
+                </label>
+                <textarea
+                  value={form.description}
+                  onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+                  rows={2}
+                  className="w-full rounded-lg border px-3 py-2 text-sm"
+                  style={{ borderColor: "var(--regu-gray-100)" }}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="isFeatured"
+                  checked={form.isFeatured}
+                  onChange={(e) => setForm((f) => ({ ...f, isFeatured: e.target.checked }))}
+                  className="h-4 w-4 rounded border-gray-300"
+                />
+                <label htmlFor="isFeatured" className="text-sm font-medium" style={{ color: "var(--regu-gray-700)" }}>
+                  Destacado (aparece en el slider de la home)
+                </label>
+              </div>
+              <div className="flex gap-2 pt-2">
+                <button
+                  type="submit"
+                  className="rounded-xl px-4 py-2 text-sm font-semibold text-white"
+                  style={{ backgroundColor: "var(--regu-blue)" }}
+                >
+                  {editingId ? "Guardar" : "Crear"}
+                </button>
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  className="rounded-xl border px-4 py-2 text-sm font-medium"
+                  style={{ borderColor: "var(--regu-gray-100)", color: "var(--regu-gray-700)" }}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </form>
           </div>
-        ))}
-        {adminEvents.length === 0 && !adding && (
-          <p className="text-sm" style={{ color: "var(--regu-gray-500)" }}>
-            No hay eventos añadidos por el admin. Los eventos estáticos del sitio siguen mostrándose.
-          </p>
-        )}
+        </div>
+      )}
+
+      <div className="overflow-x-auto rounded-xl border bg-white" style={{ borderColor: "var(--regu-gray-100)" }}>
+        <table className="w-full text-left text-sm">
+          <thead>
+            <tr style={{ borderBottom: "1px solid var(--regu-gray-100)", backgroundColor: "var(--regu-offwhite)" }}>
+              <th className="px-4 py-3 font-semibold" style={{ color: "var(--regu-gray-900)" }}>Título</th>
+              <th className="px-4 py-3 font-semibold" style={{ color: "var(--regu-gray-900)" }}>Año</th>
+              <th className="px-4 py-3 font-semibold" style={{ color: "var(--regu-gray-900)" }}>Fecha inicio</th>
+              <th className="px-4 py-3 font-semibold" style={{ color: "var(--regu-gray-900)" }}>Lugar</th>
+              <th className="px-4 py-3 font-semibold" style={{ color: "var(--regu-gray-900)" }}>Estado</th>
+              <th className="px-4 py-3 font-semibold" style={{ color: "var(--regu-gray-900)" }}>URL registro</th>
+              <th className="px-4 py-3 font-semibold" style={{ color: "var(--regu-gray-900)" }}>Destacado</th>
+              <th className="px-4 py-3 font-semibold" style={{ color: "var(--regu-gray-900)" }}>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sortedEvents.map((ev) => (
+              <tr
+                key={ev.id}
+                className="border-b border-[var(--regu-gray-100)] hover:bg-gray-50/50"
+              >
+                <td className="px-4 py-3 font-medium max-w-[200px] truncate" style={{ color: "var(--regu-gray-900)" }} title={ev.title}>
+                  {ev.title}
+                </td>
+                <td className="px-4 py-3" style={{ color: "var(--regu-gray-600)" }}>{ev.year}</td>
+                <td className="px-4 py-3" style={{ color: "var(--regu-gray-600)" }}>{ev.startDate}</td>
+                <td className="px-4 py-3" style={{ color: "var(--regu-gray-600)" }}>{ev.location}</td>
+                <td className="px-4 py-3">
+                  <span
+                    className="rounded-full px-2 py-0.5 text-xs font-semibold"
+                    style={{
+                      backgroundColor: ev.status === "upcoming" ? "rgba(68,137,198,0.12)" : "rgba(22,61,89,0.1)",
+                      color: ev.status === "upcoming" ? "var(--regu-blue)" : "var(--regu-gray-600)",
+                    }}
+                  >
+                    {EVENT_STATUS_LABEL[ev.status]}
+                  </span>
+                </td>
+                <td className="px-4 py-3 max-w-[140px] truncate" style={{ color: "var(--regu-gray-600)" }} title={ev.registrationUrl ?? ""}>
+                  {ev.registrationUrl ? "Sí" : "—"}
+                </td>
+                <td className="px-4 py-3">{ev.isFeatured ? "Sí" : "—"}</td>
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => openEdit(ev)}
+                      className="rounded-lg p-2 transition hover:bg-slate-100"
+                      aria-label="Editar"
+                    >
+                      <Pencil className="h-4 w-4" style={{ color: "var(--regu-blue)" }} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => duplicateEvent(ev.id)}
+                      className="rounded-lg p-2 transition hover:bg-slate-100"
+                      aria-label="Duplicar"
+                    >
+                      <Copy className="h-4 w-4" style={{ color: "var(--regu-gray-600)" }} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => window.confirm("¿Eliminar este evento?") && deleteEvent(ev.id)}
+                      className="rounded-lg p-2 transition hover:bg-red-50"
+                      aria-label="Eliminar"
+                    >
+                      <Trash2 className="h-4 w-4" style={{ color: "var(--regu-salmon, #c53030)" }} />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
+      {events.length === 0 && (
+        <p className="mt-4 text-sm" style={{ color: "var(--regu-gray-500)" }}>
+          No hay eventos. Añade uno con &quot;Nuevo evento&quot; o carga el seed por defecto (recarga la página sin datos en localStorage).
+        </p>
+      )}
     </div>
   );
 }

@@ -8,14 +8,27 @@ import {
 } from "react";
 import type { KPIItem, CifrasAnuales } from "@/data/home";
 import { statsKpis, cifrasPorAno } from "@/data/home";
-import { homeEvents as staticEvents, type HomeEventItem } from "@/data/events";
+import { EVENTS_SEED } from "@/data/eventsSeed";
 import { homeNews } from "@/data/news";
 import { noticiasData } from "@/pages/noticiasData";
+import type { Event } from "@/types/event";
+import { getEventStatus, getEventYear, normalizeEvent, slugifyEventId } from "@/types/event";
 
 const KEY_NEWS = "regulatel_admin_news";
-const KEY_EVENTS = "regulatel_admin_events";
+/** Eventos: modelo Event[] (único source of truth). v2 para no mezclar con formato antiguo. */
+const KEY_EVENTS = "regulatel_admin_events_v2";
 const KEY_CIFRAS = "regulatel_admin_cifras";
 const KEY_CIFRAS_POR_ANO = "regulatel_admin_cifras_por_ano";
+
+function loadEvents(): Event[] {
+  const raw = loadJson<unknown>(KEY_EVENTS, []);
+  if (!Array.isArray(raw) || raw.length === 0) return EVENTS_SEED.map(normalizeEvent);
+  const isNewFormat = raw.every(
+    (e: unknown) => e && typeof e === "object" && "startDate" in e && "id" in e
+  );
+  if (!isNewFormat) return EVENTS_SEED.map(normalizeEvent);
+  return raw.map((e) => normalizeEvent(e as Event));
+}
 
 /** Noticia creada/editada por el admin (compatible con listado y detalle) */
 export interface AdminNewsItem {
@@ -57,11 +70,14 @@ interface AdminDataContextValue {
   updateNews: (id: string, item: Partial<AdminNewsItem>) => void;
   deleteNews: (id: string) => void;
 
-  adminEvents: HomeEventItem[];
-  setAdminEvents: (v: HomeEventItem[] | ((prev: HomeEventItem[]) => HomeEventItem[])) => void;
-  addEvent: (item: HomeEventItem) => void;
-  updateEvent: (index: number, item: Partial<HomeEventItem>) => void;
-  deleteEvent: (index: number) => void;
+  /** Lista completa de eventos (source of truth). Gestionar en /admin/eventos. */
+  events: Event[];
+  setEvents: (v: Event[] | ((prev: Event[]) => Event[])) => void;
+  /** status y year se derivan en el contexto si no se pasan. */
+  addEvent: (item: Omit<Event, "createdAt" | "updatedAt" | "status" | "year"> & { status?: Event["status"]; year?: number }) => void;
+  updateEvent: (id: string, item: Partial<Omit<Event, "id" | "createdAt">>) => void;
+  deleteEvent: (id: string) => void;
+  duplicateEvent: (id: string) => void;
 
   adminCifras: KPIItem[] | null;
   setAdminCifras: (v: KPIItem[] | null | ((prev: KPIItem[] | null) => KPIItem[] | null)) => void;
@@ -79,9 +95,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   const [adminNews, setAdminNewsState] = useState<AdminNewsItem[]>(() =>
     loadJson<AdminNewsItem[]>(KEY_NEWS, [])
   );
-  const [adminEvents, setAdminEventsState] = useState<HomeEventItem[]>(() =>
-    loadJson<HomeEventItem[]>(KEY_EVENTS, [])
-  );
+  const [events, setEventsState] = useState<Event[]>(() => loadEvents());
   const [adminCifras, setAdminCifrasState] = useState<KPIItem[] | null>(() =>
     loadJson<KPIItem[] | null>(KEY_CIFRAS, null)
   );
@@ -94,8 +108,8 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   }, [adminNews]);
 
   useEffect(() => {
-    saveJson(KEY_EVENTS, adminEvents);
-  }, [adminEvents]);
+    saveJson(KEY_EVENTS, events);
+  }, [events]);
 
   useEffect(() => {
     saveJson(KEY_CIFRAS, adminCifras);
@@ -133,26 +147,56 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     setAdminNewsState((prev) => prev.filter((n) => n.id !== id));
   }, []);
 
-  const setAdminEvents = useCallback(
-    (v: HomeEventItem[] | ((prev: HomeEventItem[]) => HomeEventItem[])) => {
-      setAdminEventsState(v);
+  const setEvents = useCallback((v: Event[] | ((prev: Event[]) => Event[])) => {
+    setEventsState(v);
+  }, []);
+
+  const addEvent = useCallback(
+    (item: Omit<Event, "createdAt" | "updatedAt" | "status" | "year"> & { status?: Event["status"]; year?: number }) => {
+      const now = new Date().toISOString();
+      const status = getEventStatus({ startDate: item.startDate, endDate: item.endDate ?? null });
+      const year = item.year ?? getEventYear(item.startDate);
+      const newEvent: Event = {
+        ...item,
+        id: item.id || slugifyEventId(item.title, year),
+        year,
+        status,
+        createdAt: now,
+        updatedAt: now,
+      };
+      setEventsState((prev) => [...prev, normalizeEvent(newEvent)]);
     },
     []
   );
 
-  const addEvent = useCallback((item: HomeEventItem) => {
-    setAdminEventsState((prev) => [...prev, item]);
-  }, []);
-
-  const updateEvent = useCallback((index: number, item: Partial<HomeEventItem>) => {
-    setAdminEventsState((prev) =>
-      prev.map((e, i) => (i === index ? { ...e, ...item } : e))
+  const updateEvent = useCallback((id: string, item: Partial<Omit<Event, "id" | "createdAt">>) => {
+    setEventsState((prev) =>
+      prev.map((e) => {
+        if (e.id !== id) return e;
+        const updated = { ...e, ...item, updatedAt: new Date().toISOString() };
+        return normalizeEvent(updated);
+      })
     );
   }, []);
 
-  const deleteEvent = useCallback((index: number) => {
-    setAdminEventsState((prev) => prev.filter((_, i) => i !== index));
+  const deleteEvent = useCallback((id: string) => {
+    setEventsState((prev) => prev.filter((e) => e.id !== id));
   }, []);
+
+  const duplicateEvent = useCallback((id: string) => {
+    const ev = events.find((e) => e.id === id);
+    if (!ev) return;
+    const now = new Date().toISOString();
+    const newId = `${ev.id}-copia-${Date.now()}`;
+    const dup: Event = normalizeEvent({
+      ...ev,
+      id: newId,
+      title: `${ev.title} (copia)`,
+      createdAt: now,
+      updatedAt: now,
+    });
+    setEventsState((prev) => [...prev, dup]);
+  }, [events]);
 
   const setAdminCifras = useCallback(
     (
@@ -197,11 +241,12 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
         addNews,
         updateNews,
         deleteNews,
-        adminEvents,
-        setAdminEvents,
+        events,
+        setEvents,
         addEvent,
         updateEvent,
         deleteEvent,
+        duplicateEvent,
         adminCifras,
         setAdminCifras,
         adminCifrasPorAno,
@@ -254,15 +299,10 @@ export function useMergedNews(): HomeNewsItemLike[] {
   return merged;
 }
 
-export function useMergedEvents(): HomeEventItem[] {
+/** Lista de eventos (source of truth desde Admin o seed). */
+export function useEvents(): Event[] {
   const ctx = useContext(AdminDataContext);
-  const adminPart = ctx?.adminEvents ?? [];
-  const merged = [...staticEvents, ...adminPart];
-  merged.sort((a, b) => {
-    if (a.status !== b.status) return a.status === "proxima" ? -1 : 1;
-    return (b.year ?? 0) - (a.year ?? 0);
-  });
-  return merged;
+  return ctx?.events ?? EVENTS_SEED.map(normalizeEvent);
 }
 
 export function useMergedCifras(): KPIItem[] {

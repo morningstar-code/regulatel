@@ -1,22 +1,14 @@
 import { Link } from "react-router-dom";
-import { useMergedEvents } from "@/contexts/AdminDataContext";
-import { hasEventPassed, type HomeEventItem } from "@/data/events";
+import { useEvents } from "@/contexts/AdminDataContext";
 import { formatBERECDate } from "@/utils/date";
 
 const MAX_UPCOMING = 6;
-/** Magenta institucional para fechas (no lime). */
 const DATE_COLOR = "var(--news-accent)";
 
-function getUpcomingEvents(events: HomeEventItem[]): HomeEventItem[] {
-  const upcoming = events.filter(
-    (e) => e.status === "proxima" && !hasEventPassed(e)
-  );
-  return [...upcoming]
-    .sort((a, b) => {
-      const da = a.startDate ?? "9999-12-31";
-      const db = b.startDate ?? "9999-12-31";
-      return da.localeCompare(db);
-    })
+function getUpcomingEvents(events: ReturnType<typeof useEvents>) {
+  return events
+    .filter((e) => e.status === "upcoming")
+    .sort((a, b) => a.startDate.localeCompare(b.startDate))
     .slice(0, MAX_UPCOMING);
 }
 
@@ -38,7 +30,7 @@ export default function MegaMenuEvents({
   onLinkClick,
   variant = "desktop",
 }: MegaMenuEventsProps) {
-  const events = useMergedEvents();
+  const events = useEvents();
   const upcoming = getUpcomingEvents(events);
 
   const panelClass =
@@ -132,25 +124,23 @@ export default function MegaMenuEvents({
               </p>
             ) : (
               <ul className="list-none p-0 m-0 space-y-0">
-                {upcoming.map((ev, i) => (
+                {upcoming.map((ev) => (
                   <li
-                    key={`${ev.title}-${ev.year}-${i}`}
+                    key={ev.id}
                     className="border-b py-3 first:pt-0"
                     style={{ borderColor: "var(--regu-gray-100)" }}
                   >
                     <Link
-                      to={`/eventos?q=${encodeURIComponent(ev.title)}`}
+                      to={`/eventos/${ev.id}`}
                       onClick={onLinkClick}
                       className="block group"
                     >
-                      {ev.startDate && (
-                        <span
-                          className="text-xs font-semibold uppercase tracking-wider"
-                          style={{ color: DATE_COLOR }}
-                        >
-                          {formatBERECDate(ev.startDate)}
-                        </span>
-                      )}
+                      <span
+                        className="text-xs font-semibold uppercase tracking-wider"
+                        style={{ color: DATE_COLOR }}
+                      >
+                        {formatBERECDate(ev.startDate)}
+                      </span>
                       <span
                         className="block mt-0.5 text-base font-semibold leading-snug group-hover:underline"
                         style={{
@@ -263,25 +253,23 @@ export default function MegaMenuEvents({
               </p>
             ) : (
               <ul className="list-none p-0 m-0">
-                {upcoming.map((ev, i) => (
+                {upcoming.map((ev) => (
                   <li
-                    key={`${ev.title}-${ev.year}-${i}`}
+                    key={ev.id}
                     className="border-b py-4 first:pt-0 last:border-b-0"
                     style={{ borderColor: "var(--regu-gray-100)" }}
                   >
                     <Link
-                      to={`/eventos?q=${encodeURIComponent(ev.title)}`}
+                      to={`/eventos/${ev.id}`}
                       onClick={onLinkClick}
                       className="block group"
                     >
-                      {ev.startDate && (
-                        <span
-                          className="text-xs font-semibold uppercase tracking-wider"
-                          style={{ color: DATE_COLOR }}
-                        >
-                          {formatBERECDate(ev.startDate)} |
-                        </span>
-                      )}
+                      <span
+                        className="text-xs font-semibold uppercase tracking-wider"
+                        style={{ color: DATE_COLOR }}
+                      >
+                        {formatBERECDate(ev.startDate)} |
+                      </span>
                       <span
                         className="block mt-1 text-base font-semibold leading-snug group-hover:underline"
                         style={{

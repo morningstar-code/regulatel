@@ -6,7 +6,7 @@ import HomeHeroPro from "@/components/home/HomeHeroPro";
 import NewsSectionBerec from "@/components/home/NewsSectionBerec";
 import RegulatelEnCifras from "@/components/home/RegulatelEnCifras";
 import {
-  useMergedEvents,
+  useEvents,
   useMergedNews,
 } from "@/contexts/AdminDataContext";
 import {
@@ -18,7 +18,7 @@ import {
 
 export default function Home() {
   const homeNews = useMergedNews();
-  const homeEvents = useMergedEvents();
+  const homeEvents = useEvents();
 
   return (
     <>
