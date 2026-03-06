@@ -66,6 +66,10 @@ La salida se genera en la carpeta `dist/`.
 npm run preview
 ```
 
+### Despliegue en Vercel (video institucional)
+
+El video de la página "Qué somos" está en Git LFS. Para que se vea en Vercel, en el proyecto de Vercel hay que activar **Git Large File Storage (LFS)** en **Settings → Git**. Así Vercel descargará el archivo al clonar y el build lo incluirá. Sin esta opción, el deploy funciona pero el reproductor puede quedar en negro.
+
 ---
 
 ## Estructura del proyecto
