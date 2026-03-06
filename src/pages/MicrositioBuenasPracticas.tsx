@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   categories,
   countries,
@@ -9,6 +9,10 @@ import CategoryTabs from "@/components/buenasPracticas/CategoryTabs";
 import ComparisonPanel from "@/components/buenasPracticas/ComparisonPanel";
 
 export default function MicrositioBuenasPracticas() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const [selectedCountryA, setSelectedCountryA] = useState<string | null>(
     "rep_dominicana"
   );
