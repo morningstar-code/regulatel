@@ -25,6 +25,47 @@ export interface NoticiaData {
 
 export const noticiasData: NoticiaData[] = [
   {
+    slug: 'regulatel-invita-a-berec-a-participar-en-encuentro-birregional-en-cartagena',
+    title: 'REGULATEL invita a BEREC a participar en encuentro birregional en Cartagena',
+    date: '2026-03-02',
+    dateFormatted: '2 marzo 2026',
+    category: 'Noticias',
+    excerpt: 'REGULATEL extendió una invitación formal a BEREC para participar en la Cumbre BEREC–REGULATEL prevista para junio de 2026 en Cartagena, Colombia.',
+    imageUrl: '/images/noticias/regulatel-invita-a-berec-cartagena.jpeg',
+    author: 'REGULATEL',
+    content: [
+      'Madrid, España. — El Foro Latinoamericano de Entes Reguladores de Telecomunicaciones (REGULATEL) extendió una invitación formal al Organismo de Reguladores Europeos de Comunicaciones Electrónicas (BEREC) para llevar a cabo la Cumbre BEREC – REGULATEL en Cartagena, Colombia, prevista para junio de 2026.',
+      'La carta de invitación fue enviada por el presidente de REGULATEL Guido Gómez Mazara, y entregada formalmente por la directora ejecutiva del Instituto Dominicano de las Telecomunicaciones (INDOTEL) y en representación de la presidencia del Foro, Julissa Cruz Abreu, durante un saludo institucional celebrado entre BEREC y REGULATEL en la ciudad de Madrid, en el marco del SUMMIT LATAM.',
+      'El encuentro protocolar BEREC–REGULATEL se llevó a cabo el 26 de febrero, previo al inicio formal del registro de participantes de la cumbre, y contó con la distinguida presencia del presidente de BEREC 2026, Marko Mišmaš; la directora de la Oficina de BEREC, Verena Weber; el vicepresidente de BEREC, Ángel García Castillejo; y la directora de Telecomunicaciones de la Comisión Nacional de los Mercados y la Competencia (CNMC), Alejandra de Iturriaga, así como representantes de organismos reguladores de Brasil, Uruguay, Bolivia, Colombia, Panamá, México, Portugal y Puerto Rico.',
+      'Cruz Abreu, en su calidad de representante de la presidencia del Foro, junto a reguladores miembros presentes en el SUMMIT LATAM, reafirmaron la voluntad de ambas organizaciones de fortalecer el diálogo institucional y la cooperación técnica entre América Latina y Europa.',
+      'El encuentro birregional previsto este año en Cartagena, Colombia está concebido como un espacio para el intercambio de experiencias y buenas prácticas en temas de interés común, entre ellos los enfoques regulatorios, la promoción de la competencia, las políticas de conectividad, la protección de los usuarios y los desafíos vinculados a la transformación digital.',
+      'REGULATEL destacó que esta iniciativa busca contribuir al análisis de prioridades regulatorias compartidas, promover mercados digitales más competitivos e inclusivos y fomentar la cooperación birregional en el marco del desarrollo sostenible del sector, reiterando su disposición de continuar fortaleciendo la colaboración con BEREC mediante la identificación de nuevas oportunidades de trabajo conjunto que impulsen la modernización y el crecimiento del ecosistema digital en ambas regiones.'
+    ],
+    tags: ['BEREC', 'Cartagena', 'Cooperación birregional', 'REGULATEL', 'Cumbre 2026', 'Madrid', 'INDOTEL']
+  },
+  {
+    slug: 'gomez-mazara-aboga-en-barcelona-por-una-regulacion-de-las-telecomunicaciones-firme-y-centrada-en-proteccion-de-usuarios',
+    title: 'Gómez Mazara aboga en Barcelona por una regulación de las telecomunicaciones firme y centrada en protección de usuarios',
+    date: '2026-03-05',
+    dateFormatted: '5 marzo 2026',
+    category: 'Noticias',
+    excerpt: 'Guido Gómez Mazara destacó en Barcelona la necesidad de fortalecer el rol arbitral de los reguladores, garantizar la competencia efectiva y colocar la protección del usuario en el centro de la política pública.',
+    imageUrl: '/images/noticias/gomez-mazara-barcelona.jpeg',
+    author: 'REGULATEL',
+    content: [
+      'El presidente del INDOTEL y de REGULATEL destacó el rol arbitral del regulador, la defensa del usuario, la competencia efectiva y la modernización del marco normativo dominicano.',
+      'Barcelona, España. — El presidente del Instituto Dominicano de las Telecomunicaciones (INDOTEL), Guido Gómez Mazara, resaltó la necesidad de fortalecer el rol arbitral de los órganos reguladores, garantizar la competencia efectiva y colocar la protección del usuario en el centro de la política pública, durante su participación en la Asociación Interamericana de Empresas de Telecomunicaciones (ASIET) celebrada en Barcelona.',
+      'En su condición de presidente del Foro Latinoamericano de Entes Reguladores de Telecomunicaciones (REGULATEL), Gómez Mazara encabezó el diálogo regional sobre la evolución de los entes reguladores en América Latina, destacando que el contexto actual obliga a superar la concepción tradicional de un regulador pasivo y avanzar hacia un modelo más dinámico, que funcione como puente de entendimiento entre todos los actores del ecosistema digital.',
+      'El funcionario subrayó que la protección del usuario constituye un principio irrenunciable en la experiencia dominicana, y aseguró que toda política regulatoria debe orientarse a resguardar derechos, promover la calidad de los servicios y fortalecer la confianza ciudadana en el sistema.',
+      'Asimismo, resaltó la importancia de preservar la armonía entre los distintos actores (Estado, empresas y usuarios) como base para consolidar un entorno sostenible e innovador. En ese sentido, defendió la competencia como motor de eficiencia y crecimiento, advirtiendo que sin reglas claras y supervisión efectiva no es posible garantizar mercados justos.',
+      'Durante su intervención, compartió además los avances de República Dominicana en materia de impulso a las habilidades digitales, destacando que el rol del regulador también implica acompañar los procesos de transformación tecnológica con una visión inclusiva, que contribuya al cierre de brechas y al fortalecimiento del capital humano.',
+      'Gómez Mazara se refirió igualmente a las perspectivas de modernización del marco normativo de las telecomunicaciones en el país, indicando que la nueva legislación en discusión busca responder a los desafíos de la convergencia tecnológica, robustecer la seguridad jurídica y consolidar mecanismos más eficaces de protección al usuario.',
+      'Asimismo, valoró estos espacios multilaterales como escenarios fundamentales para intercambiar experiencias y construir consensos regionales en torno a una regulación moderna, equilibrada y orientada al desarrollo.',
+      'Gómez Mazara extendió la invitación para que República Dominicana pueda acoger futuras cumbres regulatorias, reafirmando la disposición del país de continuar impulsando el diálogo y la cooperación en el sector.'
+    ],
+    tags: ['Gómez Mazara', 'Barcelona', 'ASIET', 'Protección de usuarios', 'Regulación', 'INDOTEL', 'REGULATEL']
+  },
+  {
     slug: 'regulatel-cierra-su-periodo-2025-con-avances-clave-bajo-la-presidencia-de-la-crc',
     title: 'REGULATEL cierra su periodo 2025 con avances clave bajo la Presidencia de la CRC',
     date: '2025-12-12',

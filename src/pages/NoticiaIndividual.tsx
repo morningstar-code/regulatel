@@ -1,13 +1,14 @@
 import { motion } from "framer-motion";
-import { useParams, Link } from "react-router-dom";
+import { useParams, useLocation, Link } from "react-router-dom";
+import { useCallback, useState } from "react";
 import {
   ArrowLeft,
-  User,
   Building2,
   Maximize2,
   FileText,
   Image as ImageIcon,
   Play,
+  Share2,
 } from "lucide-react";
 import { noticiasData } from "./noticiasData";
 import { useAdminData } from "@/contexts/AdminDataContext";
@@ -22,9 +23,10 @@ const fadeIn = {
   },
 };
 
-/** Container: max 1180px, padding responsivo. Article body: max 800px lectura. */
-const CONTAINER_MAX = "1180px";
-const BODY_MAX = "800px";
+/** Réplica INDOTEL: ancho amplio; cuadro con borde muy sutil (como INDOTEL). */
+const CONTAINER_MAX = "1440px";
+const ARTICLE_BOX_MAX = "1200px";
+const BODY_MAX = "1200px";
 
 /** Datos normalizados para render (estático o admin). */
 interface ArticlePayload {
@@ -89,86 +91,79 @@ function normalizeStaticNoticia(n: NoticiaData): ArticlePayload {
   };
 }
 
-/** Link "Volver a Noticias" dentro del container. */
-function BackLink() {
+/** Breadcrumb INDOTEL: Inicio / Noticias / [título]. Último ítem en negrita azul. */
+function ArticleBreadcrumb({ title }: { title: string }) {
   return (
-    <Link
-      to="/noticias"
-      className="inline-flex items-center gap-2 text-sm font-medium transition-colors hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--regu-blue)] focus-visible:ring-offset-2 rounded"
-      style={{ color: "var(--regu-blue)" }}
+    <nav
+      aria-label="Breadcrumb"
+      className="text-xs sm:text-sm mb-4"
+      style={{ color: "var(--regu-gray-500)" }}
     >
-      <ArrowLeft className="h-4 w-4" aria-hidden />
-      Volver a Noticias
-    </Link>
+      <Link
+        to="/"
+        className="hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--regu-blue)] focus-visible:ring-offset-1 rounded"
+        style={{ color: "var(--regu-gray-600)" }}
+      >
+        Inicio
+      </Link>
+      <span className="mx-1.5" aria-hidden>/</span>
+      <Link
+        to="/noticias"
+        className="hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--regu-blue)] focus-visible:ring-offset-1 rounded"
+        style={{ color: "var(--regu-gray-600)" }}
+      >
+        Noticias
+      </Link>
+      <span className="mx-1.5" aria-hidden>/</span>
+      <span className="font-semibold" style={{ color: "var(--regu-blue)" }}>
+        {title}
+      </span>
+    </nav>
   );
 }
 
-/** Hero editorial: imagen + overlay + chip, fecha, H1. */
-function ArticleHero({ payload }: { payload: ArticlePayload }) {
-  const overlayStyle = {
-    background:
-      "linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.15) 55%, rgba(0,0,0,0) 100%)",
-  };
-
+/** Título principal INDOTEL: grande, negro, fuera de imagen, alineado a la izquierda. */
+function ArticleHeader({ payload }: { payload: ArticlePayload }) {
   return (
-    <div className="relative w-full overflow-hidden rounded-2xl h-[260px] sm:h-[300px] md:h-[360px] lg:h-[420px]">
-      {payload.imageUrl ? (
-        <img
-          src={payload.imageUrl}
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover"
-          onError={(e) => {
-            e.currentTarget.style.display = "none";
-          }}
-        />
-      ) : (
-        <div
-          className="absolute inset-0 w-full h-full"
-          style={{
-            background:
-              "linear-gradient(135deg, var(--regu-gray-100) 0%, var(--regu-offwhite) 100%)",
-          }}
-        />
-      )}
-      <div
-        className="absolute inset-0"
-        style={overlayStyle}
-      />
-      <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8 text-white">
-        <div className="flex flex-wrap items-center gap-3 mb-3">
-          <span
-            className="text-xs font-semibold uppercase tracking-wider opacity-95"
-          >
-            {payload.dateFormatted}
-          </span>
-          <span
-            className="px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider"
-            style={{ backgroundColor: "var(--regu-blue)" }}
-          >
-            {payload.category}
-          </span>
-        </div>
-        <h1
-          className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold leading-tight max-w-3xl"
-          style={{ fontFamily: "var(--token-font-heading)" }}
-        >
-          {payload.title}
-        </h1>
-      </div>
-    </div>
+    <header className="mb-5 md:mb-6">
+      <h1
+        className="text-xl sm:text-2xl md:text-[1.875rem] font-bold leading-tight tracking-tight"
+        style={{
+          color: "#1a1a1a",
+          fontFamily: "var(--token-font-heading)",
+          lineHeight: 1.3,
+        }}
+      >
+        {payload.title}
+      </h1>
+    </header>
   );
 }
 
-/** Metadata debajo del hero: autor. */
-function ArticleMeta({ author }: { author?: string }) {
-  if (!author) return null;
+/** Imagen principal INDOTEL: rectangular, ancho columna, sin bordes ni sombra. */
+function ArticleImage({ imageUrl }: { imageUrl: string }) {
+  return (
+    <figure className="mb-0 w-full">
+      <img
+        src={imageUrl}
+        alt=""
+        className="w-full h-auto max-h-[70vh] object-contain"
+        onError={(e) => {
+          e.currentTarget.style.display = "none";
+        }}
+      />
+    </figure>
+  );
+}
+
+/** Fecha debajo de la línea gris: discreta, solo fecha (estilo INDOTEL). */
+function ArticleMetaLine({ payload }: { payload: ArticlePayload }) {
   return (
     <div
-      className="flex items-center gap-2 mt-4"
-      style={{ color: "var(--regu-gray-500)", fontSize: "0.9375rem" }}
+      className="mb-6 md:mb-8 text-sm"
+      style={{ color: "var(--regu-gray-500)" }}
     >
-      <User className="h-4 w-4 flex-shrink-0" aria-hidden />
-      <span className="font-medium">{author}</span>
+      <time>{payload.dateFormatted}</time>
     </div>
   );
 }
@@ -193,7 +188,7 @@ function ArticleBody({
     return (
       <p
         key={key}
-        className="mb-5 last:mb-0"
+        className="mb-6 last:mb-0"
         style={bodyTextStyle}
       >
         {parts.map((part, i) => {
@@ -220,34 +215,17 @@ function ArticleBody({
 
   return (
     <div
-      className="article-body text-base md:text-[1.125rem]"
+      className="article-body text-base md:text-[1.0625rem]"
       style={{
         maxWidth: BODY_MAX,
         marginLeft: "auto",
         marginRight: "auto",
-        paddingTop: "1.5rem",
-        paddingBottom: "2rem",
-        lineHeight: 1.75,
+        paddingTop: "0.5rem",
+        paddingBottom: "1rem",
+        lineHeight: 1.8,
       }}
     >
-      {payload.excerpt && (
-        <div
-          className="mb-8 rounded-xl p-4 md:p-5 border-l-4"
-          style={{
-            borderLeftColor: "var(--regu-blue)",
-            backgroundColor: "rgba(68, 137, 198, 0.06)",
-          }}
-        >
-          <p
-            className="text-base md:text-lg leading-relaxed italic m-0"
-            style={{ color: "var(--regu-gray-900)" }}
-          >
-            {payload.excerpt}
-          </p>
-        </div>
-      )}
-
-      <div className="space-y-6">
+      <div className="space-y-5">
         {payload.content.map((paragraph, index) => {
           if (paragraph.startsWith("**") && paragraph.endsWith("**")) {
             const title = paragraph.replace(/\*\*/g, "");
@@ -308,14 +286,14 @@ function ArticleBody({
       </div>
 
       {payload.quotes && payload.quotes.length > 0 && (
-        <div className="mt-8 md:mt-10 space-y-6">
+        <div className="mt-8 md:mt-10 space-y-5">
           {payload.quotes.map((quote, index) => (
             <div
               key={index}
-              className="rounded-xl p-4 md:p-5 border-l-4"
+              className="pl-4 py-2 border-l-2"
               style={{
                 borderLeftColor: "var(--regu-blue)",
-                backgroundColor: "rgba(68, 137, 198, 0.06)",
+                backgroundColor: "rgba(68, 137, 198, 0.04)",
               }}
             >
               <p
@@ -338,14 +316,14 @@ function ArticleBody({
       )}
 
       {payload.highlights && payload.highlights.length > 0 && (
-        <div className="mt-8 md:mt-10 grid sm:grid-cols-2 gap-4">
+        <div className="mt-8 md:mt-10 grid sm:grid-cols-2 gap-3">
           {payload.highlights.map((h, index) => (
             <div
               key={index}
-              className="rounded-xl p-4 border flex items-start gap-3"
+              className="p-4 border-l-2 pl-4 flex items-start gap-3"
               style={{
-                borderColor: "var(--regu-gray-100)",
-                backgroundColor: "var(--regu-offwhite)",
+                borderLeftColor: "var(--regu-gray-300)",
+                backgroundColor: "transparent",
               }}
             >
               <Building2
@@ -375,19 +353,13 @@ function ArticleBody({
 
       {payload.tags && payload.tags.length > 0 && (
         <div
-          className="mt-8 md:mt-10 pt-6 border-t flex flex-wrap gap-2"
+          className="mt-8 md:mt-10 pt-5 border-t flex flex-wrap gap-2"
           style={{ borderColor: "var(--regu-gray-100)" }}
         >
           {payload.tags.map((tag, index) => (
-            <span
-              key={index}
-              className="px-3 py-1 rounded-lg text-sm font-medium"
-              style={{
-                backgroundColor: "rgba(68, 137, 198, 0.12)",
-                color: "var(--regu-blue)",
-              }}
-            >
+            <span key={index} className="text-xs text-[var(--regu-gray-500)]">
               {tag}
+              {index < payload.tags!.length - 1 && <span className="mx-1.5" aria-hidden>·</span>}
             </span>
           ))}
         </div>
@@ -584,7 +556,49 @@ function CumbreExtraBlock() {
   );
 }
 
-/** Layout editorial completo: container + back + hero + meta + body + CTA. */
+/** Compartir: usa Web Share API o copia enlace al portapapeles. */
+function ArticleShareFooter({ title }: { title: string }) {
+  const location = useLocation();
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = useCallback(() => {
+    const url = window.location.origin + location.pathname;
+    if (typeof navigator !== "undefined" && navigator.share) {
+      navigator.share({
+        title,
+        url,
+      }).catch(() => {
+        copyToClipboard(url);
+      });
+    } else {
+      copyToClipboard(url);
+    }
+  }, [title, location.pathname]);
+
+  function copyToClipboard(text: string) {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
+
+  return (
+    <div className="pt-6 pb-2">
+      <button
+        type="button"
+        onClick={handleShare}
+        className="flex items-center gap-2 text-sm cursor-pointer border-0 bg-transparent p-0 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--regu-blue)] focus-visible:ring-offset-2 rounded"
+        style={{ color: "var(--regu-gray-500)" }}
+        aria-label="Compartir esta noticia"
+      >
+        <Share2 className="h-4 w-4" aria-hidden />
+        <span>{copied ? "Enlace copiado" : "Compartir"}</span>
+      </button>
+    </div>
+  );
+}
+
+/** Layout réplica INDOTEL: breadcrumb → título → imagen → línea gris → fecha → cuerpo → compartir → volver. */
 function ArticleLayout({
   payload,
   isStaticCumbre,
@@ -599,25 +613,31 @@ function ArticleLayout({
       variants={fadeIn}
       className="w-full"
     >
-      <BackLink />
-      <div className="mt-6">
-        <ArticleHero payload={payload} />
-      </div>
-      <div style={{ maxWidth: BODY_MAX, marginLeft: "auto", marginRight: "auto" }}>
-        <ArticleMeta author={payload.author} />
-      </div>
+      <ArticleBreadcrumb title={payload.title} />
+      <ArticleHeader payload={payload} />
+      {payload.imageUrl && (
+        <ArticleImage imageUrl={payload.imageUrl} />
+      )}
+      {/* Línea fina gris debajo de la imagen (réplica INDOTEL) */}
+      {payload.imageUrl && (
+        <hr
+          className="my-4 border-0 border-t w-full"
+          style={{ borderColor: "var(--regu-gray-200)" }}
+        />
+      )}
+      <ArticleMetaLine payload={payload} />
       <ArticleBody payload={payload} isStaticCumbre={isStaticCumbre} />
+      <ArticleShareFooter title={payload.title} />
       <div
-        className="pt-6 pb-4 text-center"
-        style={{ maxWidth: BODY_MAX, marginLeft: "auto", marginRight: "auto" }}
+        className="pt-4 pb-2 border-t"
+        style={{ borderColor: "var(--regu-gray-100)" }}
       >
         <Link
           to="/noticias"
-          className="inline-flex items-center gap-2 text-sm font-semibold transition-colors hover:opacity-85"
-          style={{ color: "var(--regu-blue)" }}
+          className="inline-flex items-center gap-2 text-sm text-[var(--regu-gray-600)] hover:text-[var(--regu-blue)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--regu-blue)] focus-visible:ring-offset-2 rounded"
         >
           <ArrowLeft className="h-4 w-4" />
-          Ver todas las noticias
+          Volver a noticias
         </Link>
       </div>
     </motion.article>
@@ -636,7 +656,7 @@ export default function NoticiaIndividual() {
     const payload = normalizeAdminNoticia(adminNoticia);
     return (
       <div
-        className="w-full py-8 md:py-10 lg:py-12"
+        className="w-full pt-4 pb-10 md:pt-6 md:pb-12"
         style={{
           backgroundColor: "var(--regu-offwhite)",
           fontFamily: "var(--token-font-body)",
@@ -646,7 +666,23 @@ export default function NoticiaIndividual() {
           className="mx-auto px-4 md:px-6 lg:px-8"
           style={{ maxWidth: CONTAINER_MAX }}
         >
-          <ArticleLayout payload={payload} />
+          {/* Franja azul horizontal (réplica INDOTEL) */}
+          <div
+            className="w-full h-16 flex-shrink-0"
+            style={{ backgroundColor: "var(--regu-blue)" }}
+            aria-hidden
+          />
+          {/* Cuadro blanco del artículo: borde muy sutil y esquina superior suave (como INDOTEL) */}
+          <div
+            className="relative z-10 mx-auto px-6 md:px-12 py-8 md:py-10 bg-white rounded-t-lg"
+            style={{
+              maxWidth: ARTICLE_BOX_MAX,
+              marginTop: "-2rem",
+              boxShadow: "0 0 0 1px rgba(0,0,0,0.06)",
+            }}
+          >
+            <ArticleLayout payload={payload} />
+          </div>
         </div>
       </div>
     );
@@ -655,20 +691,42 @@ export default function NoticiaIndividual() {
   if (!noticiaStatic) {
     return (
       <div
-        className="w-full py-12 md:py-16"
+        className="w-full pt-4 pb-10 md:pt-6 md:pb-12"
         style={{
           backgroundColor: "var(--regu-offwhite)",
           fontFamily: "var(--token-font-body)",
         }}
       >
         <div
-          className="mx-auto px-4 md:px-6 text-center"
+          className="mx-auto px-4 md:px-6 lg:px-8"
           style={{ maxWidth: CONTAINER_MAX }}
         >
-          <h1 className="text-2xl font-bold mb-4" style={{ color: "var(--regu-gray-900)" }}>
-            Noticia no encontrada
-          </h1>
-          <BackLink />
+          <div
+            className="w-full h-16 flex-shrink-0"
+            style={{ backgroundColor: "var(--regu-blue)" }}
+            aria-hidden
+          />
+          <div
+            className="relative z-10 mx-auto px-6 md:px-12 py-8 md:py-10 bg-white text-center rounded-t-lg"
+            style={{
+              maxWidth: ARTICLE_BOX_MAX,
+              marginTop: "-2rem",
+              boxShadow: "0 0 0 1px rgba(0,0,0,0.06)",
+            }}
+          >
+            <ArticleBreadcrumb title="Noticia no encontrada" />
+            <h1 className="text-xl font-bold mt-2 mb-4" style={{ color: "#1a1a1a" }}>
+              Noticia no encontrada
+            </h1>
+            <Link
+              to="/noticias"
+              className="inline-flex items-center gap-2 text-sm font-medium"
+              style={{ color: "var(--regu-blue)" }}
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Volver a noticias
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -677,7 +735,7 @@ export default function NoticiaIndividual() {
   const payload = normalizeStaticNoticia(noticiaStatic);
   return (
     <div
-      className="w-full py-8 md:py-10 lg:py-12"
+      className="w-full pt-4 pb-10 md:pt-6 md:pb-12"
       style={{
         backgroundColor: "var(--regu-offwhite)",
         fontFamily: "var(--token-font-body)",
@@ -687,7 +745,21 @@ export default function NoticiaIndividual() {
         className="mx-auto px-4 md:px-6 lg:px-8"
         style={{ maxWidth: CONTAINER_MAX }}
       >
-        <ArticleLayout payload={payload} isStaticCumbre />
+        <div
+          className="w-full h-16 flex-shrink-0"
+          style={{ backgroundColor: "var(--regu-blue)" }}
+          aria-hidden
+        />
+        <div
+          className="relative z-10 mx-auto px-6 md:px-12 py-8 md:py-10 bg-white rounded-t-lg"
+          style={{
+            maxWidth: ARTICLE_BOX_MAX,
+            marginTop: "-2rem",
+            boxShadow: "0 0 0 1px rgba(0,0,0,0.06)",
+          }}
+        >
+          <ArticleLayout payload={payload} isStaticCumbre />
+        </div>
       </div>
     </div>
   );

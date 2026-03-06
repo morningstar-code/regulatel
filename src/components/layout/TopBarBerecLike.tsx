@@ -92,7 +92,7 @@ export default function TopBarBerecLike({
   const searchHeight = 44;
   const a11yBtnSize = 34;
   const subscribeHeight = 42;
-  const accentColor = "var(--news-accent)";
+  const accentColor = "var(--regu-blue)";
   /* Borde visible tipo BEREC (gris medio), fondo blanco sólido — no transparente */
   const searchBorder = "1px solid #9CA3AF";
   const searchBg = "#FFFFFF";
@@ -174,7 +174,7 @@ export default function TopBarBerecLike({
                 aria-label={mode === "sm" ? "Tamaño de fuente pequeño" : mode === "md" ? "Tamaño de fuente mediano" : "Tamaño de fuente grande"}
                 aria-pressed={fontMode === mode}
                 onClick={() => setFontMode(mode)}
-                className="rounded-md border transition-colors hover:text-[var(--news-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--regu-blue)] focus-visible:ring-offset-1"
+                className="rounded-md border transition-colors hover:text-[var(--regu-blue)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--regu-blue)] focus-visible:ring-offset-1"
                 style={{
                   width: `${a11yBtnSize}px`,
                   height: `${a11yBtnSize}px`,
@@ -182,7 +182,7 @@ export default function TopBarBerecLike({
                   fontWeight: 600,
                   color: fontMode === mode ? accentColor : "#1C1C1C",
                   borderColor: fontMode === mode ? accentColor : "rgba(0,0,0,0.12)",
-                  background: fontMode === mode ? "rgba(196,0,90,0.06)" : "transparent",
+                  background: fontMode === mode ? "rgba(68, 137, 198, 0.12)" : "transparent",
                 }}
               >
                 {mode === "sm" ? "a-" : mode === "md" ? "a" : "a+"}
@@ -207,7 +207,7 @@ export default function TopBarBerecLike({
 
           <Link
             to="/subscribe"
-            className="subscribeBtn hidden shrink-0 items-center justify-center rounded-xl border-2 font-extrabold uppercase transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--regu-blue)] focus-visible:ring-offset-2 md:inline-flex hover:bg-[var(--news-accent)] hover:text-white"
+            className="subscribeBtn hidden shrink-0 items-center justify-center rounded-xl border-2 font-extrabold uppercase transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--regu-blue)] focus-visible:ring-offset-2 md:inline-flex hover:bg-[var(--regu-blue)] hover:text-white"
             style={{
               height: `${subscribeHeight}px`,
               paddingLeft: "18px",
