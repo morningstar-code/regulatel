@@ -54,22 +54,8 @@ function Noticias() {
 
   useEffect(() => setPage(1), [sidebarFilter, yearFilter]);
 
+  // Siempre mostrar estáticas + las de la DB; si hay misma slug en DB, gana la de la DB (como en Home).
   const mergedList = useMemo(() => {
-    if (contentSource === "database") {
-      return (adminNews ?? [])
-        .filter((n) => n.published)
-        .map((n) => ({
-          slug: n.slug || n.id,
-          title: n.title,
-          date: n.date,
-          dateFormatted: n.dateFormatted,
-          category: n.category || "Noticias",
-          excerpt: n.excerpt || "",
-          imageUrl: n.imageUrl || "",
-          additionalImages: n.additionalImages ?? [],
-        }))
-        .sort((a, b) => (a.date > b.date ? -1 : 1));
-    }
     const staticItems: NewsListItem[] = noticiasData.map((n) => ({
       slug: n.slug,
       title: n.title,
@@ -79,7 +65,26 @@ function Noticias() {
       excerpt: n.excerpt,
       imageUrl: n.imageUrl,
     }));
-    return [...staticItems].sort((a, b) => (a.date > b.date ? -1 : 1));
+    if (contentSource !== "database") {
+      return [...staticItems].sort((a, b) => (a.date > b.date ? -1 : 1));
+    }
+    const dbSlugs = new Set(
+      (adminNews ?? []).filter((n) => n.published).map((n) => (n.slug || n.id).toLowerCase())
+    );
+    const staticFiltered = staticItems.filter((item) => !dbSlugs.has(item.slug.toLowerCase()));
+    const dbItems: NewsListItem[] = (adminNews ?? [])
+      .filter((n) => n.published)
+      .map((n) => ({
+        slug: n.slug || n.id,
+        title: n.title,
+        date: n.date,
+        dateFormatted: n.dateFormatted,
+        category: n.category || "Noticias",
+        excerpt: n.excerpt || "",
+        imageUrl: n.imageUrl || "",
+        additionalImages: n.additionalImages ?? [],
+      }));
+    return [...staticFiltered, ...dbItems].sort((a, b) => (a.date > b.date ? -1 : 1));
   }, [adminNews, contentSource]);
 
   const yearOptions = useMemo(() => {
