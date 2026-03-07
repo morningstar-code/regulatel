@@ -1,8 +1,8 @@
 import type { IncomingMessage, ServerResponse } from "http";
-import { listDocuments, createDocument } from "./lib/documents.js";
-import { ensureAdmin } from "./lib/adminAuth.js";
-import { parseJsonBody } from "./lib/parseBody.js";
-import { isDbConfigured } from "./lib/db.js";
+import { listDocuments, createDocument } from "../server/lib/documents.js";
+import { ensureAdmin } from "../server/lib/adminAuth.js";
+import { parseJsonBody } from "../server/lib/parseBody.js";
+import { isDbConfigured } from "../server/lib/db.js";
 
 function sendJson(res: ServerResponse, status: number, data: unknown) {
   res.setHeader("Content-Type", "application/json");

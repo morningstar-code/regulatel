@@ -1,7 +1,7 @@
 import type { IncomingMessage, ServerResponse } from "http";
-import { ensureAdmin } from "./lib/adminAuth.js";
-import { deleteFromBlob, isBlobConfigured, uploadToBlob } from "./lib/blob.js";
-import { parseJsonBody } from "./lib/parseBody.js";
+import { ensureAdmin } from "../server/lib/adminAuth.js";
+import { deleteFromBlob, isBlobConfigured, uploadToBlob } from "../server/lib/blob.js";
+import { parseJsonBody } from "../server/lib/parseBody.js";
 
 function sendJson(res: ServerResponse, status: number, data: unknown) {
   res.setHeader("Content-Type", "application/json");

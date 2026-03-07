@@ -1,8 +1,8 @@
 import type { IncomingMessage, ServerResponse } from "http";
-import { getEventById, updateEvent, deleteEvent } from "../lib/events.js";
-import { ensureAdmin } from "../lib/adminAuth.js";
-import { parseJsonBody } from "../lib/parseBody.js";
-import { isDbConfigured } from "../lib/db.js";
+import { getEventById, updateEvent, deleteEvent } from "../../server/lib/events.js";
+import { ensureAdmin } from "../../server/lib/adminAuth.js";
+import { parseJsonBody } from "../../server/lib/parseBody.js";
+import { isDbConfigured } from "../../server/lib/db.js";
 
 function sendJson(res: ServerResponse, status: number, data: unknown) {
   res.setHeader("Content-Type", "application/json");

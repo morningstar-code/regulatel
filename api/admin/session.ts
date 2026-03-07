@@ -3,7 +3,7 @@ import {
   getAdminAuthStatus,
   loginAdmin,
   logoutAdmin,
-} from "../lib/adminAuth.js";
+} from "../../server/lib/adminAuth.js";
 
 function sendJson(res: ServerResponse, status: number, data: unknown) {
   res.setHeader("Content-Type", "application/json");
