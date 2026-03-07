@@ -24,6 +24,49 @@ const RESOURCE_LABELS: Record<string, string> = {
   cifras: "REGULATEL en cifras",
 };
 
+function AuditActionBadge({ action }: { action: string }) {
+  const label = ACTION_LABELS[action] ?? action;
+  const style =
+    action === "deleted"
+      ? { backgroundColor: "rgba(200, 80, 80, 0.12)", color: "var(--regu-salmon)" }
+      : action === "uploaded"
+        ? { backgroundColor: "rgba(100, 120, 180, 0.12)", color: "var(--regu-navy)" }
+        : action === "created"
+          ? { backgroundColor: "rgba(68, 137, 198, 0.12)", color: "var(--regu-blue)" }
+          : { backgroundColor: "var(--regu-gray-100)", color: "var(--regu-gray-700)" };
+  return (
+    <span className="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium" style={style}>
+      {label}
+    </span>
+  );
+}
+
+function AuditDetailCell({ row, onViewDetail }: { row: AuditRow; onViewDetail: () => void }) {
+  const display =
+    row.details?.title != null
+      ? String(row.details.title).slice(0, 40) + (String(row.details.title).length > 40 ? "…" : "")
+      : row.resource_id != null
+        ? String(row.resource_id).slice(0, 36) + (String(row.resource_id).length > 36 ? "…" : "")
+        : "Ver detalle";
+  const fullTitle =
+    row.details?.title != null
+      ? String(row.details.title)
+      : row.resource_id != null
+        ? String(row.resource_id)
+        : "Ver detalle";
+  return (
+    <button
+      type="button"
+      onClick={onViewDetail}
+      className="text-left text-sm font-medium rounded-md px-2 py-1.5 -mx-2 w-full min-w-0 truncate hover:bg-[var(--regu-gray-100)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--regu-blue)] focus:ring-offset-0"
+      style={{ color: "var(--regu-blue)" }}
+      title={fullTitle}
+    >
+      {display}
+    </button>
+  );
+}
+
 type AuditRow = {
   id: string;
   user_email: string;
@@ -389,52 +432,69 @@ export default function AdminUsuarios() {
         ) : audit.length === 0 ? (
           <p className="px-6 pb-6 text-sm" style={{ color: "var(--regu-gray-500)" }}>Aún no hay registros.</p>
         ) : (
-          <div className="overflow-x-auto max-h-[420px] overflow-y-auto">
-            {/* Header fijo fuera de la tabla para que no se solape al hacer scroll */}
-            <div
-              className="sticky top-0 z-20 flex shrink-0 border-b text-sm"
-              style={{ backgroundColor: "var(--regu-gray-50)", borderColor: "var(--regu-gray-100)", boxShadow: "0 1px 0 0 var(--regu-gray-100)" }}
-            >
-              <div className="w-[10rem] shrink-0 px-4 py-3 font-semibold whitespace-nowrap" style={{ color: "var(--regu-gray-700)" }}>Fecha</div>
-              <div className="w-[9rem] shrink-0 px-4 py-3 font-semibold whitespace-nowrap" style={{ color: "var(--regu-gray-700)" }}>Usuario</div>
-              <div className="w-[6rem] shrink-0 px-4 py-3 font-semibold whitespace-nowrap" style={{ color: "var(--regu-gray-700)" }}>Acción</div>
-              <div className="w-[7rem] shrink-0 px-4 py-3 font-semibold whitespace-nowrap" style={{ color: "var(--regu-gray-700)" }}>Recurso</div>
-              <div className="min-w-[8rem] flex-1 px-4 py-3 font-semibold whitespace-nowrap" style={{ color: "var(--regu-gray-700)" }}>Detalle</div>
-            </div>
-            <table className="w-full text-sm border-collapse table-fixed" style={{ tableLayout: "fixed" }}>
+          <div
+            className="overflow-y-auto overflow-x-auto rounded-lg border"
+            style={{
+              maxHeight: "28rem",
+              borderColor: "var(--regu-gray-200)",
+              backgroundColor: "var(--regu-white)",
+            }}
+          >
+            <table className="w-full text-sm border-collapse" style={{ tableLayout: "fixed", minWidth: "36rem" }}>
               <colgroup>
                 <col style={{ width: "10rem" }} />
-                <col style={{ width: "9rem" }} />
-                <col style={{ width: "6rem" }} />
-                <col style={{ width: "7rem" }} />
+                <col style={{ width: "10rem" }} />
+                <col style={{ width: "6.5rem" }} />
+                <col style={{ width: "8rem" }} />
                 <col />
               </colgroup>
+              <thead>
+                <tr
+                  className="sticky top-0 z-10 border-b"
+                  style={{
+                    backgroundColor: "var(--regu-gray-50)",
+                    borderColor: "var(--regu-gray-200)",
+                    boxShadow: "0 1px 0 0 var(--regu-gray-200)",
+                  }}
+                >
+                  <th className="text-left px-4 py-3 font-semibold tracking-tight whitespace-nowrap" style={{ color: "var(--regu-gray-700)" }}>
+                    Fecha
+                  </th>
+                  <th className="text-left px-4 py-3 font-semibold tracking-tight whitespace-nowrap" style={{ color: "var(--regu-gray-700)" }}>
+                    Usuario
+                  </th>
+                  <th className="text-left px-4 py-3 font-semibold tracking-tight whitespace-nowrap" style={{ color: "var(--regu-gray-700)" }}>
+                    Acción
+                  </th>
+                  <th className="text-left px-4 py-3 font-semibold tracking-tight whitespace-nowrap" style={{ color: "var(--regu-gray-700)" }}>
+                    Recurso
+                  </th>
+                  <th className="text-left px-4 py-3 font-semibold tracking-tight whitespace-nowrap" style={{ color: "var(--regu-gray-700)" }}>
+                    Detalle
+                  </th>
+                </tr>
+              </thead>
               <tbody>
                 {audit.map((a) => (
-                  <tr key={a.id} className="border-t" style={{ borderColor: "var(--regu-gray-100)" }}>
-                    <td className="px-4 py-2.5 whitespace-nowrap" style={{ color: "var(--regu-gray-500)" }}>
+                  <tr
+                    key={a.id}
+                    className="border-b transition-colors hover:bg-[var(--regu-gray-50)]"
+                    style={{ borderColor: "var(--regu-gray-100)" }}
+                  >
+                    <td className="px-4 py-3 whitespace-nowrap align-top" style={{ color: "var(--regu-gray-600)", fontVariantNumeric: "tabular-nums" }}>
                       {formatDate(a.created_at)}
                     </td>
-                    <td className="px-4 py-2.5" style={{ color: "var(--regu-gray-800)" }}>
+                    <td className="px-4 py-3 align-top" style={{ color: "var(--regu-gray-900)" }}>
                       {a.user_name ?? a.user_email}
                     </td>
-                    <td className="px-4 py-2.5">
-                      <span className="font-medium" style={{ color: "var(--regu-navy)" }}>
-                        {ACTION_LABELS[a.action] ?? a.action}
-                      </span>
+                    <td className="px-4 py-3 align-top">
+                      <AuditActionBadge action={a.action} />
                     </td>
-                    <td className="px-4 py-2.5">
+                    <td className="px-4 py-3 align-top text-[13px]" style={{ color: "var(--regu-gray-700)" }}>
                       {RESOURCE_LABELS[a.resource_type] ?? a.resource_type}
                     </td>
-                    <td className="px-4 py-2.5">
-                      <button
-                        type="button"
-                        onClick={() => setDetailAudit(a)}
-                        className="text-left text-sm font-medium rounded-lg px-2 py-1 -mx-2 hover:bg-[var(--regu-gray-100)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--regu-blue)]"
-                        style={{ color: "var(--regu-blue)" }}
-                      >
-                        {a.details?.title ? String(a.details.title).slice(0, 28) + (String(a.details.title).length > 28 ? "…" : "") : a.resource_id ? String(a.resource_id).slice(0, 24) + (String(a.resource_id).length > 24 ? "…" : "") : "Ver detalle"}
-                      </button>
+                    <td className="px-4 py-3 align-top min-w-0">
+                      <AuditDetailCell row={a} onViewDetail={() => setDetailAudit(a)} />
                     </td>
                   </tr>
                 ))}

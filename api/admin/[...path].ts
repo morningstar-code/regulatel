@@ -39,17 +39,33 @@ function isSuperAdmin(email: string): boolean {
   return SUPER_ADMIN_EMAILS.includes(email.toLowerCase().trim());
 }
 
+function getPathname(req: IncomingMessage): string {
+  let pathname = (req.url ?? "").split("?")[0];
+  if (pathname.startsWith("http://") || pathname.startsWith("https://")) {
+    try {
+      pathname = new URL(pathname).pathname;
+    } catch {
+      pathname = (req.url ?? "").split("?")[0];
+    }
+  }
+  return pathname;
+}
+
 function getAdminSubpath(req: IncomingMessage): string {
-  const pathname = (req.url ?? "").split("?")[0];
-  const match = pathname.match(/^\/api\/admin\/?(.*)$/);
+  const pathname = getPathname(req);
+  const match = pathname.match(/\/api\/admin\/?(.*)$/);
   const rest = match ? match[1] ?? "" : "";
   return rest.split("/")[0] ?? "";
 }
 
 /** Path segments after /api/admin/ (e.g. ["document-access-users", "dau_xxx"]) */
 function getAdminPathSegments(req: IncomingMessage): string[] {
-  const pathname = (req.url ?? "").split("?")[0];
-  const match = pathname.match(/^\/api\/admin\/?(.*)$/);
+  const r = req as IncomingMessage & { query?: { path?: string[] } };
+  if (Array.isArray(r.query?.path) && r.query.path.length > 0) {
+    return r.query.path;
+  }
+  const pathname = getPathname(req);
+  const match = pathname.match(/\/api\/admin\/?(.*)$/);
   const rest = match ? match[1] ?? "" : "";
   return rest.split("/").filter(Boolean);
 }
