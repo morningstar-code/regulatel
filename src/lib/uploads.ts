@@ -22,7 +22,7 @@ function validateClientFile(file: File, kind: UploadKind) {
         "application/msword",
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       ];
-  const maxBytes = isImage ? 8 * 1024 * 1024 : 20 * 1024 * 1024;
+  const maxBytes = isImage ? 20 * 1024 * 1024 : 20 * 1024 * 1024;
 
   if (!allowedTypes.includes(file.type)) {
     throw new Error(
@@ -35,7 +35,7 @@ function validateClientFile(file: File, kind: UploadKind) {
   if (file.size > maxBytes) {
     throw new Error(
       isImage
-        ? "La imagen supera el tamaño máximo de 8 MB."
+        ? "La imagen supera el tamaño máximo de 20 MB."
         : "El documento supera el tamaño máximo de 20 MB."
     );
   }

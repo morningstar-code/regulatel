@@ -35,9 +35,13 @@ export function getEventStatus(e: { startDate: string; endDate: string | null })
   return ref >= today ? "upcoming" : "past";
 }
 
-/** Año desde startDate. */
+/** Año desde startDate. Si la fecha es inválida, devuelve el año actual. */
 export function getEventYear(startDate: string): number {
-  return new Date(startDate + "T12:00:00").getFullYear();
+  if (!startDate || typeof startDate !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(startDate.trim())) {
+    return new Date().getFullYear();
+  }
+  const y = new Date(startDate.trim() + "T12:00:00").getFullYear();
+  return Number.isNaN(y) ? new Date().getFullYear() : y;
 }
 
 /** Genera id slug desde título y año. */
@@ -75,9 +79,15 @@ export function createEvent(
   };
 }
 
-/** Formatea rango de fechas para UI (ej. "25 de Febrero", "2-5 de marzo"). */
+const FALLBACK_DATE_LABEL = "—";
+
+/** Formatea rango de fechas para UI (ej. "25 de Febrero", "2-5 de marzo"). Si la fecha es inválida, devuelve "—". */
 export function formatEventDateRange(startDate: string, endDate: string | null): string {
-  const s = new Date(startDate + "T12:00:00");
+  if (!startDate || typeof startDate !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(startDate.trim())) {
+    return FALLBACK_DATE_LABEL;
+  }
+  const s = new Date(startDate.trim() + "T12:00:00");
+  if (Number.isNaN(s.getTime())) return FALLBACK_DATE_LABEL;
   const months = [
     "enero", "febrero", "marzo", "abril", "mayo", "junio",
     "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
@@ -88,7 +98,9 @@ export function formatEventDateRange(startDate: string, endDate: string | null):
   if (!endDate || endDate === startDate) {
     return `${d} de ${m.charAt(0).toUpperCase() + m.slice(1)}`;
   }
-  const e = new Date(endDate + "T12:00:00");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(endDate.trim())) return `${d} de ${m.charAt(0).toUpperCase() + m.slice(1)}`;
+  const e = new Date(endDate.trim() + "T12:00:00");
+  if (Number.isNaN(e.getTime())) return `${d} de ${m.charAt(0).toUpperCase() + m.slice(1)}`;
   const de = e.getDate();
   const me = months[e.getMonth()];
   if (m === me && y === e.getFullYear()) {

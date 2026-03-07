@@ -16,7 +16,7 @@ const DOCUMENT_MIME_TYPES = new Set([
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ]);
 
-const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
+const MAX_IMAGE_BYTES = 20 * 1024 * 1024;
 const MAX_DOCUMENT_BYTES = 20 * 1024 * 1024;
 
 function sanitizeFileName(fileName: string): string {
@@ -38,7 +38,7 @@ function validateUpload(
       throw new Error("Tipo de imagen no permitido.");
     }
     if (size > MAX_IMAGE_BYTES) {
-      throw new Error("La imagen excede el tamaño máximo de 8 MB.");
+      throw new Error("La imagen excede el tamaño máximo de 20 MB.");
     }
     return { mimeType: contentType, maxBytes: MAX_IMAGE_BYTES };
   }

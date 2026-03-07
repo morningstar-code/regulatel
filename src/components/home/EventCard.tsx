@@ -25,6 +25,11 @@ export default function EventCard({ event }: EventCardProps) {
 
   const content = (
     <>
+      {event.imageUrl?.trim() && (
+        <div className="-mx-5 -mt-5 mb-3 overflow-hidden rounded-t-2xl" style={{ aspectRatio: "16/10", backgroundColor: "var(--regu-gray-100)" }}>
+          <img src={event.imageUrl} alt="" className="h-full w-full object-cover" />
+        </div>
+      )}
       <div className="mb-3 flex items-center justify-between gap-2">
         <span
           className="rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wide"

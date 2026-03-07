@@ -98,7 +98,7 @@ El script inserta el usuario en `admin_users` con `password_hash`; no guarda la 
 
 - El panel admin sube archivos a `Vercel Blob` mediante la ruta serverless `POST /api/uploads`.
 - El backend valida tipo MIME y tamaño:
-  - Imágenes: JPG, PNG, WEBP hasta 8 MB.
+  - Imágenes: JPG, PNG, WEBP hasta 20 MB.
   - Documentos: PDF, DOC, DOCX hasta 20 MB.
 - Cuando la subida termina, la app guarda en Neon:
   - la URL pública del archivo (`image_url` / `url`)

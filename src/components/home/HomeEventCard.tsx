@@ -35,6 +35,11 @@ export default function HomeEventCard({ event }: HomeEventCardProps) {
         boxShadow: "0 4px 20px rgba(22, 61, 89, 0.05)",
       }}
     >
+      {event.imageUrl?.trim() && (
+        <div className="-mx-6 -mt-6 mb-3.5 overflow-hidden rounded-t-[20px]" style={{ aspectRatio: "16/10", backgroundColor: "var(--regu-gray-100)" }}>
+          <img src={event.imageUrl} alt="" className="h-full w-full object-cover" />
+        </div>
+      )}
       {/* Badge + año — mismo margen inferior en todas las cards */}
       <div className="mb-3.5 flex flex-wrap items-center justify-between gap-2">
         <span

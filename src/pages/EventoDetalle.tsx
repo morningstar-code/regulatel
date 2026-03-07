@@ -1,14 +1,59 @@
+import { useState, useEffect } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
 import { useEvents } from "@/contexts/AdminDataContext";
 import { formatEventDateRange } from "@/types/event";
+import type { Event } from "@/types/event";
+import { normalizeEvent } from "@/types/event";
+import { api } from "@/lib/api";
 
 export default function EventoDetalle() {
   const { id } = useParams<{ id: string }>();
   const events = useEvents();
-  const event = events.find((e) => e.id === id);
+  const eventFromList = id ? events.find((e) => e.id === id) : null;
+  const [fetchedEvent, setFetchedEvent] = useState<Event | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [notFound, setNotFound] = useState(false);
 
-  if (!id || !event) {
+  useEffect(() => {
+    if (!id) return;
+    if (eventFromList) {
+      setFetchedEvent(null);
+      setNotFound(false);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    setNotFound(false);
+    api.events.get(id).then((res) => {
+      if (cancelled) return;
+      setLoading(false);
+      if (res.ok && res.data) {
+        setFetchedEvent(normalizeEvent(res.data as Event));
+        setNotFound(false);
+      } else {
+        setFetchedEvent(null);
+        setNotFound(true);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [id, eventFromList]);
+
+  const event = eventFromList ?? fetchedEvent;
+
+  if (!id) {
     return <Navigate to="/eventos" replace />;
+  }
+  if (notFound || (!event && !loading)) {
+    return <Navigate to="/eventos" replace />;
+  }
+  if (loading || !event) {
+    return (
+      <div className="flex min-h-[40vh] items-center justify-center" style={{ fontFamily: "var(--token-font-body)" }}>
+        <p style={{ color: "var(--regu-gray-500)" }}>Cargando evento…</p>
+      </div>
+    );
   }
 
   const dateLabel = formatEventDateRange(event.startDate, event.endDate);
@@ -65,6 +110,15 @@ export default function EventoDetalle() {
               boxShadow: "0 4px 20px rgba(22, 61, 89, 0.06)",
             }}
           >
+            {event.imageUrl?.trim() && (
+              <div className="mb-6 overflow-hidden rounded-xl" style={{ aspectRatio: "16/9", backgroundColor: "var(--regu-gray-100)" }}>
+                <img
+                  src={event.imageUrl}
+                  alt=""
+                  className="h-full w-full object-cover"
+                />
+              </div>
+            )}
             {event.description && (
               <p className="mb-4 text-base leading-relaxed" style={{ color: "var(--regu-gray-700)" }}>
                 {event.description}
