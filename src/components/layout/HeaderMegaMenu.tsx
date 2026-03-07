@@ -9,7 +9,9 @@ import { navigationItems } from "@/data/navigation";
 
 /** Histéresis: evita flicker al hacer scroll cerca del umbral. Ocultar solo al bajar pasado HIDE; mostrar solo al subir hasta SHOW o menos. */
 const SCROLL_THRESHOLD_HIDE = 80; // px — al bajar pasado esto se oculta la top bar
-const SCROLL_THRESHOLD_SHOW = 24; // px — al subir hasta aquí o menos se muestra de nuevo
+const SCROLL_THRESHOLD_SHOW = 8; // px — solo volver a mostrar cuando scroll esté casi en 0 (evita loop al colapsar: el reflow no dispara expand)
+/** Tras navegar (menú → filtro), ignorar scroll unos ms para que el topbar no suba/baje de golpe. */
+const NAV_STABILIZE_MS = 450;
 
 function isPathActive(currentPath: string, href?: string): boolean {
   if (!href) return false;
@@ -41,6 +43,8 @@ export default function HeaderMegaMenu() {
   const lastCompactRef = useRef(
     typeof window !== "undefined" ? window.scrollY > SCROLL_THRESHOLD_HIDE : false
   );
+  const ignoreScrollUntilRef = useRef(0);
+  const onScrollRef = useRef<() => void>(() => {});
 
   const activeByItemId = useMemo(() => {
     const map: Record<string, boolean> = {};
@@ -68,7 +72,16 @@ export default function HeaderMegaMenu() {
   useEffect(() => {
     setMobileMenuOpen(false);
     setOpenDesktopMenu(null);
-  }, [location.pathname]);
+    // Evitar que el topbar colapse/expanda al instante tras navegar (ej. Recursos → Gestión?tipo=banco).
+    ignoreScrollUntilRef.current = Date.now() + NAV_STABILIZE_MS;
+    setIsCompact(false);
+    lastCompactRef.current = false;
+    // Tras el periodo de estabilización, sincronizar con el scroll actual (p. ej. si la página hizo auto-scroll).
+    const t = setTimeout(() => {
+      onScrollRef.current();
+    }, NAV_STABILIZE_MS);
+    return () => clearTimeout(t);
+  }, [location.pathname, location.search]);
 
   useEffect(() => {
     if (!mobileMenuOpen) {
@@ -108,6 +121,7 @@ export default function HeaderMegaMenu() {
   const onScroll = useCallback(() => {
     const isDesktop = typeof window !== "undefined" && window.innerWidth >= 768;
     if (!isDesktop) return;
+    if (Date.now() < ignoreScrollUntilRef.current) return;
     const y = window.scrollY;
     const currentlyCompact = lastCompactRef.current;
     let nextCompact: boolean;
@@ -127,6 +141,8 @@ export default function HeaderMegaMenu() {
       setIsCompact(nextCompact);
     }
   }, [getCompact, getExpand]);
+
+  onScrollRef.current = onScroll;
 
   useEffect(() => {
     onScroll();
