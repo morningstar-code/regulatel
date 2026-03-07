@@ -18,12 +18,18 @@ export async function ensureDocumentAccessSchema() {
           email TEXT NOT NULL UNIQUE,
           password_hash TEXT NOT NULL,
           name TEXT,
+          institution TEXT,
+          position TEXT,
+          country TEXT,
           is_active BOOLEAN DEFAULT true,
           created_at TIMESTAMPTZ DEFAULT NOW(),
           updated_at TIMESTAMPTZ DEFAULT NOW()
         )
       `;
       await sql`CREATE INDEX IF NOT EXISTS idx_doc_access_users_email ON document_access_users(lower(email))`;
+      await sql`ALTER TABLE document_access_users ADD COLUMN IF NOT EXISTS institution TEXT`;
+      await sql`ALTER TABLE document_access_users ADD COLUMN IF NOT EXISTS position TEXT`;
+      await sql`ALTER TABLE document_access_users ADD COLUMN IF NOT EXISTS country TEXT`;
       await sql`
         CREATE TABLE IF NOT EXISTS document_access_sessions (
           id TEXT PRIMARY KEY,
@@ -79,6 +85,9 @@ export interface DocumentAccessUserRow {
   email: string;
   password_hash: string;
   name: string | null;
+  institution: string | null;
+  position: string | null;
+  country: string | null;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -89,7 +98,7 @@ export async function findDocumentAccessUserByEmail(email: string): Promise<Docu
   const sql = getDb();
   const normalized = email.trim().toLowerCase();
   const [row] = await sql<DocumentAccessUserRow[]>`
-    SELECT id, email, password_hash, name, is_active, created_at, updated_at
+    SELECT id, email, password_hash, name, institution, position, country, is_active, created_at, updated_at
     FROM document_access_users
     WHERE lower(email) = ${normalized}
     LIMIT 1
@@ -102,22 +111,25 @@ export async function createDocumentAccessUser(input: {
   email: string;
   passwordHash: string;
   name?: string | null;
+  institution?: string | null;
+  position?: string | null;
+  country?: string | null;
 }) {
   await ensureDocumentAccessSchema();
   const sql = getDb();
   const now = new Date().toISOString();
   const emailNorm = input.email.trim().toLowerCase();
   await sql`
-    INSERT INTO document_access_users (id, email, password_hash, name, is_active, created_at, updated_at)
-    VALUES (${input.id}, ${emailNorm}, ${input.passwordHash}, ${input.name ?? null}, true, ${now}::timestamptz, ${now}::timestamptz)
+    INSERT INTO document_access_users (id, email, password_hash, name, institution, position, country, is_active, created_at, updated_at)
+    VALUES (${input.id}, ${emailNorm}, ${input.passwordHash}, ${input.name ?? null}, ${input.institution ?? null}, ${input.position ?? null}, ${input.country ?? null}, true, ${now}::timestamptz, ${now}::timestamptz)
   `;
 }
 
-export async function listDocumentAccessUsers(): Promise<Array<{ id: string; email: string; name: string | null; is_active: boolean; created_at: string }>> {
+export async function listDocumentAccessUsers(): Promise<Array<{ id: string; email: string; name: string | null; institution: string | null; position: string | null; country: string | null; is_active: boolean; created_at: string }>> {
   await ensureDocumentAccessSchema();
   const sql = getDb();
-  const rows = await sql<Array<{ id: string; email: string; name: string | null; is_active: boolean; created_at: string }>>`
-    SELECT id, email, name, is_active, created_at
+  const rows = await sql<Array<{ id: string; email: string; name: string | null; institution: string | null; position: string | null; country: string | null; is_active: boolean; created_at: string }>>`
+    SELECT id, email, name, institution, position, country, is_active, created_at
     FROM document_access_users
     ORDER BY created_at DESC
   `;

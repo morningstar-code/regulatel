@@ -12,11 +12,14 @@ import { Lock, UserPlus, Mail, Calendar } from "lucide-react";
 export default function AdminAccesoActas() {
   const { isChecking, isAdmin, canManageUsers } = useAuth();
   const navigate = useNavigate();
-  const [users, setUsers] = useState<Array<{ id: string; email: string; name: string | null; is_active: boolean; created_at: string }>>([]);
+  const [users, setUsers] = useState<Array<{ id: string; email: string; name: string | null; institution: string | null; position: string | null; country: string | null; is_active: boolean; created_at: string }>>([]);
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [institution, setInstitution] = useState("");
+  const [position, setPosition] = useState("");
+  const [country, setCountry] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -29,7 +32,7 @@ export default function AdminAccesoActas() {
 
   const loadUsers = useCallback(async () => {
     const res = await api.admin.documentAccessUsers.list();
-    if (res.ok) setUsers(res.data);
+    if (res.ok) setUsers(Array.isArray(res.data) ? res.data : []);
   }, []);
 
   useEffect(() => {
@@ -54,6 +57,9 @@ export default function AdminAccesoActas() {
       email: email.trim(),
       password,
       name: name.trim() || undefined,
+      institution: institution.trim() || undefined,
+      position: position.trim() || undefined,
+      country: country.trim() || undefined,
     });
     setSubmitting(false);
     if (res.ok) {
@@ -61,6 +67,9 @@ export default function AdminAccesoActas() {
       setEmail("");
       setPassword("");
       setName("");
+      setInstitution("");
+      setPosition("");
+      setCountry("");
       loadUsers();
     } else {
       setFormError(res.error ?? "Error al crear la cuenta.");
@@ -126,6 +135,39 @@ export default function AdminAccesoActas() {
               placeholder="Nombre"
             />
           </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium" style={{ color: "var(--regu-gray-700)" }}>Institución (opcional)</label>
+            <input
+              type="text"
+              value={institution}
+              onChange={(e) => setInstitution(e.target.value)}
+              className="w-full rounded-lg border px-3 py-2 text-sm"
+              style={{ borderColor: "var(--regu-gray-200)" }}
+              placeholder="Institución"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium" style={{ color: "var(--regu-gray-700)" }}>Cargo (opcional)</label>
+            <input
+              type="text"
+              value={position}
+              onChange={(e) => setPosition(e.target.value)}
+              className="w-full rounded-lg border px-3 py-2 text-sm"
+              style={{ borderColor: "var(--regu-gray-200)" }}
+              placeholder="Cargo"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium" style={{ color: "var(--regu-gray-700)" }}>País (opcional)</label>
+            <input
+              type="text"
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+              className="w-full rounded-lg border px-3 py-2 text-sm"
+              style={{ borderColor: "var(--regu-gray-200)" }}
+              placeholder="País"
+            />
+          </div>
           <div className="flex items-end">
             <button
               type="submit"
@@ -152,25 +194,43 @@ export default function AdminAccesoActas() {
           <p className="px-6 pb-6 text-sm" style={{ color: "var(--regu-gray-500)" }}>Aún no hay cuentas. Crea una arriba.</p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm table-fixed">
+              <colgroup>
+                <col style={{ width: "14%" }} />
+                <col style={{ width: "20%" }} />
+                <col style={{ width: "16%" }} />
+                <col style={{ width: "14%" }} />
+                <col style={{ width: "12%" }} />
+                <col style={{ width: "14%" }} />
+              </colgroup>
               <thead>
                 <tr style={{ backgroundColor: "var(--regu-gray-50)" }}>
                   <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--regu-gray-700)" }}>Nombre</th>
                   <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--regu-gray-700)" }}>Email</th>
-                  <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--regu-gray-700)" }}>Creado</th>
+                  <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--regu-gray-700)" }}>Institución</th>
+                  <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--regu-gray-700)" }}>Cargo</th>
+                  <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--regu-gray-700)" }}>País</th>
+                  <th className="text-left px-4 py-3 font-semibold whitespace-nowrap" style={{ color: "var(--regu-gray-700)" }}>Creado</th>
                 </tr>
               </thead>
               <tbody>
                 {users.map((u) => (
                   <tr key={u.id} className="border-t" style={{ borderColor: "var(--regu-gray-100)" }}>
-                    <td className="px-4 py-3" style={{ color: "var(--regu-gray-900)" }}>{u.name ?? "—"}</td>
-                    <td className="px-4 py-3 flex items-center gap-1.5" style={{ color: "var(--regu-gray-700)" }}>
-                      <Mail className="h-3.5 w-3.5 opacity-70" />
-                      {u.email}
+                    <td className="px-4 py-3 align-top" style={{ color: "var(--regu-gray-900)" }}>{u.name ?? "—"}</td>
+                    <td className="px-4 py-3 align-top" style={{ color: "var(--regu-gray-700)" }}>
+                      <span className="inline-flex items-center gap-1.5">
+                        <Mail className="h-3.5 w-3.5 opacity-70 shrink-0" />
+                        <span className="break-all">{u.email}</span>
+                      </span>
                     </td>
-                    <td className="px-4 py-3 flex items-center gap-1" style={{ color: "var(--regu-gray-500)" }}>
-                      <Calendar className="h-3.5 w-3.5" />
-                      {formatDate(u.created_at)}
+                    <td className="px-4 py-3 align-top" style={{ color: "var(--regu-gray-600)" }}>{u.institution ?? "—"}</td>
+                    <td className="px-4 py-3 align-top" style={{ color: "var(--regu-gray-600)" }}>{u.position ?? "—"}</td>
+                    <td className="px-4 py-3 align-top" style={{ color: "var(--regu-gray-600)" }}>{u.country ?? "—"}</td>
+                    <td className="px-4 py-3 align-top whitespace-nowrap" style={{ color: "var(--regu-gray-500)" }}>
+                      <span className="inline-flex items-center gap-1">
+                        <Calendar className="h-3.5 w-3.5 shrink-0" />
+                        {formatDate(u.created_at)}
+                      </span>
                     </td>
                   </tr>
                 ))}

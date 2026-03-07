@@ -92,9 +92,9 @@ export const api = {
     },
     documentAccessUsers: {
       list: () =>
-        request<Array<{ id: string; email: string; name: string | null; is_active: boolean; created_at: string }>>("/api/admin/document-access-users"),
-      create: (body: { email: string; password: string; name?: string }) =>
-        request<{ id: string; email: string; name: string | null }>("/api/admin/document-access-users", { method: "POST", body }),
+        request<Array<{ id: string; email: string; name: string | null; institution: string | null; position: string | null; country: string | null; is_active: boolean; created_at: string }>>("/api/admin/document-access-users"),
+      create: (body: { email: string; password: string; name?: string; institution?: string; position?: string; country?: string }) =>
+        request<{ id: string; email: string; name: string | null; institution: string | null; position: string | null; country: string | null }>("/api/admin/document-access-users", { method: "POST", body }),
     },
     audit: {
       list: (params?: { limit?: number; offset?: number }) => {

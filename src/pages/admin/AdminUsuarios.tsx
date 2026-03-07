@@ -118,7 +118,7 @@ export default function AdminUsuarios() {
 
   const loadUsers = useCallback(async () => {
     const res = await api.admin.users.list();
-    if (res.ok) setUsers(res.data);
+    if (res.ok) setUsers(Array.isArray(res.data) ? res.data : []);
     else setError(res.error ?? "Error al cargar usuarios");
   }, []);
 
@@ -287,10 +287,20 @@ export default function AdminUsuarios() {
         className="rounded-xl border bg-white shadow-sm overflow-hidden"
         style={{ borderColor: "var(--regu-gray-200)" }}
       >
-        <h2 className="flex items-center gap-2 px-6 py-4 text-lg font-semibold" style={{ color: "var(--regu-navy)" }}>
-          <Users className="h-5 w-5" />
-          Usuarios registrados
-        </h2>
+        <div className="flex items-center justify-between px-6 py-4 flex-wrap gap-2">
+          <h2 className="flex items-center gap-2 text-lg font-semibold" style={{ color: "var(--regu-navy)" }}>
+            <Users className="h-5 w-5" />
+            Usuarios registrados
+          </h2>
+          <button
+            type="button"
+            onClick={() => { setError(null); loadUsers(); }}
+            className="text-sm font-medium rounded-lg px-3 py-1.5 border transition-colors"
+            style={{ borderColor: "var(--regu-gray-200)", color: "var(--regu-gray-700)" }}
+          >
+            Actualizar lista
+          </button>
+        </div>
         {loading ? (
           <p className="px-6 pb-6 text-sm" style={{ color: "var(--regu-gray-500)" }}>Cargando…</p>
         ) : error ? (
@@ -346,15 +356,15 @@ export default function AdminUsuarios() {
         ) : audit.length === 0 ? (
           <p className="px-6 pb-6 text-sm" style={{ color: "var(--regu-gray-500)" }}>Aún no hay registros.</p>
         ) : (
-          <div className="overflow-x-auto max-h-[420px] overflow-y-auto">
-            <table className="w-full text-sm">
-              <thead className="sticky top-0 z-10" style={{ backgroundColor: "var(--regu-gray-50)" }}>
+          <div className="overflow-x-auto max-h-[420px] overflow-y-auto relative">
+            <table className="w-full text-sm border-collapse">
+              <thead className="sticky top-0 z-20" style={{ backgroundColor: "var(--regu-gray-50)", boxShadow: "0 1px 0 0 var(--regu-gray-100)" }}>
                 <tr>
-                  <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--regu-gray-700)" }}>Fecha</th>
-                  <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--regu-gray-700)" }}>Usuario</th>
-                  <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--regu-gray-700)" }}>Acción</th>
-                  <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--regu-gray-700)" }}>Recurso</th>
-                  <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--regu-gray-700)" }}>Detalle</th>
+                  <th className="text-left px-4 py-3 font-semibold whitespace-nowrap" style={{ color: "var(--regu-gray-700)", backgroundColor: "var(--regu-gray-50)" }}>Fecha</th>
+                  <th className="text-left px-4 py-3 font-semibold whitespace-nowrap" style={{ color: "var(--regu-gray-700)", backgroundColor: "var(--regu-gray-50)" }}>Usuario</th>
+                  <th className="text-left px-4 py-3 font-semibold whitespace-nowrap" style={{ color: "var(--regu-gray-700)", backgroundColor: "var(--regu-gray-50)" }}>Acción</th>
+                  <th className="text-left px-4 py-3 font-semibold whitespace-nowrap" style={{ color: "var(--regu-gray-700)", backgroundColor: "var(--regu-gray-50)" }}>Recurso</th>
+                  <th className="text-left px-4 py-3 font-semibold whitespace-nowrap" style={{ color: "var(--regu-gray-700)", backgroundColor: "var(--regu-gray-50)" }}>Detalle</th>
                 </tr>
               </thead>
               <tbody>

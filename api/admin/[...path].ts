@@ -164,7 +164,10 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
         const body = (await parseJsonBody(req)) as Record<string, unknown>;
         const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
         const password = typeof body.password === "string" ? body.password : "";
-        const name = typeof body.name === "string" ? body.name.trim() : null;
+        const name = typeof body.name === "string" ? body.name.trim() || null : null;
+        const institution = typeof body.institution === "string" ? body.institution.trim() || null : null;
+        const position = typeof body.position === "string" ? body.position.trim() || null : null;
+        const country = typeof body.country === "string" ? body.country.trim() || null : null;
         if (!email) {
           sendJson(res, 400, { error: "El email es obligatorio." });
           return;
@@ -180,8 +183,8 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
         }
         const id = `dau_${crypto.randomUUID()}`;
         const passwordHash = await bcrypt.hash(password, 12);
-        await createDocumentAccessUser({ id, email, passwordHash, name });
-        sendJson(res, 201, { id, email, name });
+        await createDocumentAccessUser({ id, email, passwordHash, name, institution, position, country });
+        sendJson(res, 201, { id, email, name, institution, position, country });
         return;
       }
       res.statusCode = 405;

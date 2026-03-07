@@ -142,6 +142,9 @@ CREATE TABLE IF NOT EXISTS document_access_users (
   email TEXT NOT NULL UNIQUE,
   password_hash TEXT NOT NULL,
   name TEXT,
+  institution TEXT,
+  position TEXT,
+  country TEXT,
   is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
