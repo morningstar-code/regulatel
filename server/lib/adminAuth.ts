@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { getDb } from "./db.js";
 import { parseJsonBody } from "./parseBody.js";
 import {
+  ensureAdminAuthSchema,
   findAdminUserByIdentifier,
   getAdminUserById,
   getAdminUserCount,
@@ -63,6 +64,7 @@ function getRequestIp(req: IncomingMessage): string | null {
 }
 
 async function revokeSessionByToken(token: string) {
+  await ensureAdminAuthSchema();
   const sql = getDb();
   const now = new Date().toISOString();
   const tokenHash = hashSessionToken(token);
@@ -80,6 +82,7 @@ async function createSessionForUser(input: {
   userAgent: string | null;
   ipAddress: string | null;
 }) {
+  await ensureAdminAuthSchema();
   const sql = getDb();
   const token = buildOpaqueSessionToken();
   const tokenHash = hashSessionToken(token);
@@ -100,6 +103,7 @@ async function createSessionForUser(input: {
 }
 
 async function getSessionByToken(token: string): Promise<AdminSessionRow | null> {
+  await ensureAdminAuthSchema();
   const sql = getDb();
   const tokenHash = hashSessionToken(token);
   const [row] = await sql<AdminSessionRow[]>`
@@ -112,6 +116,7 @@ async function getSessionByToken(token: string): Promise<AdminSessionRow | null>
 }
 
 export async function getAuthenticatedAdmin(req: IncomingMessage) {
+  await ensureAdminAuthSchema();
   const cookies = parseCookies(req);
   const token = cookies[COOKIE_NAME];
   if (!token) return null;
@@ -138,6 +143,7 @@ export async function getAuthenticatedAdmin(req: IncomingMessage) {
 }
 
 export async function loginAdmin(req: IncomingMessage, res: ServerResponse) {
+  await ensureAdminAuthSchema();
   const body = (await parseJsonBody(req)) as Record<string, unknown>;
   const submittedUser = typeof body.username === "string" ? body.username.trim() : "";
   const submittedPassword = typeof body.password === "string" ? body.password : "";
@@ -179,6 +185,7 @@ export async function ensureAdmin(req: IncomingMessage) {
 }
 
 export async function getAdminAuthStatus(req: IncomingMessage) {
+  await ensureAdminAuthSchema();
   const auth = await getAuthenticatedAdmin(req);
   const userCount = await getAdminUserCount();
   return {
