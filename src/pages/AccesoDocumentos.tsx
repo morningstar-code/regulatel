@@ -1,11 +1,8 @@
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { Lock, ArrowLeft } from "lucide-react";
-import {
-  getRestrictedDocument,
-  checkRestrictedPassword,
-  markRestrictedUnlocked,
-} from "@/config/restrictedDocuments";
+import { getRestrictedDocument, markRestrictedUnlocked } from "@/config/restrictedDocuments";
+import { api } from "@/lib/api";
 
 export default function AccesoDocumentos() {
   const [searchParams] = useSearchParams();
@@ -13,31 +10,65 @@ export default function AccesoDocumentos() {
   const docId = searchParams.get("doc");
   const document = getRestrictedDocument(docId);
 
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [checkingSession, setCheckingSession] = useState(true);
 
-  const handleSubmit = (e: FormEvent) => {
+  useEffect(() => {
+    let cancelled = false;
+    api.documentAccess.session().then((res) => {
+      if (cancelled) return;
+      setCheckingSession(false);
+      if (res.ok && res.data?.ok && document) {
+        markRestrictedUnlocked(document.id);
+        navigate(document.redirectUrl, { replace: true });
+      } else if (res.ok && res.data?.ok && !document) {
+        navigate("/gestion?tipo=planes-actas", { replace: true });
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [document?.id, navigate, document?.redirectUrl]);
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
-    if (!password.trim()) {
+    if (!email.trim()) {
+      setError("Ingrese su email.");
+      return;
+    }
+    if (!password) {
       setError("Ingrese la contraseña.");
       return;
     }
     setSubmitting(true);
-    if (!checkRestrictedPassword(password.trim())) {
-      setError("Contraseña incorrecta. Intente de nuevo.");
-      setSubmitting(false);
-      return;
-    }
-    if (document) {
-      markRestrictedUnlocked(document.id);
-      navigate(document.redirectUrl);
-    } else {
-      navigate("/gestion?tipo=planes-actas");
-    }
+    const res = await api.documentAccess.login({ email: email.trim(), password });
     setSubmitting(false);
+    if (res.ok && res.data?.ok) {
+      if (document) {
+        markRestrictedUnlocked(document.id);
+        navigate(document.redirectUrl);
+      } else {
+        navigate("/gestion?tipo=planes-actas");
+      }
+    } else {
+      setError(res.ok ? "Error inesperado." : (res.error ?? "Credenciales incorrectas. Intente de nuevo."));
+    }
   };
+
+  if (checkingSession) {
+    return (
+      <div
+        className="min-h-screen w-full flex items-center justify-center py-16"
+        style={{ fontFamily: "var(--token-font-body)", background: "linear-gradient(180deg, var(--regu-offwhite) 0%, var(--regu-gray-100) 100%)" }}
+      >
+        <p style={{ color: "var(--regu-gray-500)" }}>Verificando sesión…</p>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -82,6 +113,29 @@ export default function AccesoDocumentos() {
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label
+                htmlFor="acceso-email"
+                className="mb-1.5 block text-sm font-semibold"
+                style={{ color: "var(--regu-gray-900)" }}
+              >
+                Email
+              </label>
+              <input
+                id="acceso-email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+                placeholder="su@email.com"
+                className="w-full rounded-lg border px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-offset-0"
+                style={{
+                  borderColor: "var(--regu-gray-100)",
+                  color: "var(--regu-gray-900)",
+                }}
+                disabled={submitting}
+              />
+            </div>
             <div>
               <label
                 htmlFor="acceso-password"

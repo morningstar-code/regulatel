@@ -1,6 +1,7 @@
 import type { IncomingMessage, ServerResponse } from "http";
 import { deleteCifrasForYear } from "../../server/lib/cifras.js";
 import { ensureAdmin } from "../../server/lib/adminAuth.js";
+import { logAudit } from "../../server/lib/auditLog.js";
 import { isDbConfigured } from "../../server/lib/db.js";
 
 function sendJson(res: ServerResponse, status: number, data: unknown) {
@@ -34,12 +35,21 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
 
   try {
     if (req.method === "DELETE") {
-      await ensureAdmin(req);
+      const auth = await ensureAdmin(req);
       const ok = await deleteCifrasForYear(year);
       if (!ok) {
         sendJson(res, 404, { error: "No cifras for this year" });
         return;
       }
+      await logAudit({
+        userId: auth.user.id,
+        userEmail: auth.user.email,
+        userName: auth.user.name,
+        action: "deleted",
+        resourceType: "cifras",
+        resourceId: String(year),
+        details: { year, restoredDefault: true },
+      });
       res.statusCode = 204;
       res.end();
       return;

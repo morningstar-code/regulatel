@@ -118,14 +118,15 @@ CREATE TABLE IF NOT EXISTS admin_sessions (
 CREATE INDEX IF NOT EXISTS idx_admin_sessions_user_id ON admin_sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_admin_sessions_expires_at ON admin_sessions(expires_at);
 
--- Auditoría: quién hizo qué (crear, actualizar, eliminar, subir)
+-- Auditoría: quién hizo qué (crear, actualizar, eliminar, subir, incl. REGULATEL en cifras)
+-- Si la tabla ya existía sin 'cifras', ejecutar en Neon: ALTER TABLE admin_audit_log DROP CONSTRAINT IF EXISTS admin_audit_log_resource_type_check; ALTER TABLE admin_audit_log ADD CONSTRAINT admin_audit_log_resource_type_check CHECK (resource_type IN ('news', 'event', 'document', 'upload', 'admin_user', 'cifras'));
 CREATE TABLE IF NOT EXISTS admin_audit_log (
   id TEXT PRIMARY KEY,
   user_id TEXT NOT NULL,
   user_email TEXT NOT NULL,
   user_name TEXT,
   action TEXT NOT NULL CHECK (action IN ('created', 'updated', 'deleted', 'uploaded')),
-  resource_type TEXT NOT NULL CHECK (resource_type IN ('news', 'event', 'document', 'upload', 'admin_user')),
+  resource_type TEXT NOT NULL CHECK (resource_type IN ('news', 'event', 'document', 'upload', 'admin_user', 'cifras')),
   resource_id TEXT,
   details JSONB DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW()
@@ -134,3 +135,25 @@ CREATE TABLE IF NOT EXISTS admin_audit_log (
 CREATE INDEX IF NOT EXISTS idx_audit_created_at ON admin_audit_log(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_audit_user_id ON admin_audit_log(user_id);
 CREATE INDEX IF NOT EXISTS idx_audit_resource ON admin_audit_log(resource_type, resource_id);
+
+-- Usuarios con acceso solo a documentos restringidos (actas). No acceden al panel admin.
+CREATE TABLE IF NOT EXISTS document_access_users (
+  id TEXT PRIMARY KEY,
+  email TEXT NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
+  name TEXT,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_document_access_users_email ON document_access_users(lower(email));
+
+CREATE TABLE IF NOT EXISTS document_access_sessions (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES document_access_users(id) ON DELETE CASCADE,
+  session_token_hash TEXT NOT NULL UNIQUE,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_document_access_sessions_user_id ON document_access_sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_document_access_sessions_expires_at ON document_access_sessions(expires_at);

@@ -15,6 +15,7 @@ import AdminCifras from '@/pages/admin/AdminCifras';
 import AdminDocumentos from '@/pages/admin/AdminDocumentos';
 import AdminRevista from '@/pages/admin/AdminRevista';
 import AdminUsuarios from '@/pages/admin/AdminUsuarios';
+import AdminAccesoActas from '@/pages/admin/AdminAccesoActas';
 import Home from '@/pages/Home';
 import Autoridades from '@/pages/Autoridades';
 import AutoridadDetalle from '@/pages/AutoridadDetalle';
@@ -56,6 +57,7 @@ function App() {
               <Route path="documentos" element={<AdminDocumentos />} />
               <Route path="revista" element={<AdminRevista />} />
               <Route path="usuarios" element={<AdminUsuarios />} />
+              <Route path="acceso-actas" element={<AdminAccesoActas />} />
             </Route>
             <Route element={<Layout><Outlet /></Layout>}>
               <Route path="/" element={<Home />} />

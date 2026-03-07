@@ -1,13 +1,7 @@
 /**
  * Configuración de documentos restringidos (actas).
- * Capa de acceso temporal hasta implementar autenticación real.
- *
- * IMPORTANTE: La contraseña aquí es solo para frontend; no es seguridad real.
- * Centralizar aquí para cambiarla fácilmente y migrar después a backend.
+ * El acceso se controla por email + contraseña (usuarios creados en el panel admin).
  */
-
-/** Contraseña temporal para acceso a documentos restringidos. Cambiar cuando exista auth real. */
-export const RESTRICTED_ACCESS_PASSWORD = "regulatel2026";
 
 export interface RestrictedDocumentEntry {
   /** ID del documento (ej: acta-27, acta-2023) */
@@ -61,8 +55,4 @@ export function isRestrictedUnlocked(docId: string): boolean {
 export function getRestrictedDocument(docId: string | null): RestrictedDocumentEntry | null {
   if (!docId) return null;
   return RESTRICTED_DOCUMENTS[docId] ?? null;
-}
-
-export function checkRestrictedPassword(password: string): boolean {
-  return password === RESTRICTED_ACCESS_PASSWORD;
 }

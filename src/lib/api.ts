@@ -63,6 +63,11 @@ export const api = {
     upload: (body: unknown) => request<unknown>("/api/uploads", { method: "POST", body }),
     delete: (body: unknown) => request<void>("/api/uploads", { method: "DELETE", body }),
   },
+  documentAccess: {
+    login: (body: { email: string; password: string }) =>
+      request<{ ok: boolean }>("/api/document-access/login", { method: "POST", body }),
+    session: () => request<{ ok: boolean }>("/api/document-access/session"),
+  },
   admin: {
     session: () =>
       request<{
@@ -84,6 +89,12 @@ export const api = {
       list: () => request<Array<{ id: string; name: string; email: string; username: string | null; role: string; is_active: boolean; last_login_at: string | null; created_at: string }>>("/api/admin/users"),
       create: (body: { email: string; password: string; name?: string; role?: string }) =>
         request<{ id: string; email: string; name: string; role: string }>("/api/admin/users", { method: "POST", body }),
+    },
+    documentAccessUsers: {
+      list: () =>
+        request<Array<{ id: string; email: string; name: string | null; is_active: boolean; created_at: string }>>("/api/admin/document-access-users"),
+      create: (body: { email: string; password: string; name?: string }) =>
+        request<{ id: string; email: string; name: string | null }>("/api/admin/document-access-users", { method: "POST", body }),
     },
     audit: {
       list: (params?: { limit?: number; offset?: number }) => {

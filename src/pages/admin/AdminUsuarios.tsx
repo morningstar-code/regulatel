@@ -6,7 +6,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
-import { UserPlus, Users, History, Mail, Shield, Calendar } from "lucide-react";
+import { UserPlus, Users, History, Mail, Shield, Calendar, X, FileText, Hash } from "lucide-react";
 
 const ACTION_LABELS: Record<string, string> = {
   created: "Creó",
@@ -21,7 +21,75 @@ const RESOURCE_LABELS: Record<string, string> = {
   document: "Documento",
   upload: "Archivo",
   admin_user: "Usuario admin",
+  cifras: "REGULATEL en cifras",
 };
+
+type AuditRow = {
+  id: string;
+  user_email: string;
+  user_name: string | null;
+  action: string;
+  resource_type: string;
+  resource_id: string | null;
+  details: Record<string, unknown>;
+  created_at: string;
+};
+
+function formatAuditDetailSummary(row: AuditRow): { lines: string[]; url?: string } {
+  const d = row.details ?? {};
+  const lines: string[] = [];
+  let url: string | undefined;
+  if (row.resource_type === "cifras") {
+    if (row.action === "deleted" && d.restoredDefault) {
+      lines.push(`Se restauraron las cifras del año ${row.resource_id ?? d.year ?? "?"} a los valores por defecto.`);
+    } else {
+      const y = d.year ?? row.resource_id;
+      lines.push(`Año ${y}:`);
+      if (typeof d.gruposTrabajo === "number") lines.push(`  • Grupos de trabajo: ${d.gruposTrabajo}`);
+      if (typeof d.comitesEjecutivos === "number") lines.push(`  • Comités ejecutivos: ${d.comitesEjecutivos}`);
+      if (typeof d.revistaDigital === "number") lines.push(`  • Revista digital: ${d.revistaDigital}`);
+      if (typeof d.paises === "number") lines.push(`  • Países: ${d.paises}`);
+    }
+    return { lines };
+  }
+  if (row.resource_type === "news" && d.title) {
+    lines.push(`Título: ${String(d.title)}`);
+    if (d.slug) lines.push(`Slug: ${String(d.slug)}`);
+    return { lines };
+  }
+  if (row.resource_type === "event" && (d.title || row.resource_id)) {
+    lines.push(d.title ? `Evento: ${String(d.title)}` : `ID: ${row.resource_id ?? "—"}`);
+    return { lines };
+  }
+  if (row.resource_type === "document" && (d.title || row.resource_id)) {
+    lines.push(d.title ? `Documento: ${String(d.title)}` : `ID: ${row.resource_id ?? "—"}`);
+    return { lines };
+  }
+  if (row.resource_type === "upload") {
+    const u = d.url ?? row.resource_id;
+    if (typeof u === "string" && (u.startsWith("http://") || u.startsWith("https://"))) {
+      url = u;
+      lines.push(`Archivo subido: ${u.length > 60 ? u.slice(0, 60) + "…" : u}`);
+    } else {
+      lines.push(`ID o referencia: ${row.resource_id ?? "—"}`);
+    }
+    return { lines, url };
+  }
+  if (row.resource_type === "admin_user") {
+    if (d.email) lines.push(`Email: ${String(d.email)}`);
+    if (d.role) lines.push(`Rol: ${String(d.role)}`);
+    return { lines };
+  }
+  if (Object.keys(d).length > 0) {
+    Object.entries(d).forEach(([k, v]) => {
+      if (v != null && v !== "") lines.push(`${k}: ${String(v)}`);
+    });
+  }
+  if (lines.length === 0 && row.resource_id) {
+    lines.push(`ID: ${row.resource_id}`);
+  }
+  return { lines };
+}
 
 export default function AdminUsuarios() {
   const { isChecking, isAdmin, canManageUsers } = useAuth();
@@ -34,7 +102,8 @@ export default function AdminUsuarios() {
   }, [isChecking, isAdmin, canManageUsers, navigate]);
 
   const [users, setUsers] = useState<Array<{ id: string; name: string; email: string; username: string | null; role: string; is_active: boolean; last_login_at: string | null; created_at: string }>>([]);
-  const [audit, setAudit] = useState<Array<{ id: string; user_email: string; user_name: string | null; action: string; resource_type: string; resource_id: string | null; details: Record<string, unknown>; created_at: string }>>([]);
+  const [audit, setAudit] = useState<AuditRow[]>([]);
+  const [detailAudit, setDetailAudit] = useState<AuditRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [auditLoading, setAuditLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -120,8 +189,14 @@ export default function AdminUsuarios() {
           Usuarios y auditoría
         </h1>
         <p className="mt-1 text-sm" style={{ color: "var(--regu-gray-600)" }}>
-          Crear cuentas de administrador y consultar el registro de actividad.
+          Solo las cuentas super administrador (autorizadas) pueden ver esta página. La lista muestra <strong>todos</strong> los usuarios del sistema con acceso al panel.
         </p>
+        <div className="mt-3 rounded-lg border px-4 py-3 text-sm" style={{ borderColor: "var(--regu-gray-200)", backgroundColor: "var(--regu-gray-50)", color: "var(--regu-gray-700)" }}>
+          <p className="font-semibold mb-1" style={{ color: "var(--regu-navy)" }}>Roles</p>
+          <p><strong>Admin:</strong> Acceso completo al panel (noticias, eventos, documentos, REGULATEL en cifras, revista).</p>
+          <p className="mt-1"><strong>Editor:</strong> Mismo acceso al contenido que Admin. La diferencia está reservada para futuras restricciones (por ejemplo, solo editar sin eliminar).</p>
+          <p className="mt-2 text-xs" style={{ color: "var(--regu-gray-500)" }}>Solo los super administradores pueden crear usuarios y ver este registro de auditoría.</p>
+        </div>
       </div>
 
       {/* Crear nueva cuenta */}
@@ -299,8 +374,15 @@ export default function AdminUsuarios() {
                     <td className="px-4 py-2.5">
                       {RESOURCE_LABELS[a.resource_type] ?? a.resource_type}
                     </td>
-                    <td className="px-4 py-2.5 text-xs" style={{ color: "var(--regu-gray-600)" }}>
-                      {a.details?.title ? String(a.details.title) : a.resource_id ? String(a.resource_id).slice(0, 24) : "—"}
+                    <td className="px-4 py-2.5">
+                      <button
+                        type="button"
+                        onClick={() => setDetailAudit(a)}
+                        className="text-left text-sm font-medium rounded-lg px-2 py-1 -mx-2 hover:bg-[var(--regu-gray-100)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--regu-blue)]"
+                        style={{ color: "var(--regu-blue)" }}
+                      >
+                        {a.details?.title ? String(a.details.title).slice(0, 28) + (String(a.details.title).length > 28 ? "…" : "") : a.resource_id ? String(a.resource_id).slice(0, 24) + (String(a.resource_id).length > 24 ? "…" : "") : "Ver detalle"}
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -309,6 +391,77 @@ export default function AdminUsuarios() {
           </div>
         )}
       </section>
+
+      {/* Modal detalle de auditoría */}
+      {detailAudit && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ backgroundColor: "rgba(0,0,0,0.45)" }}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="audit-detail-title"
+        >
+          <div
+            className="w-full max-w-lg rounded-2xl border bg-white shadow-xl overflow-hidden"
+            style={{ borderColor: "var(--regu-gray-200)" }}
+          >
+            <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: "var(--regu-gray-100)", backgroundColor: "var(--regu-gray-50)" }}>
+              <h2 id="audit-detail-title" className="text-lg font-bold flex items-center gap-2" style={{ color: "var(--regu-navy)" }}>
+                {detailAudit.resource_type === "cifras" ? <Hash className="h-5 w-5" /> : <FileText className="h-5 w-5" />}
+                Detalle del registro
+              </h2>
+              <button
+                type="button"
+                onClick={() => setDetailAudit(null)}
+                className="rounded-lg p-2 hover:bg-white/80 transition-colors"
+                aria-label="Cerrar"
+              >
+                <X className="h-5 w-5" style={{ color: "var(--regu-gray-600)" }} />
+              </button>
+            </div>
+            <div className="px-6 py-5 space-y-4">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                <span className="font-medium" style={{ color: "var(--regu-gray-500)" }}>Fecha</span>
+                <span style={{ color: "var(--regu-gray-900)" }}>{formatDate(detailAudit.created_at)}</span>
+                <span className="font-medium" style={{ color: "var(--regu-gray-500)" }}>Usuario</span>
+                <span style={{ color: "var(--regu-gray-900)" }}>{detailAudit.user_name ?? detailAudit.user_email}</span>
+                <span className="font-medium" style={{ color: "var(--regu-gray-500)" }}>Acción</span>
+                <span style={{ color: "var(--regu-gray-900)" }}>{ACTION_LABELS[detailAudit.action] ?? detailAudit.action}</span>
+                <span className="font-medium" style={{ color: "var(--regu-gray-500)" }}>Recurso</span>
+                <span style={{ color: "var(--regu-gray-900)" }}>{RESOURCE_LABELS[detailAudit.resource_type] ?? detailAudit.resource_type}</span>
+              </div>
+              <div className="pt-3 border-t" style={{ borderColor: "var(--regu-gray-100)" }}>
+                <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--regu-gray-500)" }}>Qué se registró</p>
+                <div className="rounded-xl border p-4 text-sm font-mono leading-relaxed" style={{ borderColor: "var(--regu-gray-100)", color: "var(--regu-gray-800)", backgroundColor: "var(--regu-gray-50)" }}>
+                  {(() => {
+                    const { lines, url } = formatAuditDetailSummary(detailAudit);
+                    return (
+                      <>
+                        {lines.length > 0 ? lines.map((line, i) => <p key={i} className={line.startsWith("  •") ? "pl-2" : ""}>{line}</p>) : <p>—</p>}
+                        {url && (
+                          <a href={url} target="_blank" rel="noopener noreferrer" className="mt-3 inline-block text-[var(--regu-blue)] hover:underline break-all">
+                            Abrir archivo
+                          </a>
+                        )}
+                      </>
+                    );
+                  })()}
+                </div>
+              </div>
+            </div>
+            <div className="px-6 py-4 border-t flex justify-end" style={{ borderColor: "var(--regu-gray-100)" }}>
+              <button
+                type="button"
+                onClick={() => setDetailAudit(null)}
+                className="rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors"
+                style={{ backgroundColor: "var(--regu-blue)", color: "white" }}
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import type { IncomingMessage, ServerResponse } from "http";
 import { listCifras, upsertCifras } from "../server/lib/cifras.js";
 import { ensureAdmin } from "../server/lib/adminAuth.js";
+import { logAudit } from "../server/lib/auditLog.js";
 import { parseJsonBody } from "../server/lib/parseBody.js";
 import { isDbConfigured } from "../server/lib/db.js";
 
@@ -32,7 +33,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
       return;
     }
     if (req.method === "PUT") {
-      await ensureAdmin(req);
+      const auth = await ensureAdmin(req);
       const body = (await parseJsonBody(req)) as Record<string, unknown>;
       const year = typeof body.year === "number" ? body.year : parseInt(String(body.year), 10);
       if (!Number.isInteger(year) || year < 2000 || year > 2100) {
@@ -48,6 +49,15 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
         comitesEjecutivos,
         revistaDigital,
         paises,
+      });
+      await logAudit({
+        userId: auth.user.id,
+        userEmail: auth.user.email,
+        userName: auth.user.name,
+        action: "updated",
+        resourceType: "cifras",
+        resourceId: String(year),
+        details: { year, gruposTrabajo, comitesEjecutivos, revistaDigital, paises },
       });
       sendJson(res, 200, item);
       return;

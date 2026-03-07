@@ -9,6 +9,7 @@ import {
   FileText,
   BookOpen,
   Users,
+  Lock,
   LogOut,
 } from "lucide-react";
 import { useEffect } from "react";
@@ -66,23 +67,33 @@ export default function AdminLayout() {
               </Link>
             ))}
             {canManageUsers && (
-              <Link
-                to="/admin/usuarios"
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition"
-                style={{ color: "var(--regu-gray-900)" }}
-              >
-                <Users className="h-4 w-4" />
-                Usuarios y auditoría
-              </Link>
+              <>
+                <Link
+                  to="/admin/usuarios"
+                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition"
+                  style={{ color: "var(--regu-gray-900)" }}
+                >
+                  <Users className="h-4 w-4" />
+                  Usuarios y auditoría
+                </Link>
+                <Link
+                  to="/admin/acceso-actas"
+                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition"
+                  style={{ color: "var(--regu-gray-900)" }}
+                >
+                  <Lock className="h-4 w-4" />
+                  Acceso a actas
+                </Link>
+              </>
             )}
           </nav>
           <div className="mt-auto border-t px-2 pt-4" style={{ borderColor: "var(--regu-gray-100)" }}>
             <Link
               to="/"
-              className="mb-2 flex items-center gap-3 rounded-lg px-3 py-2 text-sm"
-              style={{ color: "var(--regu-gray-500)" }}
+              className="mb-2 flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium"
+              style={{ color: "var(--regu-blue)" }}
             >
-              Ver sitio
+              Ir a home
             </Link>
             <button
               type="button"

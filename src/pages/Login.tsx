@@ -1,14 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
-  const { login, isConfigured, bootstrapRequired } = useAuth();
+  const { login, isAdmin, isChecking, isConfigured, bootstrapRequired } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!isChecking && isAdmin) {
+      navigate("/admin", { replace: true });
+    }
+  }, [isChecking, isAdmin, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,6 +28,14 @@ export default function Login() {
       setError("Usuario o contraseña incorrectos.");
     }
   };
+
+  if (isChecking || isAdmin) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "var(--regu-offwhite)" }}>
+        <p style={{ color: "var(--regu-gray-500)" }}>Redirigiendo al panel…</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "var(--regu-offwhite)" }}>
