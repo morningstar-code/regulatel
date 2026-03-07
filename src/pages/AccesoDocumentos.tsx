@@ -18,16 +18,33 @@ export default function AccesoDocumentos() {
 
   useEffect(() => {
     let cancelled = false;
-    api.documentAccess.session().then((res) => {
+    (async () => {
+      const docRes = await api.documentAccess.session();
+      if (cancelled) return;
+      if (docRes.ok && docRes.data?.ok) {
+        setCheckingSession(false);
+        if (document) {
+          markRestrictedUnlocked(document.id);
+          navigate(document.redirectUrl, { replace: true });
+        } else {
+          navigate("/gestion?tipo=planes-actas", { replace: true });
+        }
+        return;
+      }
+      // Quienes tienen rol admin en el panel tienen también acceso a actas restringidas
+      const adminRes = await api.admin.session();
       if (cancelled) return;
       setCheckingSession(false);
-      if (res.ok && res.data?.ok && document) {
-        markRestrictedUnlocked(document.id);
-        navigate(document.redirectUrl, { replace: true });
-      } else if (res.ok && res.data?.ok && !document) {
-        navigate("/gestion?tipo=planes-actas", { replace: true });
+      if (adminRes.ok && adminRes.data?.authenticated && adminRes.data?.user) {
+        if (document) {
+          markRestrictedUnlocked(document.id);
+          navigate(document.redirectUrl, { replace: true });
+        } else {
+          navigate("/gestion?tipo=planes-actas", { replace: true });
+        }
       }
-    });
+      // Si no hay sesión doc ni admin, el efecto termina y se muestra el formulario de login
+    })();
     return () => {
       cancelled = true;
     };

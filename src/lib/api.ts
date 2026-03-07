@@ -95,6 +95,10 @@ export const api = {
         request<Array<{ id: string; email: string; name: string | null; institution: string | null; position: string | null; country: string | null; is_active: boolean; created_at: string }>>("/api/admin/document-access-users"),
       create: (body: { email: string; password: string; name?: string; institution?: string; position?: string; country?: string }) =>
         request<{ id: string; email: string; name: string | null; institution: string | null; position: string | null; country: string | null }>("/api/admin/document-access-users", { method: "POST", body }),
+      update: (id: string, body: { name?: string; institution?: string; position?: string; country?: string; password?: string }) =>
+        request<{ id: string; email: string; name: string | null; institution: string | null; position: string | null; country: string | null }>(`/api/admin/document-access-users/${encodeURIComponent(id)}`, { method: "PATCH", body }),
+      delete: (id: string) =>
+        request<void>(`/api/admin/document-access-users/${encodeURIComponent(id)}`, { method: "DELETE" }),
     },
     audit: {
       list: (params?: { limit?: number; offset?: number }) => {

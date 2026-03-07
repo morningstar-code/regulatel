@@ -86,6 +86,8 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     }
     if (req.method === "DELETE") {
       const auth = await ensureAdmin(req);
+      const existing = await getNewsById(id);
+      const title = existing?.title ?? null;
       const ok = await deleteNews(id);
       if (!ok) {
         sendJson(res, 404, { error: "Not found" });
@@ -98,7 +100,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
         action: "deleted",
         resourceType: "news",
         resourceId: id,
-        details: {},
+        details: title != null ? { title } : {},
       });
       res.statusCode = 204;
       res.end();

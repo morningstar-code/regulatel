@@ -20,6 +20,9 @@ import {
   listDocumentAccessUsers,
   createDocumentAccessUser,
   findDocumentAccessUserByEmail,
+  findDocumentAccessUserById,
+  deleteDocumentAccessUser,
+  updateDocumentAccessUser,
 } from "../../server/lib/documentAccess.js";
 import { parseJsonBody } from "../../server/lib/parseBody.js";
 import { isDbConfigured } from "../../server/lib/db.js";
@@ -43,9 +46,17 @@ function getAdminSubpath(req: IncomingMessage): string {
   return rest.split("/")[0] ?? "";
 }
 
+/** Path segments after /api/admin/ (e.g. ["document-access-users", "dau_xxx"]) */
+function getAdminPathSegments(req: IncomingMessage): string[] {
+  const pathname = (req.url ?? "").split("?")[0];
+  const match = pathname.match(/^\/api\/admin\/?(.*)$/);
+  const rest = match ? match[1] ?? "" : "";
+  return rest.split("/").filter(Boolean);
+}
+
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   if (req.method === "OPTIONS") {
     res.statusCode = 204;
@@ -121,7 +132,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
           action: "created",
           resourceType: "admin_user",
           resourceId: id,
-          details: { email, role },
+          details: { name, email, role },
         });
         sendJson(res, 201, { id, email, name, role });
         return;
@@ -156,6 +167,59 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
         return;
       }
       await ensureDocumentAccessSchema();
+      const segments = getAdminPathSegments(req);
+      const documentAccessUserId = segments[0] === "document-access-users" && segments[1] ? segments[1] : null;
+
+      if (documentAccessUserId && (req.method === "DELETE" || req.method === "PATCH")) {
+        if (req.method === "DELETE") {
+          const ok = await deleteDocumentAccessUser(documentAccessUserId);
+          if (!ok) {
+            sendJson(res, 404, { error: "Usuario no encontrado." });
+            return;
+          }
+          res.statusCode = 204;
+          res.end();
+          return;
+        }
+        if (req.method === "PATCH") {
+          const body = (await parseJsonBody(req)) as Record<string, unknown>;
+          const name = typeof body.name === "string" ? body.name.trim() || null : undefined;
+          const institution = typeof body.institution === "string" ? body.institution.trim() || null : undefined;
+          const position = typeof body.position === "string" ? body.position.trim() || null : undefined;
+          const country = typeof body.country === "string" ? body.country.trim() || null : undefined;
+          const password = typeof body.password === "string" ? body.password : undefined;
+          if (password !== undefined && password.length > 0 && password.length < 6) {
+            sendJson(res, 400, { error: "La contraseña debe tener al menos 6 caracteres." });
+            return;
+          }
+          const ok = await updateDocumentAccessUser(documentAccessUserId, {
+            name,
+            institution,
+            position,
+            country,
+            password: password && password.length >= 6 ? password : undefined,
+          });
+          if (!ok) {
+            sendJson(res, 404, { error: "Usuario no encontrado." });
+            return;
+          }
+          const updated = await findDocumentAccessUserById(documentAccessUserId);
+          if (!updated) {
+            sendJson(res, 200, { id: documentAccessUserId });
+            return;
+          }
+          sendJson(res, 200, {
+            id: updated.id,
+            email: updated.email,
+            name: updated.name,
+            institution: updated.institution,
+            position: updated.position,
+            country: updated.country,
+          });
+          return;
+        }
+      }
+
       if (req.method === "GET") {
         sendJson(res, 200, await listDocumentAccessUsers());
         return;

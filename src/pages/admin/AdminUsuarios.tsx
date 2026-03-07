@@ -35,36 +35,58 @@ type AuditRow = {
   created_at: string;
 };
 
-function formatAuditDetailSummary(row: AuditRow): { lines: string[]; url?: string } {
+function formatAuditDetailSummary(row: AuditRow): { sentence: string; lines: string[]; url?: string } {
   const d = row.details ?? {};
   const lines: string[] = [];
   let url: string | undefined;
-  if (row.resource_type === "cifras") {
-    if (row.action === "deleted" && d.restoredDefault) {
-      lines.push(`Se restauraron las cifras del año ${row.resource_id ?? d.year ?? "?"} a los valores por defecto.`);
-    } else {
-      const y = d.year ?? row.resource_id;
-      lines.push(`Año ${y}:`);
-      if (typeof d.gruposTrabajo === "number") lines.push(`  • Grupos de trabajo: ${d.gruposTrabajo}`);
-      if (typeof d.comitesEjecutivos === "number") lines.push(`  • Comités ejecutivos: ${d.comitesEjecutivos}`);
-      if (typeof d.revistaDigital === "number") lines.push(`  • Revista digital: ${d.revistaDigital}`);
-      if (typeof d.paises === "number") lines.push(`  • Países: ${d.paises}`);
-    }
-    return { lines };
+  const who = row.user_name ?? row.user_email ?? "Un administrador";
+  const actionVerb = ACTION_LABELS[row.action] ?? row.action;
+  const resourceLabel = RESOURCE_LABELS[row.resource_type] ?? row.resource_type;
+
+  if (row.resource_type === "admin_user") {
+    const name = typeof d.name === "string" ? d.name : null;
+    const email = typeof d.email === "string" ? d.email : null;
+    const role = typeof d.role === "string" ? d.role : "admin";
+    const targetName = name || email || "usuario";
+    const sentence =
+      row.action === "created"
+        ? `Admin ${who} creó usuario ${role} ${targetName}${email ? ` con correo ${email}` : ""}.`
+        : row.action === "updated"
+          ? `Admin ${who} actualizó usuario admin ${targetName}${email ? ` (${email})` : ""}.`
+          : `Admin ${who} ${actionVerb} usuario admin ${targetName}${email ? ` (${email})` : ""}.`;
+    if (d.email) lines.push(`Email: ${String(d.email)}`);
+    if (d.role) lines.push(`Rol: ${String(d.role)}`);
+    return { sentence, lines };
   }
-  if (row.resource_type === "news" && d.title) {
-    lines.push(`Título: ${String(d.title)}`);
+
+  if (row.resource_type === "news") {
+    const title = typeof d.title === "string" ? d.title : null;
+    const sentence = title
+      ? `Admin ${who} ${actionVerb} la noticia «${title}».`
+      : `Admin ${who} ${actionVerb} ${resourceLabel} (ID: ${row.resource_id ?? "—"}).`;
+    if (title) lines.push(`Título: ${title}`);
     if (d.slug) lines.push(`Slug: ${String(d.slug)}`);
-    return { lines };
+    return { sentence, lines };
   }
-  if (row.resource_type === "event" && (d.title || row.resource_id)) {
-    lines.push(d.title ? `Evento: ${String(d.title)}` : `ID: ${row.resource_id ?? "—"}`);
-    return { lines };
+
+  if (row.resource_type === "event") {
+    const title = typeof d.title === "string" ? d.title : null;
+    const sentence = title
+      ? `Admin ${who} ${actionVerb} el evento «${title}».`
+      : `Admin ${who} ${actionVerb} ${resourceLabel} (ID: ${row.resource_id ?? "—"}).`;
+    if (title) lines.push(`Evento: ${title}`);
+    return { sentence, lines };
   }
-  if (row.resource_type === "document" && (d.title || row.resource_id)) {
-    lines.push(d.title ? `Documento: ${String(d.title)}` : `ID: ${row.resource_id ?? "—"}`);
-    return { lines };
+
+  if (row.resource_type === "document") {
+    const title = typeof d.title === "string" ? d.title : null;
+    const sentence = title
+      ? `Admin ${who} ${actionVerb} el documento «${title}».`
+      : `Admin ${who} ${actionVerb} ${resourceLabel} (ID: ${row.resource_id ?? "—"}).`;
+    if (title) lines.push(`Documento: ${title}`);
+    return { sentence, lines };
   }
+
   if (row.resource_type === "upload") {
     const u = d.url ?? row.resource_id;
     if (typeof u === "string" && (u.startsWith("http://") || u.startsWith("https://"))) {
@@ -73,22 +95,33 @@ function formatAuditDetailSummary(row: AuditRow): { lines: string[]; url?: strin
     } else {
       lines.push(`ID o referencia: ${row.resource_id ?? "—"}`);
     }
-    return { lines, url };
+    const sentence = `Admin ${who} ${actionVerb} un archivo.`;
+    return { sentence, lines, url };
   }
-  if (row.resource_type === "admin_user") {
-    if (d.email) lines.push(`Email: ${String(d.email)}`);
-    if (d.role) lines.push(`Rol: ${String(d.role)}`);
-    return { lines };
+
+  if (row.resource_type === "cifras") {
+    if (row.action === "deleted" && d.restoredDefault) {
+      const sentence = `Admin ${who} restauró las cifras del año ${row.resource_id ?? d.year ?? "?"} a los valores por defecto.`;
+      return { sentence, lines };
+    }
+    const y = d.year ?? row.resource_id;
+    lines.push(`Año ${y}:`);
+    if (typeof d.gruposTrabajo === "number") lines.push(`  • Grupos de trabajo: ${d.gruposTrabajo}`);
+    if (typeof d.comitesEjecutivos === "number") lines.push(`  • Comités ejecutivos: ${d.comitesEjecutivos}`);
+    if (typeof d.revistaDigital === "number") lines.push(`  • Revista digital: ${d.revistaDigital}`);
+    if (typeof d.paises === "number") lines.push(`  • Países: ${d.paises}`);
+    const sentence = `Admin ${who} ${actionVerb} REGULATEL en cifras (año ${y}).`;
+    return { sentence, lines };
   }
+
+  const sentence = `Admin ${who} ${actionVerb} ${resourceLabel} (ID: ${row.resource_id ?? "—"}).`;
   if (Object.keys(d).length > 0) {
     Object.entries(d).forEach(([k, v]) => {
       if (v != null && v !== "") lines.push(`${k}: ${String(v)}`);
     });
   }
-  if (lines.length === 0 && row.resource_id) {
-    lines.push(`ID: ${row.resource_id}`);
-  }
-  return { lines };
+  if (lines.length === 0 && row.resource_id) lines.push(`ID: ${row.resource_id}`);
+  return { sentence, lines };
 }
 
 export default function AdminUsuarios() {
@@ -442,12 +475,13 @@ export default function AdminUsuarios() {
               </div>
               <div className="pt-3 border-t" style={{ borderColor: "var(--regu-gray-100)" }}>
                 <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--regu-gray-500)" }}>Qué se registró</p>
-                <div className="rounded-xl border p-4 text-sm font-mono leading-relaxed" style={{ borderColor: "var(--regu-gray-100)", color: "var(--regu-gray-800)", backgroundColor: "var(--regu-gray-50)" }}>
+                <div className="rounded-xl border p-4 text-sm leading-relaxed" style={{ borderColor: "var(--regu-gray-100)", color: "var(--regu-gray-800)", backgroundColor: "var(--regu-gray-50)" }}>
                   {(() => {
-                    const { lines, url } = formatAuditDetailSummary(detailAudit);
+                    const { sentence, lines, url } = formatAuditDetailSummary(detailAudit);
                     return (
                       <>
-                        {lines.length > 0 ? lines.map((line, i) => <p key={i} className={line.startsWith("  •") ? "pl-2" : ""}>{line}</p>) : <p>—</p>}
+                        <p className="font-medium mb-2" style={{ color: "var(--regu-gray-900)" }}>{sentence}</p>
+                        {lines.length > 0 && <div className="text-sm font-mono mt-2 space-y-0.5">{lines.map((line, i) => <p key={i} className={line.startsWith("  •") ? "pl-2" : ""}>{line}</p>)}</div>}
                         {url && (
                           <a href={url} target="_blank" rel="noopener noreferrer" className="mt-3 inline-block text-[var(--regu-blue)] hover:underline break-all">
                             Abrir archivo

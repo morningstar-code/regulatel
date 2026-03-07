@@ -125,6 +125,55 @@ export async function createDocumentAccessUser(input: {
   `;
 }
 
+export async function findDocumentAccessUserById(id: string): Promise<DocumentAccessUserRow | null> {
+  await ensureDocumentAccessSchema();
+  const sql = getDb();
+  const [row] = await sql<DocumentAccessUserRow[]>`
+    SELECT id, email, password_hash, name, institution, position, country, is_active, created_at, updated_at
+    FROM document_access_users WHERE id = ${id} LIMIT 1
+  `;
+  return row ?? null;
+}
+
+export async function deleteDocumentAccessUser(id: string): Promise<boolean> {
+  await ensureDocumentAccessSchema();
+  const sql = getDb();
+  const result = await sql`DELETE FROM document_access_users WHERE id = ${id}`;
+  return (result.count ?? 0) > 0;
+}
+
+export async function updateDocumentAccessUser(
+  id: string,
+  input: { name?: string | null; institution?: string | null; position?: string | null; country?: string | null; password?: string }
+): Promise<boolean> {
+  await ensureDocumentAccessSchema();
+  const sql = getDb();
+  const existing = await findDocumentAccessUserById(id);
+  if (!existing) return false;
+  const name = input.name !== undefined ? input.name : existing.name;
+  const institution = input.institution !== undefined ? input.institution : existing.institution;
+  const position = input.position !== undefined ? input.position : existing.position;
+  const country = input.country !== undefined ? input.country : existing.country;
+  const now = new Date().toISOString();
+  if (input.password !== undefined && input.password.length >= 6) {
+    const passwordHash = await bcrypt.hash(input.password, 12);
+    await sql`
+      UPDATE document_access_users
+      SET name = ${name}, institution = ${institution}, position = ${position}, country = ${country},
+          password_hash = ${passwordHash}, updated_at = ${now}::timestamptz
+      WHERE id = ${id}
+    `;
+  } else {
+    await sql`
+      UPDATE document_access_users
+      SET name = ${name}, institution = ${institution}, position = ${position}, country = ${country},
+          updated_at = ${now}::timestamptz
+      WHERE id = ${id}
+    `;
+  }
+  return true;
+}
+
 export async function listDocumentAccessUsers(): Promise<Array<{ id: string; email: string; name: string | null; institution: string | null; position: string | null; country: string | null; is_active: boolean; created_at: string }>> {
   await ensureDocumentAccessSchema();
   const sql = getDb();

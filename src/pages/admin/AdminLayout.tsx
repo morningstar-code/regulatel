@@ -11,6 +11,7 @@ import {
   Users,
   Lock,
   LogOut,
+  Home,
 } from "lucide-react";
 import { useEffect } from "react";
 
@@ -90,9 +91,10 @@ export default function AdminLayout() {
           <div className="mt-auto border-t px-2 pt-4" style={{ borderColor: "var(--regu-gray-100)" }}>
             <Link
               to="/"
-              className="mb-2 flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium"
-              style={{ color: "var(--regu-blue)" }}
+              className="mb-2 flex items-center gap-3 rounded-lg border-2 px-3 py-2.5 text-sm font-semibold transition hover:opacity-90"
+              style={{ borderColor: "var(--regu-blue)", color: "var(--regu-blue)", backgroundColor: "rgba(22, 61, 89, 0.06)" }}
             >
+              <Home className="h-4 w-4" />
               Ir a home
             </Link>
             <button
