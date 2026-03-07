@@ -20,7 +20,20 @@ async function request<T>(
     };
     const res = await fetch(`${API_BASE}${path}`, init);
     const text = await res.text();
-    const data = text.trim() ? (JSON.parse(text) as T) : (undefined as T);
+    let data: T | undefined;
+    if (text.trim()) {
+      const trimmed = text.trim();
+      if (trimmed.startsWith("<") || trimmed.startsWith("The page") || trimmed.startsWith("<!")) {
+        return { ok: false, error: "El servidor devolvió una página en lugar de datos. ¿La API está en marcha? (En desarrollo usa el backend o despliega en Vercel)." };
+      }
+      try {
+        data = JSON.parse(trimmed) as T;
+      } catch {
+        return { ok: false, error: "La respuesta del servidor no es JSON válido." };
+      }
+    } else if (res.status === 204 || res.ok) {
+      data = undefined as T;
+    }
     if (!res.ok) {
       const errMsg = data && typeof data === "object" && "error" in data ? String((data as { error: string }).error) : res.statusText;
       return { ok: false, error: errMsg };

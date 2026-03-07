@@ -177,8 +177,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
             sendJson(res, 404, { error: "Usuario no encontrado." });
             return;
           }
-          res.statusCode = 204;
-          res.end();
+          sendJson(res, 200, { deleted: true });
           return;
         }
         if (req.method === "PATCH") {

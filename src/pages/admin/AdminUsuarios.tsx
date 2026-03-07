@@ -389,17 +389,26 @@ export default function AdminUsuarios() {
         ) : audit.length === 0 ? (
           <p className="px-6 pb-6 text-sm" style={{ color: "var(--regu-gray-500)" }}>Aún no hay registros.</p>
         ) : (
-          <div className="overflow-x-auto max-h-[420px] overflow-y-auto relative">
-            <table className="w-full text-sm border-collapse">
-              <thead className="sticky top-0 z-20" style={{ backgroundColor: "var(--regu-gray-50)", boxShadow: "0 1px 0 0 var(--regu-gray-100)" }}>
-                <tr>
-                  <th className="text-left px-4 py-3 font-semibold whitespace-nowrap" style={{ color: "var(--regu-gray-700)", backgroundColor: "var(--regu-gray-50)" }}>Fecha</th>
-                  <th className="text-left px-4 py-3 font-semibold whitespace-nowrap" style={{ color: "var(--regu-gray-700)", backgroundColor: "var(--regu-gray-50)" }}>Usuario</th>
-                  <th className="text-left px-4 py-3 font-semibold whitespace-nowrap" style={{ color: "var(--regu-gray-700)", backgroundColor: "var(--regu-gray-50)" }}>Acción</th>
-                  <th className="text-left px-4 py-3 font-semibold whitespace-nowrap" style={{ color: "var(--regu-gray-700)", backgroundColor: "var(--regu-gray-50)" }}>Recurso</th>
-                  <th className="text-left px-4 py-3 font-semibold whitespace-nowrap" style={{ color: "var(--regu-gray-700)", backgroundColor: "var(--regu-gray-50)" }}>Detalle</th>
-                </tr>
-              </thead>
+          <div className="overflow-x-auto max-h-[420px] overflow-y-auto">
+            {/* Header fijo fuera de la tabla para que no se solape al hacer scroll */}
+            <div
+              className="sticky top-0 z-20 flex shrink-0 border-b text-sm"
+              style={{ backgroundColor: "var(--regu-gray-50)", borderColor: "var(--regu-gray-100)", boxShadow: "0 1px 0 0 var(--regu-gray-100)" }}
+            >
+              <div className="w-[10rem] shrink-0 px-4 py-3 font-semibold whitespace-nowrap" style={{ color: "var(--regu-gray-700)" }}>Fecha</div>
+              <div className="w-[9rem] shrink-0 px-4 py-3 font-semibold whitespace-nowrap" style={{ color: "var(--regu-gray-700)" }}>Usuario</div>
+              <div className="w-[6rem] shrink-0 px-4 py-3 font-semibold whitespace-nowrap" style={{ color: "var(--regu-gray-700)" }}>Acción</div>
+              <div className="w-[7rem] shrink-0 px-4 py-3 font-semibold whitespace-nowrap" style={{ color: "var(--regu-gray-700)" }}>Recurso</div>
+              <div className="min-w-[8rem] flex-1 px-4 py-3 font-semibold whitespace-nowrap" style={{ color: "var(--regu-gray-700)" }}>Detalle</div>
+            </div>
+            <table className="w-full text-sm border-collapse table-fixed" style={{ tableLayout: "fixed" }}>
+              <colgroup>
+                <col style={{ width: "10rem" }} />
+                <col style={{ width: "9rem" }} />
+                <col style={{ width: "6rem" }} />
+                <col style={{ width: "7rem" }} />
+                <col />
+              </colgroup>
               <tbody>
                 {audit.map((a) => (
                   <tr key={a.id} className="border-t" style={{ borderColor: "var(--regu-gray-100)" }}>
