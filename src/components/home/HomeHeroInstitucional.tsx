@@ -46,8 +46,11 @@ export default function HomeHeroInstitucional({
       style={{ fontFamily: "var(--token-font-body)" }}
       aria-label="Hero principal"
     >
-      {/* Fondo: imagen o gradiente */}
-      <div className="absolute inset-0">
+      {/* Fondo: imagen o gradiente. Mientras la imagen carga se ve el gradiente (evita el gris). */}
+      <div
+        className="absolute inset-0"
+        style={{ background: coverImageUrl ? HERO_BG_GRADIENT : undefined }}
+      >
         {coverImageUrl ? (
           <>
             <img
