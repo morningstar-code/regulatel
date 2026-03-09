@@ -202,9 +202,9 @@ export default function TopBarBerecLike({
 
           {/* Iconos sociales: colores de marca, mismo tamaño visual, espaciado uniforme */}
           <div className="topbarSocial hidden md:flex items-center shrink-0" style={{ gap: "8px" }}>
-            <a href="https://www.youtube.com/@INDOTELRD" target="_blank" rel="noreferrer noopener" aria-label="YouTube" className="rounded p-1 transition-colors hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--regu-blue)] focus-visible:ring-offset-1 inline-flex items-center justify-center" style={{ color: "#E53935" }}>
+            <Link to="/canal-youtube" aria-label="Canal de YouTube (en preparación)" className="rounded p-1 transition-colors hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--regu-blue)] focus-visible:ring-offset-1 inline-flex items-center justify-center" style={{ color: "#E53935" }}>
               <Youtube style={{ width: "18px", height: "18px" }} />
-            </a>
+            </Link>
             <a href="https://x.com/regulatel" target="_blank" rel="noreferrer noopener" aria-label="X (Twitter)" className="rounded p-1 transition-colors hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--regu-blue)] focus-visible:ring-offset-1 inline-flex items-center justify-center" style={{ color: "#14171A" }}>
               <XLogo size={18} />
             </a>

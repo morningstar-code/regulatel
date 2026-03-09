@@ -180,7 +180,7 @@ export default function Subscribe() {
             </div>
             <p className="text-sm">
               <Link
-                to="/pendiente/privacidad"
+                to="/declaracion-de-privacidad"
                 className="underline hover:no-underline"
                 style={{ color: ACCENT }}
               >
@@ -294,7 +294,7 @@ export default function Subscribe() {
             </div>
             <p className="text-sm">
               <Link
-                to="/pendiente/privacidad"
+                to="/declaracion-de-privacidad"
                 className="underline hover:no-underline"
                 style={{ color: ACCENT }}
               >

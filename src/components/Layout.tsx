@@ -2,8 +2,8 @@
  * Portal REGULATEL – Layout principal (header, contenido, footer).
  * Versión inicial desarrollada por Diego Cuervo (INDOTEL). 2026.
  */
-import type { ReactNode } from "react";
-import { Link } from "react-router-dom";
+import { type ReactNode, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import HeaderMegaMenu from "@/components/layout/HeaderMegaMenu";
 
 interface LayoutProps {
@@ -11,6 +11,12 @@ interface LayoutProps {
 }
 
 export default function Layout({ children }: LayoutProps) {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
   return (
     <div className="min-h-screen text-slate-900" style={{ backgroundColor: "var(--token-page-bg)" }}>
       <HeaderMegaMenu />
@@ -46,11 +52,11 @@ export default function Layout({ children }: LayoutProps) {
                 Contacto
               </Link>
               <Link
-                to="/pendiente/privacidad"
+                to="/declaracion-de-privacidad"
                 className="transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--token-accent)]"
                 style={{ color: "var(--token-text-secondary)" }}
               >
-                Privacidad
+                Declaración de privacidad
               </Link>
               <Link
                 to="/pendiente/terminos"

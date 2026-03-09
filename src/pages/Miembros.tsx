@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Globe, ExternalLink, Search, Mail, User, Briefcase, X, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Globe, ExternalLink, Search, Mail, User, Briefcase, X, ChevronRight, ChevronLeft, ArrowLeft } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import PageHero from '@/components/PageHero';
@@ -621,6 +621,21 @@ const Miembros: React.FC = () => {
             </p>
           </div>
         </motion.div>
+
+        <nav
+          className="mt-16 md:mt-20 pt-10 pb-6 border-t flex justify-center"
+          style={{ borderColor: "var(--regu-gray-100)" }}
+          aria-label="Navegación final"
+        >
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-base font-semibold transition-colors bg-[#4489C6]/10 hover:bg-[#4489C6]/16 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4489C6] focus-visible:ring-offset-2"
+            style={{ color: "var(--regu-blue)" }}
+          >
+            <ArrowLeft className="w-4 h-4 shrink-0" aria-hidden />
+            Volver a inicio
+          </Link>
+        </nav>
       </div>
     </div>
     </>

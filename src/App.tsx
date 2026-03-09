@@ -37,6 +37,8 @@ import BuscarDocumentos from '@/pages/BuscarDocumentos';
 import AccesoDocumentos from '@/pages/AccesoDocumentos';
 import MicrositioBuenasPracticas from '@/pages/MicrositioBuenasPracticas';
 import Subscribe from '@/pages/Subscribe';
+import CanalYouTube from '@/pages/CanalYouTube';
+import DeclaracionPrivacidad from '@/pages/DeclaracionPrivacidad';
 import QueSomos from '@/pages/quienes-somos/QueSomos';
 import VisionMision from '@/pages/quienes-somos/VisionMision';
 import ObjetivosYFunciones from '@/pages/quienes-somos/ObjetivosYFunciones';
@@ -86,6 +88,8 @@ function App() {
               <Route path="/convenios/:slug" element={<ConvenioDetalle />} />
           <Route path="/contacto" element={<Contacto />} />
               <Route path="/subscribe" element={<Subscribe />} />
+              <Route path="/canal-youtube" element={<CanalYouTube />} />
+              <Route path="/declaracion-de-privacidad" element={<DeclaracionPrivacidad />} />
               <Route path="/pendiente/:slug" element={<TodoPlaceholder />} />
               {/* Rutas individuales de entes reguladores */}
           <Route path="/sub-secretaria-telecom" element={<EnteRegulador />} />
