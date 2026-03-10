@@ -13,6 +13,7 @@ import {
   BookOpen,
   Search,
   Lock,
+  ArrowLeft,
 } from "lucide-react";
 import { getRestrictedDocument, isRestrictedUnlocked } from "@/config/restrictedDocuments";
 import PageHero from "@/components/PageHero";
@@ -316,6 +317,25 @@ export default function Gestion() {
             </motion.div>
           )}
         </div>
+
+        <nav
+          className="mt-16 md:mt-20 pt-10 pb-6 border-t flex justify-center"
+          style={{ borderColor: "var(--regu-gray-100)" }}
+          aria-label="Navegación final"
+        >
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-base font-semibold transition-colors border-2 hover:bg-[#4489C6]/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--regu-blue)] focus-visible:ring-offset-2"
+            style={{
+              color: "var(--regu-blue)",
+              borderColor: "var(--regu-blue)",
+              backgroundColor: "rgba(68, 137, 198, 0.08)",
+            }}
+          >
+            <ArrowLeft className="w-4 h-4 shrink-0" aria-hidden />
+            Volver a inicio
+          </Link>
+        </nav>
       </div>
 
       {/* Modal de Preview de PDF */}
