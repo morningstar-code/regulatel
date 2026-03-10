@@ -153,47 +153,93 @@
   }
 }
 
-/* Mega panel: subheaders con tamaño fijo para que nada los sobrescriba (desktop 18px) */
+/* Mega panel: títulos de columna — más presencia, jerarquía clara */
 .header-font-fixed .mega-panel-subheader {
-  font-size: 18px !important;
+  font-size: 22px !important;
   font-weight: 800 !important;
-  letter-spacing: 0.04em !important;
-  line-height: 1.2 !important;
-  margin-bottom: 20px !important;
+  letter-spacing: 0.07em !important;
+  line-height: 1.25 !important;
+  margin-bottom: 30px !important;
   color: var(--regu-navy) !important;
 }
 @media (max-width: 1024px) {
   .header-font-fixed .mega-panel-subheader {
-    font-size: 17px !important;
+    font-size: 20px !important;
+    margin-bottom: 26px !important;
   }
 }
 @media (max-width: 768px) {
   .header-font-fixed .mega-panel-subheader {
-    font-size: 16px !important;
+    font-size: 18px !important;
+    margin-bottom: 22px !important;
   }
 }
 
-/* Mega menu links: tamaño y legibilidad (desktop 16px, no depender de variables) */
+/* Mega menu: enlaces — escala más sólida, respiración */
 .header-font-fixed .mega-menu-link {
   font-size: 16px !important;
-  line-height: 1.4 !important;
+  line-height: 1.55 !important;
   font-weight: 600 !important;
+  padding-top: 3px !important;
+  padding-bottom: 3px !important;
+}
+.header-font-fixed .mega-panel-category-link {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  line-height: 1.52 !important;
+}
+/* Hijos (subcategorías / documentos): más legibles, nivel subordinado */
+.header-font-fixed .mega-panel-child-link {
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  line-height: 1.52 !important;
 }
 @media (max-width: 1024px) {
-  .header-font-fixed .mega-menu-link {
+  .header-font-fixed .mega-menu-link,
+  .header-font-fixed .mega-panel-category-link {
     font-size: 15px !important;
   }
-}
-@media (max-width: 768px) {
-  .header-font-fixed .mega-menu-link {
+  .header-font-fixed .mega-panel-child-link {
     font-size: 14px !important;
   }
 }
-/* Un poco más de aire entre ítems del mega panel (solo desktop; móvil ya tiene py-2) */
+@media (max-width: 768px) {
+  .header-font-fixed .mega-menu-link,
+  .header-font-fixed .mega-panel-category-link {
+    font-size: 15px !important;
+  }
+  .header-font-fixed .mega-panel-child-link {
+    font-size: 14px !important;
+  }
+}
+
+/* Texto secundario — más legible, claramente subordinado */
+.header-font-fixed .mega-panel-secondary {
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  line-height: 1.45 !important;
+  color: var(--regu-gray-500) !important;
+  margin-top: 8px !important;
+}
+
+/* Subtítulos de año (Revista Digital): más presencia, integrados */
+.header-font-fixed .mega-panel-year-subtitle {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.1em !important;
+  color: var(--regu-gray-700) !important;
+}
+
+/* Aire entre grupos (categoría + hijos) — ritmo vertical más marcado */
 .header-font-fixed .mega-panel-links > li {
-  margin-bottom: 5px !important;
+  margin-bottom: 38px !important;
 }
 .header-font-fixed .mega-panel-links > li:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* Último ítem de cada sublista sin margen extra */
+.header-font-fixed .mega-panel-children .mega-panel-child-item:last-child {
   margin-bottom: 0 !important;
 }
 

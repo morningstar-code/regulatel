@@ -34,22 +34,22 @@ const PageHero: React.FC<PageHeroProps> = ({ title, subtitle, breadcrumb, descri
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="flex items-center gap-2 mb-6 text-sm text-white/80"
+            className="flex flex-wrap items-center gap-2.5 md:gap-3 mb-6 text-base md:text-lg text-white/90"
           >
-            <Link to="/" className="hover:text-white transition-colors flex items-center gap-1">
-              <Home className="w-4 h-4" />
-              HOME
+            <Link to="/" className="hover:text-white transition-colors flex items-center gap-2 font-medium">
+              <Home className="w-5 h-5 md:w-5 md:h-5 shrink-0" aria-hidden />
+              <span>HOME</span>
             </Link>
             {breadcrumb.map((item, index) => (
               <React.Fragment key={index}>
-                <ChevronRight className="w-4 h-4 text-white/60" />
+                <ChevronRight className="w-5 h-5 text-white/70 shrink-0" aria-hidden />
                 {item.path ? (
-                  <Link to={item.path} className="hover:text-white transition-colors">
+                  <Link to={item.path} className="hover:text-white transition-colors font-medium">
                     {item.label}
                   </Link>
                 ) : (
                   <span
-                    className="text-white font-medium border-b-2 pb-0.5"
+                    className="text-white font-semibold border-b-2 pb-1"
                     style={{ borderColor: 'var(--regu-lime)' }}
                   >
                     {item.label}

@@ -13,26 +13,32 @@ const fadeIn = {
   },
 };
 
-// Mapeo directo de URLs de logos reales desde regulatel.org
+// Logos locales desde gallery (public/images/logos y public/images/comite-ejecutivo)
 const logoUrlMap: Record<string, string> = {
-  'sub-secretaria-telecom': 'https://www.regulatel.org/sites/default/files/gallery/4.%20SUB%20SECRETARIA%20TELECOM.png',
-  'anatel': 'https://www.regulatel.org/sites/default/files/gallery/3.%20ANATEL.png',
-  'att': 'https://www.regulatel.org/sites/default/files/gallery/2.%20ATT.png',
-  'enacom': 'https://www.regulatel.org/sites/default/files/portfolio-images/1.%20ENACOM%202024.png',
-  'sutel': 'https://www.regulatel.org/sites/default/files/gallery/6.%20SUTEL.png.png',
-  'min-com': 'https://www.regulatel.org/sites/default/files/gallery/7.%20MIN%20COM.png',
-  'agcom': 'https://www.regulatel.org/sites/default/files/gallery/13.%20AGCOM.png',
-  'arcotel': 'https://www.regulatel.org/sites/default/files/gallery/8.%20ARCOTEL.png',
-  'crc': 'https://www.regulatel.org/sites/default/files/portfolio-images/CRC%20Home.png',
-  'cnmc': 'https://www.regulatel.org/sites/default/files/gallery/10.%20CNMC.png',
-  'sit': 'https://www.regulatel.org/sites/default/files/gallery/11.%20SIT.png',
-  'conatel': 'https://www.regulatel.org/sites/default/files/gallery/12.%20CONATEL.png',
-  'indotel': '/images/logos/indotel.jpg',
-  'ift': 'https://www.regulatel.org/sites/default/files/gallery/ift.png',
-  'subtel': 'https://www.regulatel.org/sites/default/files/gallery/subtel.png',
-  'mtc': 'https://www.regulatel.org/sites/default/files/gallery/mtc.png',
-  'conatel-gt': 'https://www.regulatel.org/sites/default/files/gallery/conatel-gt.png',
-  'super-tel': 'https://www.regulatel.org/sites/default/files/gallery/super-tel.png',
+  'sub-secretaria-telecom': '/images/logos/sub-secretaria-telecom.png',
+  'anatel': '/images/comite-ejecutivo/anatel.png',
+  'att': '/images/logos/att.png',
+  'enacom': '/images/logos/enacom.png',
+  'sutel': '/images/logos/sutel.png',
+  'min-com': '/images/logos/min-com.png',
+  'agcom': '/images/logos/agcom.png',
+  'arcotel': '/images/logos/arcotel.png',
+  'crc': '/images/logos/crc.png',
+  'cnmc': '/images/logos/cnmc.png',
+  'sit': '/images/logos/sit.png',
+  'conatel': '/images/logos/conatel.png',
+  'indotel': '/images/logos/indotel.png',
+  'ift': '/images/logos/ift.png',
+  'subtel': '/images/logos/subtel.png',
+  'osiptel': '/images/logos/osiptel.png',
+  'conatel-gt': '/images/logos/conatel-gt.png',
+  'conatel-py': '/images/logos/conatel-py.png',
+  'anacom': '/images/logos/anacom.png',
+  'net': '/images/logos/net.png',
+  'ursec': '/images/logos/ursec.png',
+  'conatel-ve': '/images/logos/conatel-ve.png',
+  'asep': '/images/logos/asep.png',
+  'telcor': '/images/logos/telcor.png',
 };
 
 // Componente inteligente para cargar logos con múltiples intentos
@@ -41,39 +47,10 @@ const LogoImage: React.FC<{ name: string; route: string }> = ({ name, route }) =
   const [hasError, setHasError] = React.useState(false);
   const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
   const routeKey = route.replace('/', '');
-  const baseUrl = 'https://www.regulatel.org';
-  
-  // Generar todas las posibles URLs - primero el mapeo directo
   const possibleUrls = React.useMemo(() => {
-    const urls: string[] = [];
-    
-    // Primero intentar el mapeo directo (URLs reales)
-    if (logoUrlMap[routeKey]) {
-      urls.push(logoUrlMap[routeKey]);
-    }
-    
-    // Luego intentar variaciones como fallback
-    const extensions = ['.png', '.jpg', '.jpeg', '.svg', '.gif'];
-    const paths = [
-      `/sites/default/files/gallery/${routeKey}`,
-      `/sites/default/files/portfolio-images/${routeKey}`,
-      `/sites/default/files/gallery/${routeKey}.png`,
-      `/sites/default/files/portfolio-images/${routeKey}.png`,
-    ];
-    
-    paths.forEach(path => {
-      extensions.forEach(ext => {
-        if (!path.endsWith(ext)) {
-          const url = `${baseUrl}${path}${ext}`;
-          if (!urls.includes(url)) {
-            urls.push(url);
-          }
-        }
-      });
-    });
-    
-    return urls;
-  }, [routeKey, baseUrl]);
+    const url = logoUrlMap[routeKey];
+    return url ? [url] : [];
+  }, [routeKey]);
   
   useEffect(() => {
     if (possibleUrls.length > 0) {
@@ -121,6 +98,7 @@ interface EnteInfo {
   name: string;
   country: string;
   fullName?: string;
+  displayTitle?: string;
   route: string;
   externalUrl: string;
   website?: string;
@@ -142,12 +120,18 @@ const websiteMap: Record<string, string> = {
   'conatel': 'https://www.conatel.gob.hn',
   'indotel': 'https://www.indotel.gob.do',
   'ift': 'https://www.ift.org.mx',
-  'mtc': 'https://www.gob.pe/mtc',
+  'osiptel': 'https://www.osiptel.gob.pe',
   'conatel-gt': 'https://www.conatel.gob.gt',
   'sit': 'https://www.siget.gob.sv',
-  'min-com': 'https://www.telecomunicaciones.gob.ec',
+  'min-com': 'https://www.mincom.gob.cu',
   'sub-secretaria-telecom': 'https://www.argentina.gob.ar/secretaria-de-innovacion-publica/subsecretaria-de-telecomunicaciones',
-  'super-tel': 'https://www.super.gob.ec',
+  'conatel-py': 'https://www.conatel.gov.py',
+  'anacom': 'https://www.anacom.pt',
+  'net': 'https://www.jrsp.pr.gov',
+  'ursec': 'https://www.ursec.gub.uy',
+  'conatel-ve': 'https://www.conatel.gob.ve',
+  'asep': 'https://www.asep.gob.pa',
+  'telcor': 'https://www.telcor.gob.ni',
 };
 
 // Mapeo de autoridades de cada ente regulador
@@ -165,16 +149,16 @@ const authoritiesMap: Record<string, AuthorityInfo[]> = {
     { name: 'Claudio Araya San Martín', role: 'Subsecretario' }
   ],
   'crc': [
-    { name: 'Claudia Ximena Bustamante Osorio', role: 'Directora Ejecutiva' }
+    { name: 'Felipe Augusto Díaz Suaza', role: 'Director Ejecutivo' }
   ],
   'sutel': [
-    { name: 'Federico Chacón Loaiza', role: 'Presidente' }
+    { name: 'Carlos Watson Carazo', role: 'Presidente' }
   ],
   'arcotel': [
     { name: 'Jorge Roberto Hoyos Zavala', role: 'Director Ejecutivo' }
   ],
   'sit': [
-    { name: 'Herbert Armando Rubio Montes', role: 'Superintendente' }
+    { name: 'Manuel Aguilar', role: 'Superintendente' }
   ],
   'cnmc': [
     { name: 'Alejandra de Iturriaga', role: 'Directora de Telecomunicaciones y Servicios Audiovisuales' },
@@ -185,6 +169,32 @@ const authoritiesMap: Record<string, AuthorityInfo[]> = {
   ],
   'agcom': [
     { name: 'Giacomo Lasorella', role: 'Presidente' }
+  ],
+  'osiptel': [
+    { name: 'Jesus Guillén Marroquín', role: 'Presidente ejecutivo (e)' }
+  ],
+  'conatel-py': [
+    { name: 'Juan Carlos Duarte Duré', role: 'Presidente' }
+  ],
+  'anacom': [
+    { name: 'Sandra Maximiano', role: 'Presidente del Consejo de Administración' }
+  ],
+  'net': [
+    { name: 'Ferdinand A. Ramos Soegaard', role: 'Presidente de la Junta Reglamentadora' }
+  ],
+  'ursec': [
+    { name: 'Gonzalo Balseiro', role: 'Presidente' },
+    { name: 'Bruno Fernandez', role: 'Vicepresidente' },
+    { name: 'Leandro Claramunt', role: 'Director' }
+  ],
+  'conatel-ve': [
+    { name: 'Jorge Elieser Márquez Monsalve', role: 'Presidente' }
+  ],
+  'asep': [
+    { name: 'Zelmar Rodríguez Crespo', role: 'Administradora General' }
+  ],
+  'telcor': [
+    { name: 'Nahima Díaz Flores', role: 'Directora General' }
   ],
   'indotel': [
     { name: 'Guido Orlando Gómez Mazara', role: 'Presidente del Consejo Directivo' },
@@ -201,9 +211,6 @@ const authoritiesMap: Record<string, AuthorityInfo[]> = {
   ],
   'min-com': [
     { name: 'Wilfredo López Rodríguez', role: 'Director de Regulaciones' }
-  ],
-  'super-tel': [
-    { name: 'Jorge Roberto Hoyos Zavala', role: 'Director Ejecutivo' }
   ],
 };
 
@@ -257,28 +264,32 @@ const entesInfo: Record<string, EnteInfo> = {
     authorities: authoritiesMap['sutel']
   },
   'min-com': {
-    name: 'MINISTERIO DE COMUNICACIONES',
-    country: 'Ecuador',
+    name: 'MINCOM',
+    country: 'Cuba',
+    fullName: 'Ministerio de Comunicaciones',
+    displayTitle: 'MINCOM – CUBA',
     route: '/min-com',
-    externalUrl: 'https://www.regulatel.org/min-com',
+    externalUrl: 'https://www.mincom.gob.cu',
     website: websiteMap['min-com'],
-    description: 'Ministerio de Comunicaciones de Ecuador.',
+    description: 'Ministerio de Comunicaciones de Cuba.',
     authorities: authoritiesMap['min-com']
   },
   'agcom': {
     name: 'AGCOM',
     country: 'Italia',
     fullName: 'Autorità per le Garanzie nelle Comunicazioni',
+    displayTitle: 'AGCOM – ITALIA',
     route: '/agcom',
     externalUrl: 'https://www.regulatel.org/agcom',
     website: websiteMap['agcom'],
-    description: 'Autorità per le Garanzie nelle Comunicaciones de Italia.',
+    description: 'Autorità per le Garanzie nelle Comunicazioni de Italia.',
     authorities: authoritiesMap['agcom']
   },
   'arcotel': {
     name: 'ARCOTEL',
     country: 'Ecuador',
     fullName: 'Agencia de Regulación y Control de las Telecomunicaciones',
+    displayTitle: 'ARCOTEL – ECUADOR',
     route: '/arcotel',
     externalUrl: 'https://www.regulatel.org/arcotel',
     website: websiteMap['arcotel'],
@@ -306,11 +317,12 @@ const entesInfo: Record<string, EnteInfo> = {
     authorities: authoritiesMap['cnmc']
   },
   'sit': {
-    name: 'SIT',
+    name: 'SIGET',
     country: 'El Salvador',
     fullName: 'Superintendencia General de Electricidad y Telecomunicaciones',
+    displayTitle: 'SIGET – EL SALVADOR',
     route: '/sit',
-    externalUrl: 'https://www.regulatel.org/sit',
+    externalUrl: 'https://www.siget.gob.sv',
     website: websiteMap['sit'],
     description: 'Superintendencia General de Electricidad y Telecomunicaciones de El Salvador.',
     authorities: authoritiesMap['sit']
@@ -355,14 +367,93 @@ const entesInfo: Record<string, EnteInfo> = {
     description: 'Subsecretaría de Telecomunicaciones de Chile.',
     authorities: authoritiesMap['subtel']
   },
-  'mtc': {
-    name: 'MTC',
+  'osiptel': {
+    name: 'OSIPTEL',
     country: 'Perú',
-    fullName: 'Ministerio de Transportes y Comunicaciones',
-    route: '/mtc',
-    externalUrl: 'https://www.regulatel.org/mtc',
-    website: websiteMap['mtc'],
-    description: 'Ministerio de Transportes y Comunicaciones de Perú.'
+    fullName: 'Organismo Supervisor de Inversión Privada en Telecomunicaciones',
+    displayTitle: 'OSIPTEL – PERÚ',
+    route: '/osiptel',
+    externalUrl: 'https://www.osiptel.gob.pe',
+    website: websiteMap['osiptel'],
+    description: 'Organismo Supervisor de Inversión Privada en Telecomunicaciones de Perú.',
+    authorities: authoritiesMap['osiptel']
+  },
+  'conatel-py': {
+    name: 'CONATEL',
+    country: 'Paraguay',
+    fullName: 'Comisión Nacional de Telecomunicaciones',
+    displayTitle: 'CONATEL – PARAGUAY',
+    route: '/conatel-py',
+    externalUrl: 'https://www.conatel.gov.py',
+    website: websiteMap['conatel-py'],
+    description: 'Comisión Nacional de Telecomunicaciones de Paraguay.',
+    authorities: authoritiesMap['conatel-py']
+  },
+  'anacom': {
+    name: 'ANACOM',
+    country: 'Portugal',
+    fullName: 'Autoridade Nacional de Comunicações',
+    displayTitle: 'ANACOM – PORTUGAL',
+    route: '/anacom',
+    externalUrl: 'https://www.anacom.pt',
+    website: websiteMap['anacom'],
+    description: 'Autoridade Nacional de Comunicações de Portugal.',
+    authorities: authoritiesMap['anacom']
+  },
+  'net': {
+    name: 'NET',
+    country: 'Puerto Rico',
+    fullName: 'Negociado de Telecomunicaciones de Puerto Rico',
+    displayTitle: 'NET – PUERTO RICO',
+    route: '/net',
+    externalUrl: 'https://www.jrsp.pr.gov',
+    website: websiteMap['net'],
+    description: 'Negociado de Telecomunicaciones de Puerto Rico.',
+    authorities: authoritiesMap['net']
+  },
+  'ursec': {
+    name: 'URSEC',
+    country: 'Uruguay',
+    fullName: 'Unidad Reguladora de Servicios de Comunicaciones',
+    displayTitle: 'URSEC – URUGUAY',
+    route: '/ursec',
+    externalUrl: 'https://www.ursec.gub.uy',
+    website: websiteMap['ursec'],
+    description: 'Unidad Reguladora de Servicios de Comunicaciones de Uruguay.',
+    authorities: authoritiesMap['ursec']
+  },
+  'conatel-ve': {
+    name: 'CONATEL',
+    country: 'Venezuela',
+    fullName: 'Comisión Nacional de Telecomunicaciones',
+    displayTitle: 'CONATEL – VENEZUELA',
+    route: '/conatel-ve',
+    externalUrl: 'https://www.conatel.gob.ve',
+    website: websiteMap['conatel-ve'],
+    description: 'Comisión Nacional de Telecomunicaciones de Venezuela.',
+    authorities: authoritiesMap['conatel-ve']
+  },
+  'asep': {
+    name: 'ASEP',
+    country: 'Panamá',
+    fullName: 'Autoridad Nacional de los Servicios Públicos',
+    displayTitle: 'ASEP – PANAMÁ',
+    route: '/asep',
+    externalUrl: 'https://www.asep.gob.pa',
+    website: websiteMap['asep'],
+    description: 'Autoridad Nacional de los Servicios Públicos de Panamá.',
+    authorities: authoritiesMap['asep']
+  },
+  'telcor': {
+    name: 'TELCOR',
+    country: 'Nicaragua',
+    fullName: 'Instituto Nicaraguense de Telecomunicaciones y Correo',
+    displayTitle: 'TELCOR – NICARAGUA',
+    route: '/telcor',
+    externalUrl: 'https://www.telcor.gob.ni',
+    website: websiteMap['telcor'],
+    description: 'Instituto Nicaraguense de Telecomunicaciones y Correo de Nicaragua.',
+    authorities: authoritiesMap['telcor']
   },
   'conatel-gt': {
     name: 'CONATEL',
@@ -373,16 +464,6 @@ const entesInfo: Record<string, EnteInfo> = {
     website: websiteMap['conatel-gt'],
     description: 'Comisión Nacional de Telecomunicaciones de Guatemala.',
     authorities: authoritiesMap['conatel-gt']
-  },
-  'super-tel': {
-    name: 'SUPERTEL',
-    country: 'Ecuador',
-    fullName: 'Superintendencia de Telecomunicaciones',
-    route: '/super-tel',
-    externalUrl: 'https://www.regulatel.org/super-tel',
-    website: websiteMap['super-tel'],
-    description: 'Superintendencia de Telecomunicaciones de Ecuador.',
-    authorities: authoritiesMap['super-tel']
   },
 };
 
@@ -406,9 +487,15 @@ const EnteRegulador: React.FC = () => {
     '/indotel': 'indotel',
     '/ift': 'ift',
     '/subtel': 'subtel',
-    '/mtc': 'mtc',
+    '/osiptel': 'osiptel',
     '/conatel-gt': 'conatel-gt',
-    '/super-tel': 'super-tel',
+    '/conatel-py': 'conatel-py',
+    '/anacom': 'anacom',
+    '/net': 'net',
+    '/ursec': 'ursec',
+    '/conatel-ve': 'conatel-ve',
+    '/asep': 'asep',
+    '/telcor': 'telcor',
   };
   
   const key = routeToKey[routePath] || routePath.replace('/', '');
@@ -463,7 +550,7 @@ const EnteRegulador: React.FC = () => {
               </div>
             </div>
             <div className="flex-1">
-              <h1 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: 'var(--regu-gray-900)' }}>{ente.name}</h1>
+              <h1 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: 'var(--regu-gray-900)' }}>{ente.displayTitle ?? ente.name}</h1>
               {ente.fullName && (
                 <p className="text-lg mb-4 font-medium" style={{ color: 'var(--regu-gray-700)' }}>{ente.fullName}</p>
               )}
@@ -474,7 +561,7 @@ const EnteRegulador: React.FC = () => {
               
               {ente.authorities && ente.authorities.length > 0 && (
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--regu-gray-900)' }}>{ente.name} – {ente.country}</h3>
+                  <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--regu-gray-900)' }}>{ente.displayTitle ?? `${ente.name} – ${ente.country}`}</h3>
                   <div className="space-y-3">
                     {ente.authorities.map((authority, index) => (
                       <div key={index} className="flex items-start gap-3">

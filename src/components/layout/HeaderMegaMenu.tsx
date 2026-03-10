@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Lock } from "lucide-react";
 import NavMegaPanel from "@/components/layout/NavMegaPanel";
 import MegaMenuEvents from "@/components/layout/MegaMenuEvents";
 import ConveniosMenu from "@/components/convenios/ConveniosMenu";
@@ -406,9 +406,9 @@ export default function HeaderMegaMenu() {
                     />
                   </div>
                 ) : hasPanel && expanded && item.columns?.length ? (
-                  <div id={panelId} className="space-y-4 border-t px-3 py-4" style={{ borderColor: "var(--mega-divider)" }}>
+                  <div id={panelId} className="space-y-6 border-t px-4 py-5" style={{ borderColor: "var(--mega-divider)" }}>
                     {item.columns?.map((column) => (
-                      <div key={column.title} className="space-y-2">
+                      <div key={column.title} className="space-y-3">
                         <h3
                           className="mega-panel-subheader uppercase"
                           style={{
@@ -417,7 +417,7 @@ export default function HeaderMegaMenu() {
                         >
                           {column.title}
                         </h3>
-                        <ul className="list-none space-y-0 p-0" style={{ margin: 0 }}>
+                        <ul className="mega-panel-links list-none space-y-0 p-0" style={{ margin: 0 }}>
                           {column.links.map((link) => (
                             <li key={link.label}>
                               {link.external ? (
@@ -425,7 +425,7 @@ export default function HeaderMegaMenu() {
                                   href={link.href}
                                   target="_blank"
                                   rel="noreferrer noopener"
-                                  className="mega-menu-link block py-2 transition-colors hover:text-[var(--mega-link-hover-color)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--token-accent)]"
+                                  className="mega-menu-link block py-2.5 transition-colors hover:text-[var(--mega-link-hover-color)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--token-accent)]"
                                   style={{
                                     color: "var(--mega-link-color)",
                                   }}
@@ -435,7 +435,7 @@ export default function HeaderMegaMenu() {
                               ) : (
                                 <Link
                                   to={link.href}
-                                  className="mega-menu-link block py-2 transition-colors hover:text-[var(--mega-link-hover-color)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--token-accent)]"
+                                  className="mega-menu-link block py-2.5 transition-colors hover:text-[var(--mega-link-hover-color)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--token-accent)]"
                                   style={{
                                     color: "var(--mega-link-color)",
                                   }}
@@ -443,36 +443,66 @@ export default function HeaderMegaMenu() {
                                   {link.label}
                                 </Link>
                               )}
+                              {link.subtitle && (
+                                <span className="mega-panel-secondary mt-0.5 block pl-0">
+                                  {link.subtitle}
+                                </span>
+                              )}
                               {link.children?.length ? (
-                                <ul className="mt-0 list-none border-l pl-4" style={{ margin: 0, borderColor: "var(--mega-divider)" }}>
-                                  {link.children.map((child) => (
-                                    <li key={child.label}>
-                                      {child.external ? (
-                                        <a
-                                          href={child.href}
-                                          target="_blank"
-                                          rel="noreferrer noopener"
-                                          className="mega-menu-link block py-2 transition-colors hover:text-[var(--mega-link-hover-color)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--token-accent)]"
-                                          style={{
-                                            color: "var(--mega-link-color)",
-                                          }}
-                                        >
-                                          {child.label}
-                                        </a>
-                                      ) : (
-                                        <Link
-                                          to={child.href}
-                                          className="mega-menu-link block py-2 transition-colors hover:text-[var(--mega-link-hover-color)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--token-accent)]"
-                                          style={{
-                                            color: "var(--mega-link-color)",
-                                          }}
-                                        >
-                                          {child.label}
-                                        </Link>
-                                      )}
-                                    </li>
-                                  ))}
-                                </ul>
+                                (() => {
+                                  const hasGroups = link.children.some((c) => "groupLabel" in c && c.groupLabel);
+                                  const childList = (children: typeof link.children) => (
+                                    <ul className="mega-panel-children mt-2 list-none border-l-2 pl-5 space-y-1" style={{ margin: 0, borderColor: "var(--regu-gray-100)" }}>
+                                      {children.map((child) => (
+                                        <li key={child.label} className="mega-panel-child-item">
+                                          {child.external ? (
+                                            <a
+                                              href={child.href}
+                                              target="_blank"
+                                              rel="noreferrer noopener"
+                                              className="mega-menu-link mega-panel-child-link block py-2 transition-colors hover:text-[var(--mega-link-hover-color)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--token-accent)]"
+                                              style={{ color: "var(--mega-link-color)" }}
+                                            >
+                                              {child.label}
+                                            </a>
+                                          ) : child.restricted ? (
+                                            <span className="block">
+                                              <Link to={child.href} className="mega-menu-link mega-panel-child-link inline-flex items-center gap-1.5 py-2 transition-colors hover:text-[var(--mega-link-hover-color)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--token-accent)]" style={{ color: "var(--mega-link-color)" }}>
+                                                <Lock className="h-3.5 w-3.5 shrink-0 opacity-85" aria-hidden />
+                                                {child.label}
+                                              </Link>
+                                              <span className="mega-panel-secondary mt-0.5 block">Acceso restringido</span>
+                                            </span>
+                                          ) : (
+                                            <Link to={child.href} className="mega-menu-link mega-panel-child-link block py-2 transition-colors hover:text-[var(--mega-link-hover-color)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--token-accent)]" style={{ color: "var(--mega-link-color)" }}>
+                                              {child.label}
+                                            </Link>
+                                          )}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  );
+                                  if (!hasGroups) return childList(link.children);
+                                  const groups: { label: string; items: typeof link.children }[] = [];
+                                  const seen = new Set<string>();
+                                  for (const child of link.children) {
+                                    const g = child.groupLabel ?? "";
+                                    if (!seen.has(g)) { seen.add(g); groups.push({ label: g, items: [] }); }
+                                    groups.find((x) => x.label === g)!.items.push(child);
+                                  }
+                                  return (
+                                    <div className="mt-4 space-y-6">
+                                      {groups.map((group) => (
+                                        <div key={group.label}>
+                                          <p className="mega-panel-year-subtitle mb-2.5 font-semibold uppercase tracking-wider pl-5">
+                                            {group.label}
+                                          </p>
+                                          {childList(group.items)}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  );
+                                })()
                               ) : null}
                             </li>
                           ))}

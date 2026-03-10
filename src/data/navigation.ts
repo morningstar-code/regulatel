@@ -7,6 +7,8 @@ export interface NavigationItemLink {
   restricted?: boolean;
   /** Microtexto opcional bajo el label (ej: "Solo usuarios autorizados") */
   subtitle?: string;
+  /** Agrupa este ítem bajo un subtítulo en la lista de hijos (ej: "2026", "2025") */
+  groupLabel?: string;
   todo?: string;
   children?: NavigationItemLink[];
 }
@@ -75,10 +77,10 @@ export const navigationItems: NavigationItem[] = [
             label: "Planes de trabajo",
             href: "/gestion?tipo=planes-actas",
             children: [
-              { label: "Plan de Trabajo 2026", href: "/gestion?tipo=planes-actas&id=plan-2026" },
-              { label: "Plan de Trabajo 2025", href: "/gestion?tipo=planes-actas&id=plan-2025" },
-              { label: "Plan de Trabajo 2024", href: "/gestion?tipo=planes-actas&id=plan-2024" },
-              { label: "Plan de Trabajo 2023", href: "/gestion?tipo=planes-actas&id=acta-2023" },
+              { label: "Plan de Trabajo 2026", href: "/gestion?tipo=planes-actas&id=plan-2026", groupLabel: "2026" },
+              { label: "Plan de Trabajo 2025", href: "/gestion?tipo=planes-actas&id=plan-2025", groupLabel: "2025" },
+              { label: "Plan de Trabajo 2024", href: "/gestion?tipo=planes-actas&id=plan-2024", groupLabel: "2024" },
+              { label: "Plan de Trabajo 2023", href: "/gestion?tipo=planes-actas&id=acta-2023", groupLabel: "2023" },
             ],
           },
           {
@@ -106,11 +108,11 @@ export const navigationItems: NavigationItem[] = [
             label: "Revista Digital REGULATEL",
             href: "/gestion?tipo=revista",
             children: [
-              { label: "1. Edición 2026", href: "/gestion?tipo=revista" },
-              { label: "4. Edición 2025", href: "/gestion?tipo=revista&id=revista-q4-2025" },
-              { label: "3. Edición 2025", href: "/gestion?tipo=revista&id=revista-q3-2025" },
-              { label: "2. Edición 2025", href: "/gestion?tipo=revista&id=revista-q2-2025" },
-              { label: "1. Edición 2025", href: "/gestion?tipo=revista&id=revista-q1-2025" },
+              { label: "1. Edición 2026", href: "/gestion?tipo=revista", groupLabel: "2026" },
+              { label: "4. Edición 2025", href: "/gestion?tipo=revista&id=revista-q4-2025", groupLabel: "2025" },
+              { label: "3. Edición 2025", href: "/gestion?tipo=revista&id=revista-q3-2025", groupLabel: "2025" },
+              { label: "2. Edición 2025", href: "/gestion?tipo=revista&id=revista-q2-2025", groupLabel: "2025" },
+              { label: "1. Edición 2025", href: "/gestion?tipo=revista&id=revista-q1-2025", groupLabel: "2025" },
             ],
           },
         ],

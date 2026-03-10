@@ -11,17 +11,25 @@ interface NavMegaPanelProps {
 }
 
 /**
- * Single link — BEREC 1:1: 13px, line-height 28px, weight 600, hover underline + accent.
+ * Single link — legible, jerarquía clara (categoría vs hijo vs secundario).
  */
 function PanelLink({
   link,
   onLinkClick,
+  variant = "default",
 }: {
   link: NavigationItemLink;
   onLinkClick: () => void;
+  variant?: "category" | "child" | "default";
 }) {
   const baseClass =
     "mega-menu-link block transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-[var(--token-accent)]";
+  const variantClass =
+    variant === "category"
+      ? "mega-panel-category-link"
+      : variant === "child"
+        ? "mega-panel-child-link"
+        : "";
   const style = {
     fontFamily: "var(--token-font-body)",
     fontSize: "var(--mega-link-size)",
@@ -32,6 +40,8 @@ function PanelLink({
     padding: 0,
   } as React.CSSProperties;
 
+  const className = [baseClass, variantClass].filter(Boolean).join(" ");
+
   if (link.external) {
     return (
       <a
@@ -39,7 +49,7 @@ function PanelLink({
         target="_blank"
         rel="noreferrer noopener"
         onClick={onLinkClick}
-        className={baseClass}
+        className={className}
         style={style}
       >
         {link.label}
@@ -51,14 +61,11 @@ function PanelLink({
   if (link.restricted) {
     return (
       <span className="block">
-        <Link to={link.href} onClick={onLinkClick} className={baseClass} style={style}>
+        <Link to={link.href} onClick={onLinkClick} className={className} style={style}>
           <Lock className="mr-1.5 inline-block h-3.5 w-3.5 shrink-0 opacity-85" aria-hidden />
           {link.label}
         </Link>
-        <span
-          className="mt-0.5 block text-xs"
-          style={{ color: "var(--regu-gray-500)", fontWeight: 500 }}
-        >
+        <span className="mega-panel-secondary mt-1.5 block">
           Acceso restringido
         </span>
       </span>
@@ -66,7 +73,7 @@ function PanelLink({
   }
 
   return (
-    <Link to={link.href} onClick={onLinkClick} className={baseClass} style={style}>
+    <Link to={link.href} onClick={onLinkClick} className={className} style={style}>
       {link.label}
     </Link>
   );
@@ -104,7 +111,7 @@ export default function NavMegaPanel({
           display: "grid",
           gridTemplateColumns:
             columns.length === 3
-              ? "1fr 1fr 1fr"
+              ? "1.08fr 1fr 0.92fr"
               : columns.length === 2
                 ? "1fr 1fr"
                 : `repeat(${columns.length}, 1fr)`,
@@ -115,6 +122,7 @@ export default function NavMegaPanel({
           paddingBottom: "var(--mega-padding-y-bottom)",
           paddingLeft: "var(--mega-padding-x)",
           paddingRight: "var(--mega-padding-x)",
+          alignItems: "start",
         }}
       >
         {columns.map((column, index) => (
@@ -139,31 +147,101 @@ export default function NavMegaPanel({
             <ul className="mega-panel-links list-none p-0" style={{ margin: 0 }}>
               {column.links.map((link) => (
                 <li key={link.label} style={{ margin: 0 }}>
-                  <PanelLink link={link} onLinkClick={onLinkClick} />
+                  <PanelLink
+                    link={link}
+                    onLinkClick={onLinkClick}
+                    variant={link.children?.length ? "category" : "default"}
+                  />
                   {link.subtitle && (
-                    <span
-                      className="mt-0.5 block text-xs"
-                      style={{ color: "var(--regu-gray-500)", fontWeight: 500 }}
-                    >
+                    <span className="mega-panel-secondary mt-1.5 block">
                       {link.subtitle}
                     </span>
                   )}
                   {link.children?.length ? (
-                    <ul
-                      className="list-none pl-4"
-                      style={{
-                        margin: 0,
-                        marginTop: "2px",
-                        borderLeft: "var(--mega-col-divider)",
-                        paddingLeft: "12px",
-                      }}
-                    >
-                      {link.children.map((child) => (
-                        <li key={child.label} style={{ margin: 0 }}>
-                          <PanelLink link={child} onLinkClick={onLinkClick} />
-                        </li>
-                      ))}
-                    </ul>
+                    (() => {
+                      const hasGroups = link.children.some((c) => c.groupLabel);
+                      if (!hasGroups) {
+                        return (
+                          <ul
+                            className="mega-panel-children list-none"
+                            style={{
+                              margin: 0,
+                              marginTop: "14px",
+                              paddingLeft: "var(--mega-child-indent, 20px)",
+                              borderLeft: "2px solid var(--regu-gray-100)",
+                            }}
+                          >
+                            {link.children.map((child) => (
+                              <li
+                                key={child.label}
+                                className="mega-panel-child-item"
+                                style={{
+                                  margin: 0,
+                                  marginBottom: "var(--mega-child-spacing, 10px)",
+                                }}
+                              >
+                                <PanelLink
+                                  link={child}
+                                  onLinkClick={onLinkClick}
+                                  variant="child"
+                                />
+                              </li>
+                            ))}
+                          </ul>
+                        );
+                      }
+                      const groups: { label: string; items: typeof link.children }[] = [];
+                      const seen = new Set<string>();
+                      for (const child of link.children) {
+                        const g = child.groupLabel ?? "";
+                        if (!seen.has(g)) {
+                          seen.add(g);
+                          groups.push({ label: g, items: [] });
+                        }
+                        groups.find((x) => x.label === g)!.items.push(child);
+                      }
+                      return (
+                        <div className="mt-5 space-y-7">
+                          {groups.map((group) => (
+                            <div key={group.label}>
+                              <p
+                                className="mega-panel-year-subtitle mb-3 font-semibold uppercase tracking-wider"
+                                style={{
+                                  paddingLeft: "var(--mega-child-indent, 24px)",
+                                }}
+                              >
+                                {group.label}
+                              </p>
+                              <ul
+                                className="mega-panel-children list-none"
+                                style={{
+                                  margin: 0,
+                                  paddingLeft: "var(--mega-child-indent, 20px)",
+                                  borderLeft: "2px solid var(--regu-gray-100)",
+                                }}
+                              >
+                                {group.items.map((child) => (
+                                  <li
+                                    key={child.label}
+                                    className="mega-panel-child-item"
+                                    style={{
+                                      margin: 0,
+                                      marginBottom: "var(--mega-child-spacing, 10px)",
+                                    }}
+                                  >
+                                    <PanelLink
+                                      link={child}
+                                      onLinkClick={onLinkClick}
+                                      variant="child"
+                                    />
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          ))}
+                        </div>
+                      );
+                    })()
                   ) : null}
                 </li>
               ))}

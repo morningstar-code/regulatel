@@ -24,27 +24,32 @@ interface EnteRegulador {
   externalUrl: string;
 }
 
-// Mapeo directo de URLs de logos reales desde regulatel.org
+// Logos locales (public/images/logos)
 const logoUrlMap: Record<string, string> = {
-  'sub-secretaria-telecom': 'https://www.regulatel.org/sites/default/files/gallery/4.%20SUB%20SECRETARIA%20TELECOM.png',
-  'anatel': 'https://www.regulatel.org/sites/default/files/gallery/3.%20ANATEL.png',
-  'att': 'https://www.regulatel.org/sites/default/files/gallery/2.%20ATT.png',
-  'enacom': 'https://www.regulatel.org/sites/default/files/portfolio-images/1.%20ENACOM%202024.png',
-  'sutel': 'https://www.regulatel.org/sites/default/files/gallery/6.%20SUTEL.png.png',
-  'min-com': 'https://www.regulatel.org/sites/default/files/gallery/7.%20MIN%20COM.png',
-  'agcom': 'https://www.regulatel.org/sites/default/files/gallery/13.%20AGCOM.png',
-  'arcotel': 'https://www.regulatel.org/sites/default/files/gallery/8.%20ARCOTEL.png',
-  'crc': 'https://www.regulatel.org/sites/default/files/portfolio-images/CRC%20Home.png',
-  'cnmc': 'https://www.regulatel.org/sites/default/files/gallery/10.%20CNMC.png',
-  'sit': 'https://www.regulatel.org/sites/default/files/gallery/11.%20SIT.png',
-  'conatel': 'https://www.regulatel.org/sites/default/files/gallery/12.%20CONATEL.png',
-  'indotel': '/images/logos/indotel.jpg',
-  'ift': 'https://www.regulatel.org/sites/default/files/gallery/ift.png',
-  'subtel': 'https://www.regulatel.org/sites/default/files/gallery/subtel.png',
-  'mtc': 'https://www.regulatel.org/sites/default/files/gallery/mtc.png',
-  'conatel-gt': 'https://www.regulatel.org/sites/default/files/gallery/conatel-gt.png',
-  'super-tel': 'https://www.regulatel.org/sites/default/files/gallery/super-tel.png',
-  'crt': '/images/comite-ejecutivo/crt.png',
+  'sub-secretaria-telecom': '/images/logos/sub-secretaria-telecom.png',
+  'anatel': '/images/comite-ejecutivo/anatel.png',
+  'att': '/images/logos/att.png',
+  'enacom': '/images/logos/enacom.png',
+  'sutel': '/images/logos/sutel.png',
+  'min-com': '/images/logos/min-com.png',
+  'agcom': '/images/logos/agcom.png',
+  'arcotel': '/images/logos/arcotel.png',
+  'crc': '/images/logos/crc.png',
+  'cnmc': '/images/logos/cnmc.png',
+  'sit': '/images/logos/sit.png',
+  'conatel': '/images/logos/conatel.png',
+  'indotel': '/images/logos/indotel.png',
+  'ift': '/images/logos/ift.png',
+  'subtel': '/images/logos/subtel.png',
+  'osiptel': '/images/logos/osiptel.png',
+  'conatel-gt': '/images/logos/conatel-gt.png',
+  'conatel-py': '/images/logos/conatel-py.png',
+  'anacom': '/images/logos/anacom.png',
+  'net': '/images/logos/net.png',
+  'ursec': '/images/logos/ursec.png',
+  'conatel-ve': '/images/logos/conatel-ve.png',
+  'asep': '/images/logos/asep.png',
+  'telcor': '/images/logos/telcor.png',
 };
 
 // Componente inteligente para cargar logos con múltiples intentos
@@ -53,39 +58,11 @@ const LogoImage: React.FC<{ name: string; route: string }> = ({ name, route }) =
   const [hasError, setHasError] = React.useState(false);
   const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
   const routeKey = route.replace('/', '');
-  const baseUrl = 'https://www.regulatel.org';
   
-  // Generar todas las posibles URLs - primero el mapeo directo
   const possibleUrls = React.useMemo(() => {
-    const urls: string[] = [];
-    
-    // Primero intentar el mapeo directo (URLs reales)
-    if (logoUrlMap[routeKey]) {
-      urls.push(logoUrlMap[routeKey]);
-    }
-    
-    // Luego intentar variaciones como fallback
-    const extensions = ['.png', '.jpg', '.jpeg', '.svg', '.gif'];
-    const paths = [
-      `/sites/default/files/gallery/${routeKey}`,
-      `/sites/default/files/portfolio-images/${routeKey}`,
-      `/sites/default/files/gallery/${routeKey}.png`,
-      `/sites/default/files/portfolio-images/${routeKey}.png`,
-    ];
-    
-    paths.forEach(path => {
-      extensions.forEach(ext => {
-        if (!path.endsWith(ext)) {
-          const url = `${baseUrl}${path}${ext}`;
-          if (!urls.includes(url)) {
-            urls.push(url);
-          }
-        }
-      });
-    });
-    
-    return urls;
-  }, [routeKey, baseUrl]);
+    const url = logoUrlMap[routeKey];
+    return url ? [url] : [];
+  }, [routeKey]);
   
   useEffect(() => {
     if (possibleUrls.length > 0) {
@@ -133,29 +110,29 @@ interface DirectorioAutoridad {
 }
 
 const directorioAutoridades: DirectorioAutoridad[] = [
-  { pais: 'COLOMBIA', presidente: 'Claudia Ximena Bustamante', corresponsal: 'Mariana Sarmiento', correo: 'mariana.sarmiento@crcom.gov.co', cargo: 'Relaciones con grupos de valor' },
+  { pais: 'COLOMBIA', presidente: 'Felipe Augusto Díaz Suaza', corresponsal: 'Mariana Sarmiento', correo: 'mariana.sarmiento@crcom.gov.co', cargo: 'Director Ejecutivo' },
   { pais: 'HONDURAS', presidente: 'Lorenzo Sauceda Calix', corresponsal: 'Claudia Rosario Reyes Solis', correo: 'rosario.reyes@conatel.gob.hn', cargo: 'Jefe Unidad de Relaciones Internacionales e Interistitucionales' },
-  { pais: 'COSTA RICA', presidente: 'Federico Chacón Loaiza', corresponsal: 'Ivannia Morales', correo: 'ivannia.morales@sutel.go.cr', cargo: 'Asesora del Consejo y Coordinadora de Asuntos Internacionales' },
-  { pais: 'CUBA', presidente: 'Wilfredo Reynaldo Lopez Rodriguez', corresponsal: 'Melba Pita Calderon', correo: 'Melba.pita@mincom.gob.cu', cargo: 'Especialista superior' },
+  { pais: 'COSTA RICA', presidente: 'Carlos Watson Carazo', corresponsal: 'Ivannia Morales', correo: 'ivannia.morales@sutel.go.cr', cargo: 'Presidente' },
+  { pais: 'CUBA', presidente: 'Wilfredo López Rodríguez', corresponsal: 'Melba Pita Calderon', correo: 'Melba.pita@mincom.gob.cu', cargo: 'Director de Regulaciones' },
   { pais: 'REPÚBLICA DOMINICANA', presidente: 'Guido Orlando Gómez Mazara', corresponsal: 'Amparo Arango Echeverri', correo: 'aarango@indotel.gob.do', cargo: 'Directora Relaciones Internacionales' },
   { pais: 'MÉXICO', presidente: 'Javier Juárez Mojica', corresponsal: 'Diana Haidee Gómez Gallardo', correo: 'diana.gomez@ift.org.mx', cargo: 'Directora de Política Internacional' },
-  { pais: 'PERÚ', presidente: 'Jesus Guillén Marroquín', corresponsal: 'Vanessa Castillo Mendives', correo: 'vcastillo@osiptel.gob.pe', cargo: 'Coordinadora de Relaciones Internacionales y Cooperación Técnica' },
+  { pais: 'PERÚ', presidente: 'Jesus Guillén Marroquín', corresponsal: 'Vanessa Castillo Mendives', correo: 'vcastillo@osiptel.gob.pe', cargo: 'Presidente ejecutivo (e)' },
   { pais: 'GUATEMALA', presidente: 'Herbert Armando Rubio Montes', corresponsal: 'Ingrid Roxanda García Santiago', correo: 'ingrid.garcia@sit.gob.gt', cargo: 'Asesora Asuntos Nacionales e Internacionales' },
-  { pais: 'PORTUGAL', presidente: 'Sandra Maximiano', corresponsal: 'Rita Silva', correo: 'rita.silva@anacom.pt', cargo: 'Head of European Union Affairs' },
+  { pais: 'PORTUGAL', presidente: 'Sandra Maximiano', corresponsal: 'Rita Silva', correo: 'rita.silva@anacom.pt', cargo: 'Presidente del Consejo de Administración' },
   { pais: 'BRASIL', presidente: 'Carlos Baigorri', corresponsal: 'Salerme Oliveira', correo: 'salerme@anatel.gov.br', cargo: 'Assessor' },
   { pais: 'ESPAÑA', presidente: 'Alejandra de Iturriaga', corresponsal: 'Antonio Serra Bastida', correo: 'antonio.serra@cnmc.es', cargo: 'Funcionario' },
-  { pais: 'URUGUAY', presidente: 'Gonzalo Balseiro', corresponsal: 'Carol Dolinkas', correo: 'cdolinkas@ursec.gub.uy', cargo: 'Jefa de Relaciones Internacionales' },
-  { pais: 'VENEZUELA', presidente: 'Jorge Eliéser Marquez Monsalve', corresponsal: 'Mariana Solymer Calderón Martínez', correo: 'mcalderon@conatel.gob.ve', cargo: 'Jefa de División de Seguimiento Internacional' },
+  { pais: 'URUGUAY', presidente: 'Gonzalo Balseiro', corresponsal: 'Bruno Fernandez, Leandro Claramunt', correo: 'cdolinkas@ursec.gub.uy', cargo: 'Presidente / Vicepresidente / Director' },
+  { pais: 'VENEZUELA', presidente: 'Jorge Elieser Márquez Monsalve', corresponsal: 'Mariana Solymer Calderón Martínez', correo: 'mcalderon@conatel.gob.ve', cargo: 'Presidente' },
   { pais: 'BOLIVIA', presidente: 'Néstor Ríos Rivero', corresponsal: 'Alan Wilbert Borda Rivera', correo: 'aborda@att.gob.bo', cargo: 'Responsable de Relaciones Internacionales' },
-  { pais: 'ECUADOR', presidente: 'Jorge Roberto Hoyos Zavala', corresponsal: 'Jenny Paulina Zhunio Cifuentes', correo: 'paulina.zhunio@arcotel.gob.ec', cargo: 'Especialista Jefe 1' },
+  { pais: 'ECUADOR', presidente: 'Jorge Roberto Hoyos Zavala', corresponsal: 'Jenny Paulina Zhunio Cifuentes', correo: 'paulina.zhunio@arcotel.gob.ec', cargo: 'Director Ejecutivo' },
   { pais: 'ARGENTINA', presidente: 'Juan Martín Ozores', corresponsal: 'Daniel Jorge Carletti', correo: 'dcarletti@enacom.gob.ar', cargo: 'Subdirección de Asuntos Internacionales' },
-  { pais: 'ITALIA', presidente: 'Giacomo Lasorella', corresponsal: 'Antonio De Tommaso', correo: 'Ia.detommaso@agcom.it; sri@agcom.it', cargo: 'Head of EU and International Affairs Office' },
-  { pais: 'EL SALVADOR', presidente: 'Manuel Ernesto Aguilar', corresponsal: 'Maria Escobar', correo: 'mescobar@siget.gob.sv', cargo: 'Jefa de Unidad de Organismos Multilaterales' },
-  { pais: 'NICARAGUA', presidente: 'Nahima Díaz Flores', corresponsal: 'Alina Rivas', correo: 'arivas@telcor.gob.ni', cargo: 'Enlace para temas internacionales' },
-  { pais: 'PANAMÁ', presidente: 'Zelmar Rodríguez de Massiah', corresponsal: 'Ana De la Rosa', correo: 'adelarosa@asep.gob.pa', cargo: 'Enlace Internacional' },
+  { pais: 'ITALIA', presidente: 'Giacomo Lasorella', corresponsal: 'Antonio De Tommaso', correo: 'Ia.detommaso@agcom.it; sri@agcom.it', cargo: 'Presidente' },
+  { pais: 'EL SALVADOR', presidente: 'Manuel Aguilar', corresponsal: 'Maria Escobar', correo: 'mescobar@siget.gob.sv', cargo: 'Superintendente' },
+  { pais: 'NICARAGUA', presidente: 'Nahima Díaz Flores', corresponsal: 'Alina Rivas', correo: 'arivas@telcor.gob.ni', cargo: 'Directora General' },
+  { pais: 'PANAMÁ', presidente: 'Zelmar Rodríguez Crespo', corresponsal: 'Ana De la Rosa', correo: 'adelarosa@asep.gob.pa', cargo: 'Administradora General' },
   { pais: 'CHILE', presidente: 'Claudio Araya San Martín', corresponsal: 'Denis Gonzalez Grandjean', correo: 'dgonzalezg@subtel.gob.cl', cargo: 'Abogado Unidad de Asuntos Internacionales' },
-  { pais: 'PUERTO RICO', presidente: 'Ferdinand A. Ramos Soegaard', corresponsal: 'Rafael O. García Santiago', correo: 'rgarcia@jrsp.pr.gov', cargo: 'Secretario Auxiliar de la Junta del Negociado de Telecomunicaciones' },
-  { pais: 'PARAGUAY', presidente: 'Juan Carlos Duarte Duré', corresponsal: 'Marco Cubilla Da Silva', correo: 'mcubilla@conatel.gov.py', cargo: 'Funcionario' },
+  { pais: 'PUERTO RICO', presidente: 'Ferdinand A. Ramos Soegaard', corresponsal: 'Rafael O. García Santiago', correo: 'rgarcia@jrsp.pr.gov', cargo: 'Presidente de la Junta Reglamentadora' },
+  { pais: 'PARAGUAY', presidente: 'Juan Carlos Duarte Duré', corresponsal: 'Marco Cubilla Da Silva', correo: 'mcubilla@conatel.gov.py', cargo: 'Presidente' },
 ];
 
 const Miembros: React.FC = () => {
@@ -190,19 +167,24 @@ const Miembros: React.FC = () => {
     { name: 'ANATEL', country: 'Brasil', fullName: 'Agência Nacional de Telecomunicações', route: '/anatel', externalUrl: 'https://www.regulatel.org/anatel' },
     { name: 'SUBTEL', country: 'Chile', fullName: 'Subsecretaría de Telecomunicaciones', route: '/subtel', externalUrl: 'https://www.regulatel.org/subtel' },
     { name: 'CRC', country: 'Colombia', fullName: 'Comisión de Regulación de Comunicaciones', route: '/crc', externalUrl: 'https://www.regulatel.org/crc' },
-    { name: 'CRT', country: 'Costa Rica', fullName: 'Comisión Reguladora de Telecomunicaciones', route: '/crt', externalUrl: 'https://www.crt.go.cr' },
-    { name: 'SUTEL', country: 'Costa Rica', fullName: 'Superintendencia de Telecomunicaciones', route: '/sutel', externalUrl: 'https://www.regulatel.org/sutel' },
-    { name: 'SIT', country: 'El Salvador', fullName: 'Superintendencia General de Electricidad y Telecomunicaciones', route: '/sit', externalUrl: 'https://www.regulatel.org/sit' },
-    { name: 'ARCOTEL', country: 'Ecuador', fullName: 'Agencia de Regulación y Control de las Telecomunicaciones', route: '/arcotel', externalUrl: 'https://www.regulatel.org/arcotel' },
-    { name: 'MINISTERIO DE COMUNICACIONES', country: 'Ecuador', route: '/min-com', externalUrl: 'https://www.regulatel.org/min-com' },
-    { name: 'SUPERTEL', country: 'Ecuador', fullName: 'Superintendencia de Telecomunicaciones', route: '/super-tel', externalUrl: 'https://www.regulatel.org/super-tel' },
+    { name: 'SUTEL', country: 'Costa Rica', fullName: 'Superintendencia de Telecomunicaciones', route: '/sutel', externalUrl: 'https://www.sutel.go.cr' },
+    { name: 'SIGET', country: 'El Salvador', fullName: 'Superintendencia General de Electricidad y Telecomunicaciones', route: '/sit', externalUrl: 'https://www.regulatel.org/sit' },
+    { name: 'ARCOTEL', country: 'Ecuador', fullName: 'Agencia de Regulación y Control de las Telecomunicaciones', route: '/arcotel', externalUrl: 'https://www.arcotel.gob.ec' },
+    { name: 'MINCOM', country: 'Cuba', fullName: 'Ministerio de Comunicaciones', route: '/min-com', externalUrl: 'https://www.mincom.gob.cu' },
     { name: 'CNMC', country: 'España', fullName: 'Comisión Nacional de los Mercados y la Competencia', route: '/cnmc', externalUrl: 'https://www.regulatel.org/cnmc' },
     { name: 'CONATEL', country: 'Guatemala', fullName: 'Comisión Nacional de Telecomunicaciones', route: '/conatel-gt', externalUrl: 'https://www.regulatel.org/conatel-gt' },
     { name: 'CONATEL', country: 'Honduras', fullName: 'Comisión Nacional de Telecomunicaciones', route: '/conatel', externalUrl: 'https://www.regulatel.org/conatel' },
     { name: 'AGCOM', country: 'Italia', fullName: 'Autorità per le Garanzie nelle Comunicazioni', route: '/agcom', externalUrl: 'https://www.regulatel.org/agcom' },
     { name: 'IFT', country: 'México', fullName: 'Instituto Federal de Telecomunicaciones', route: '/ift', externalUrl: 'https://www.regulatel.org/ift' },
-    { name: 'MTC', country: 'Perú', fullName: 'Ministerio de Transportes y Comunicaciones', route: '/mtc', externalUrl: 'https://www.regulatel.org/mtc' },
+    { name: 'TELCOR', country: 'Nicaragua', fullName: 'Instituto Nicaraguense de Telecomunicaciones y Correo', route: '/telcor', externalUrl: 'https://www.telcor.gob.ni' },
+    { name: 'ASEP', country: 'Panamá', fullName: 'Autoridad Nacional de los Servicios Públicos', route: '/asep', externalUrl: 'https://www.asep.gob.pa' },
+    { name: 'CONATEL', country: 'Paraguay', fullName: 'Comisión Nacional de Telecomunicaciones', route: '/conatel-py', externalUrl: 'https://www.conatel.gov.py' },
+    { name: 'OSIPTEL', country: 'Perú', fullName: 'Organismo Supervisor de Inversión Privada en Telecomunicaciones', route: '/osiptel', externalUrl: 'https://www.osiptel.gob.pe' },
+    { name: 'ANACOM', country: 'Portugal', fullName: 'Autoridade Nacional de Comunicações', route: '/anacom', externalUrl: 'https://www.anacom.pt' },
+    { name: 'NET', country: 'Puerto Rico', fullName: 'Negociado de Telecomunicaciones de Puerto Rico', route: '/net', externalUrl: 'https://www.jrsp.pr.gov' },
     { name: 'INDOTEL', country: 'República Dominicana', fullName: 'Instituto Dominicano de las Telecomunicaciones', route: '/indotel', externalUrl: 'https://www.regulatel.org/indotel' },
+    { name: 'URSEC', country: 'Uruguay', fullName: 'Unidad Reguladora de Servicios de Comunicaciones', route: '/ursec', externalUrl: 'https://www.ursec.gub.uy' },
+    { name: 'CONATEL', country: 'Venezuela', fullName: 'Comisión Nacional de Telecomunicaciones', route: '/conatel-ve', externalUrl: 'https://www.conatel.gob.ve' },
   ];
   const entesReguladores = useMemo(
     () => [...entesReguladoresBase].sort((a, b) => a.country.localeCompare(b.country, 'es')),

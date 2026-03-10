@@ -44,7 +44,6 @@ export const comiteEjecutivoData: ComiteEjecutivoData = {
   miembros: [
     { name: "ATT", logoUrl: `${LOGOS}/att.png`, linkUrl: "https://www.att.gob.bo", country: "Bolivia" },
     { name: "ANATEL", logoUrl: `${LOGOS}/anatel.png`, linkUrl: "https://www.anatel.gov.br", country: "Brasil" },
-    { name: "CRT - Comisión Reguladora de Telecomunicaciones", logoUrl: `${LOGOS}/crt.png`, linkUrl: "https://www.crt.go.cr", country: "Costa Rica" },
     { name: "SUTEL", logoUrl: `${LOGOS}/sutel.png`, linkUrl: "https://www.sutel.go.cr", country: "Costa Rica" },
     { name: "CNMC", logoUrl: `${LOGOS}/cnmc.png`, linkUrl: "https://www.cnmc.es", country: "España" },
     { name: "OSIPTEL", logoUrl: `${LOGOS}/osiptel.png`, linkUrl: "https://www.osiptel.gob.pe", country: "Perú" },

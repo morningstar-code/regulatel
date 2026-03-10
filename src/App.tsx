@@ -107,10 +107,15 @@ function App() {
           <Route path="/indotel" element={<EnteRegulador />} />
           <Route path="/ift" element={<EnteRegulador />} />
           <Route path="/subtel" element={<EnteRegulador />} />
-          <Route path="/mtc" element={<EnteRegulador />} />
+          <Route path="/osiptel" element={<EnteRegulador />} />
           <Route path="/conatel-gt" element={<EnteRegulador />} />
-              <Route path="/super-tel" element={<EnteRegulador />} />
-          <Route path="/crt" element={<EnteRegulador />} />
+          <Route path="/conatel-py" element={<EnteRegulador />} />
+          <Route path="/anacom" element={<EnteRegulador />} />
+          <Route path="/net" element={<EnteRegulador />} />
+          <Route path="/ursec" element={<EnteRegulador />} />
+          <Route path="/conatel-ve" element={<EnteRegulador />} />
+          <Route path="/asep" element={<EnteRegulador />} />
+          <Route path="/telcor" element={<EnteRegulador />} />
             </Route>
           </Routes>
         </AdminDataProvider>
