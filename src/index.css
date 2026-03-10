@@ -153,6 +153,26 @@
   }
 }
 
+/* Mega panel: adaptación al viewport (Mac/Safari, laptops) — scroll interno elegante */
+.mega-panel-viewport {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+.mega-panel-viewport::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.mega-panel-viewport::-webkit-scrollbar-track {
+  background: transparent;
+}
+.mega-panel-viewport::-webkit-scrollbar-thumb {
+  background: rgba(22, 61, 89, 0.2);
+  border-radius: 4px;
+}
+.mega-panel-viewport::-webkit-scrollbar-thumb:hover {
+  background: rgba(22, 61, 89, 0.35);
+}
+
 /* Mega panel: títulos de columna — azul institucional fuerte + línea sutil */
 .header-font-fixed .mega-panel-subheader {
   font-size: 27px !important;

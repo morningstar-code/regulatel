@@ -151,6 +151,8 @@
   --mega-child-indent: 28px;
   --mega-child-spacing: 11px;
   --mega-year-subtitle-size: 15px;
+  /* Mega panel: límite al viewport (header + margen) para no cortar en Mac/Safari */
+  --mega-panel-viewport-offset: 140px;
   /* Nav active/hover underline bar */
   --nav-underline-height: 2px;
   --nav-underline-width: 48px;

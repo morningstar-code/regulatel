@@ -96,13 +96,15 @@ export default function NavMegaPanel({
       role="region"
       aria-label={label}
       className={[
-        "absolute left-0 right-0 top-full z-50 w-full transition-[visibility,opacity,transform] duration-150 motion-reduce:transition-none",
+        "mega-panel-viewport absolute left-0 right-0 top-full z-50 w-full transition-[visibility,opacity,transform] duration-150 motion-reduce:transition-none",
         isOpen ? "visible translate-y-0 opacity-100" : "invisible -translate-y-0.5 opacity-0",
       ].join(" ")}
       style={{
         fontFamily: "var(--token-font-body)",
         background: "var(--mega-panel-bg)",
         borderBottom: "var(--mega-panel-border-bottom)",
+        maxHeight: "calc(100vh - var(--mega-panel-viewport-offset, 140px))",
+        overflowY: "auto",
       }}
     >
       <div
