@@ -151,9 +151,9 @@ export default function TopBarBerecLike({
           </Link>
         </div>
 
-        {/* (2) Centro: 2 search inputs — puede encogerse para dejar sitio a la derecha */}
-        <div className="topbarCenter hidden md:flex items-center" style={{ gap: "16px", flex: "1 1 0", minWidth: 0, justifyContent: "center", maxWidth: "720px" }}>
-          <form onSubmit={handleSearchWebsite} role="search" aria-label="Buscar en el sitio" className="searchField flex items-center rounded-xl shrink-0" style={{ width: "280px", minWidth: "200px", height: `${searchHeight}px`, border: searchBorder, borderRadius: "12px", background: searchBg, paddingLeft: "14px", paddingRight: "14px", boxShadow: "none" }}>
+        {/* (2) Centro: 2 search inputs — minWidth evita que colapse y que el bloque a-/a/a+ invada el buscador */}
+        <div className="topbarCenter hidden md:flex items-center" style={{ gap: "16px", flex: "1 1 0", minWidth: "432px", justifyContent: "center", maxWidth: "720px" }}>
+          <form onSubmit={handleSearchWebsite} role="search" aria-label="Buscar en el sitio" className="searchField flex items-center rounded-xl min-w-0 flex-[1_1_280px]" style={{ maxWidth: "280px", minWidth: "200px", height: `${searchHeight}px`, border: searchBorder, borderRadius: "12px", background: searchBg, paddingLeft: "14px", paddingRight: "14px", boxShadow: "none" }}>
             <Search className="searchIcon shrink-0" style={{ width: "18px", height: "18px", color: "#4B5563", marginRight: "10px" }} aria-hidden />
             <SiteSearchAutocomplete
               value={searchWebsite}
@@ -161,7 +161,7 @@ export default function TopBarBerecLike({
               placeholder="BUSCAR EN EL SITIO"
             />
           </form>
-          <form onSubmit={handleSearchDocuments} role="search" aria-label="Buscar documentos" className="searchField flex items-center rounded-xl shrink-0" style={{ width: "280px", minWidth: "200px", height: `${searchHeight}px`, border: searchBorder, borderRadius: "12px", background: searchBg, paddingLeft: "14px", paddingRight: "14px", boxShadow: "none" }}>
+          <form onSubmit={handleSearchDocuments} role="search" aria-label="Buscar documentos" className="searchField flex items-center rounded-xl min-w-0 flex-[1_1_280px]" style={{ maxWidth: "280px", minWidth: "200px", height: `${searchHeight}px`, border: searchBorder, borderRadius: "12px", background: searchBg, paddingLeft: "14px", paddingRight: "14px", boxShadow: "none" }}>
             <FileText className="searchIcon shrink-0" style={{ width: "18px", height: "18px", color: "#4B5563", marginRight: "10px" }} aria-hidden />
             <input
               type="search"
