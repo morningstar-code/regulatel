@@ -20,11 +20,11 @@ export default function ConveniosList({ convenios }: ConveniosListProps) {
               boxShadow: "var(--token-shadow-card)",
             }}
           >
-            <div className="flex-shrink-0 flex items-center justify-center sm:justify-start w-full sm:w-40 h-28 sm:h-32">
+            <div className="flex-shrink-0 flex items-center justify-center sm:justify-start w-full sm:w-52 h-36 sm:h-40">
               <img
                 src={c.logoSrc}
                 alt={`Logo ${c.acronym}`}
-                className="max-h-[70px] w-auto object-contain"
+                className="max-h-[110px] sm:max-h-[120px] w-auto object-contain"
               />
             </div>
             <div className="flex-1 min-w-0">

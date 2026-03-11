@@ -173,51 +173,49 @@
   background: rgba(22, 61, 89, 0.35);
 }
 
-/* Mega panel: títulos de columna — azul institucional, compacto vertical */
+/* Mega panel: títulos de columna — escalan con a-/a/a+ */
 .header-font-fixed .mega-panel-subheader {
-  font-size: 27px !important;
+  font-size: var(--mega-heading-size) !important;
   font-weight: 800 !important;
   letter-spacing: 0.09em !important;
   line-height: 1.22 !important;
   margin-bottom: 20px !important;
   color: var(--regu-navy) !important;
-  border-bottom: 2px solid rgba(68, 137, 198, 0.22) !important;
+  border-bottom: 2px solid rgba(68, 137, 198, 0.28) !important;
   padding-bottom: 6px !important;
 }
 @media (max-width: 1024px) {
   .header-font-fixed .mega-panel-subheader {
-    font-size: 24px !important;
+    font-size: calc(var(--mega-heading-size) * 0.89) !important;
     margin-bottom: 18px !important;
     padding-bottom: 5px !important;
   }
 }
 @media (max-width: 768px) {
   .header-font-fixed .mega-panel-subheader {
-    font-size: 21px !important;
+    font-size: calc(var(--mega-heading-size) * 0.78) !important;
     margin-bottom: 16px !important;
     padding-bottom: 5px !important;
   }
 }
 
-/* Mega menu: categorías — gris oscuro legible */
+/* Mega menu: categorías y enlaces — escalan con a-/a/a+ */
 .header-font-fixed .mega-panel-category-link {
-  font-size: 18px !important;
+  font-size: var(--mega-link-size) !important;
   font-weight: 700 !important;
   line-height: 1.45 !important;
   color: var(--regu-gray-900) !important;
 }
-/* Mega menu: enlaces genéricos */
 .header-font-fixed .mega-menu-link {
-  font-size: 18px !important;
+  font-size: var(--mega-link-size) !important;
   line-height: 1.45 !important;
   font-weight: 700 !important;
   padding-top: 2px !important;
   padding-bottom: 2px !important;
   color: var(--regu-gray-900) !important;
 }
-/* Hijos (documentos/planes): mismo gris, hover azul — fáciles de escanear */
 .header-font-fixed .mega-panel-child-link {
-  font-size: 17px !important;
+  font-size: var(--mega-child-size) !important;
   font-weight: 600 !important;
   line-height: 1.45 !important;
   color: var(--regu-gray-900) !important;
@@ -225,41 +223,39 @@
 @media (max-width: 1024px) {
   .header-font-fixed .mega-menu-link,
   .header-font-fixed .mega-panel-category-link {
-    font-size: 17px !important;
+    font-size: calc(var(--mega-link-size) * 0.94) !important;
   }
   .header-font-fixed .mega-panel-child-link {
-    font-size: 16px !important;
+    font-size: calc(var(--mega-child-size) * 0.94) !important;
   }
 }
 @media (max-width: 768px) {
   .header-font-fixed .mega-menu-link,
   .header-font-fixed .mega-panel-category-link {
-    font-size: 17px !important;
+    font-size: calc(var(--mega-link-size) * 0.94) !important;
   }
   .header-font-fixed .mega-panel-child-link {
-    font-size: 16px !important;
+    font-size: calc(var(--mega-child-size) * 0.94) !important;
   }
 }
 
-/* Texto secundario — gris medio elegante, compacto */
+/* Texto secundario y años — escalan con a-/a/a+ */
 .header-font-fixed .mega-panel-secondary {
-  font-size: 15px !important;
+  font-size: var(--mega-secondary-size) !important;
   font-weight: 600 !important;
   line-height: 1.4 !important;
   color: var(--regu-gray-700) !important;
   margin-top: 4px !important;
 }
-
-/* Subtítulos de año — azul institucional, poco margen para compactar */
 .header-font-fixed .mega-panel-year-subtitle {
-  font-size: 15px !important;
+  font-size: var(--mega-year-subtitle-size) !important;
   font-weight: 700 !important;
   letter-spacing: 0.1em !important;
   color: var(--regu-blue) !important;
-  border-left: 3px solid rgba(51, 164, 180, 0.5) !important;
+  border-left: 3px solid rgba(51, 164, 180, 0.55) !important;
   padding-left: 20px !important;
   margin-left: 0 !important;
-  margin-bottom: 8px !important;
+  margin-bottom: 10px !important;
 }
 
 /* Espacio entre grupos (Planes, Asambleas, Revista, etc.) — controlado como Eventos */
@@ -273,6 +269,13 @@
 /* Último ítem de cada sublista sin margen extra */
 .header-font-fixed .mega-panel-children .mega-panel-child-item:last-child {
   margin-bottom: 0 !important;
+}
+
+/* Columna Herramientas: mismo peso visual que las demás (altura unificada + base sutil) */
+.mega-panel-col-last {
+  padding-bottom: 1rem !important;
+  background: rgba(22, 61, 89, 0.02);
+  border-radius: 0 0 6px 0;
 }
 
 /* Mega menu links: hover + focus — guiado visual sin recargar */

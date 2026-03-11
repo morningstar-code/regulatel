@@ -33,10 +33,21 @@ export default function HeroInstitucionalBackground() {
         </radialGradient>
       </defs>
 
-      {/* Silueta muy tenue de la región (América Latina): abstracción editorial */}
+      {/* Mapa regional: Sudamérica simplificado, estilo punteado institucional — referencia latinoamericana */}
       <path
-        d="M 200 140 C 320 80 480 70 620 110 C 780 160 820 260 780 380 C 720 500 520 540 340 500 C 180 460 120 320 160 180 Z"
-        fill="rgba(255,255,255,0.028)"
+        d="M 380 95 L 420 100 Q 520 85 640 110 Q 780 140 820 200 Q 860 280 840 380 Q 800 480 680 520 Q 520 540 380 500 Q 260 450 220 350 Q 200 240 260 150 Q 320 100 380 95 Z"
+        fill="none"
+        stroke="rgba(255,255,255,0.055)"
+        strokeWidth="0.9"
+        strokeLinejoin="round"
+        strokeDasharray="5 12"
+        opacity="1"
+      />
+
+      {/* Silueta muy tenue de la región: relleno suave para anclar el mapa */}
+      <path
+        d="M 380 95 L 420 100 Q 520 85 640 110 Q 780 140 820 200 Q 860 280 840 380 Q 800 480 680 520 Q 520 540 380 500 Q 260 450 220 350 Q 200 240 260 150 Q 320 100 380 95 Z"
+        fill="rgba(255,255,255,0.018)"
         stroke="none"
         opacity="1"
       />

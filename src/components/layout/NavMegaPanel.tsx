@@ -103,38 +103,49 @@ export default function NavMegaPanel({
         fontFamily: "var(--token-font-body)",
         background: "var(--mega-panel-bg)",
         borderBottom: "var(--mega-panel-border-bottom)",
+        boxShadow: "var(--mega-panel-shadow)",
         maxHeight: "var(--mega-panel-max-height, 62vh)",
         overflowY: "auto",
       }}
     >
       <div
-        className="w-full"
+        className="w-full mx-auto"
         style={{
-          display: "grid",
-          gridTemplateColumns:
-            columns.length === 3
-              ? "1.08fr 1fr 0.92fr"
-              : columns.length === 2
-                ? "1fr 1fr"
-                : `repeat(${columns.length}, 1fr)`,
-          columnGap: "var(--mega-column-gap)",
           maxWidth: columns.length === 2 ? "720px" : "var(--mega-wrapper-max)",
-          margin: "0 auto",
           paddingTop: "var(--mega-padding-y-top)",
           paddingBottom: "var(--mega-padding-y-bottom)",
           paddingLeft: "var(--mega-padding-x)",
           paddingRight: "var(--mega-padding-x)",
-          alignItems: "start",
+          border: "var(--mega-panel-inner-border)",
+          borderTop: "none",
+          borderBottomLeftRadius: "10px",
+          borderBottomRightRadius: "10px",
+          boxShadow: "0 2px 12px rgba(22, 61, 89, 0.04)",
         }}
       >
+        <div
+          className="w-full mega-panel-grid"
+          style={{
+            display: "grid",
+            gridTemplateColumns:
+              columns.length === 3
+                ? "1fr 1fr 1fr"
+                : columns.length === 2
+                  ? "1fr 1fr"
+                  : `repeat(${columns.length}, 1fr)`,
+            columnGap: "var(--mega-column-gap)",
+            alignItems: "stretch",
+          }}
+        >
         {columns.map((column, index) => (
           <div
             key={column.title}
-            className="min-w-0"
+            className={`min-w-0 flex flex-col ${index === columns.length - 1 && columns.length === 3 ? "mega-panel-col-last" : ""}`}
             style={{
               paddingLeft: "var(--mega-col-padding-inline)",
               paddingRight: "var(--mega-col-padding-inline)",
               borderLeft: index === 0 ? "none" : "var(--mega-col-divider)",
+              borderRight: index === columns.length - 1 ? "var(--mega-col-divider)" : "none",
             }}
           >
             <h3
@@ -250,6 +261,7 @@ export default function NavMegaPanel({
             </ul>
           </div>
         ))}
+        </div>
       </div>
     </div>
   );

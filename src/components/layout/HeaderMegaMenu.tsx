@@ -204,7 +204,7 @@ export default function HeaderMegaMenu() {
             style={{ maxWidth: "var(--token-container-max)" }}
           >
             <ul
-              className="flex flex-wrap items-stretch justify-center"
+              className="flex flex-nowrap items-stretch justify-center"
               style={{
                 gap: "var(--header-nav-item-gap)",
                 paddingTop: "var(--header-nav-row-padding-top)",

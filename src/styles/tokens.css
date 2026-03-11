@@ -119,11 +119,13 @@
 
   /* ——— Mega menu ——— */
   --menu-label: 13px;
-  --mega-panel-bg: var(--regu-white);
-  --mega-panel-border-bottom: 1px solid rgba(22, 61, 89, 0.12);
+  --mega-panel-bg: #fcfcfd;
+  --mega-panel-border-bottom: 1px solid rgba(22, 61, 89, 0.14);
+  --mega-panel-shadow: 0 4px 24px rgba(22, 61, 89, 0.06);
+  --mega-panel-inner-border: 1px solid rgba(22, 61, 89, 0.07);
   --mega-wrapper-max: 1320px;
-  --mega-padding-y-top: 32px;
-  --mega-padding-y-bottom: 36px;
+  --mega-padding-y-top: 28px;
+  --mega-padding-y-bottom: 26px;
   --mega-padding-x: 40px;
   --mega-column-gap: 48px;
   --mega-col-padding-inline: 28px;
@@ -166,22 +168,24 @@
   --topbar-collapse-duration: 180ms;
 }
 
-/* Tamaño de fuente global (a- a a+): small / medium / large — escala todo el sitio como BEREC */
+/* Tamaño de fuente global (a- a a+): small / medium / large — escala todo el sitio, incluido header y mega menú */
 html[data-font="sm"] {
   --base-font-size: 14px;
   --font-scale: 0.875;
   --token-font-size-base: 14px;
   --token-heading-h2-size: 22.75px;
   --token-heading-h3-size: 16.625px;
-  --token-nav-font-size: 11.375px;
-  --mega-heading-size: 11px;
-  --mega-link-size: 11.375px;
-  --mega-link-line-height: 24.5px;
-  --menu-label: 11.375px;
+  --token-nav-font-size: 11.5px;
+  --mega-heading-size: 24px;
+  --mega-link-size: 16px;
+  --mega-child-size: 15px;
+  --mega-secondary-size: 13px;
+  --mega-year-subtitle-size: 13px;
+  --menu-label: 11.5px;
   --token-content-wrap-max: 1760px;
   --token-content-inner-max: 1440px;
 }
-/* Normal cómodo: base algo mayor que 16px para mejor legibilidad; más amplitud horizontal */
+/* Normal (a): base cómoda; header y mega menú usan estas variables */
 html[data-font="md"],
 html:not([data-font]) {
   --base-font-size: 17px;
@@ -190,48 +194,32 @@ html:not([data-font]) {
   --token-heading-h2-size: 27.625px;
   --token-heading-h3-size: 20.2px;
   --token-nav-font-size: 13px;
-  --mega-heading-size: 19px;
-  --mega-link-size: 13px;
-  --mega-link-line-height: 28px;
+  --mega-heading-size: 27px;
+  --mega-link-size: 18px;
+  --mega-child-size: 17px;
+  --mega-secondary-size: 15px;
+  --mega-year-subtitle-size: 15px;
   --menu-label: 13px;
   --token-content-wrap-max: 1920px;
   --token-content-inner-max: 1600px;
 }
-/* Grande (a+): más ancho útil para que el contenido no colapse en columna estrecha */
+/* Grande (a+): header y mega menú escalan; gap nav reducido para que todo quepa en una fila */
 html[data-font="lg"] {
   --base-font-size: 20px;
   --font-scale: 1.25;
   --token-font-size-base: 20px;
   --token-heading-h2-size: 32.5px;
   --token-heading-h3-size: 23.75px;
-  --token-nav-font-size: 14.625px;
-  --mega-heading-size: 22px;
-  --mega-link-size: 14.625px;
-  --mega-link-line-height: 31.5px;
-  --menu-label: 14.625px;
+  --token-nav-font-size: 15px;
+  --header-nav-item-gap: 32px;
+  --mega-heading-size: 30px;
+  --mega-link-size: 20px;
+  --mega-child-size: 19px;
+  --mega-secondary-size: 16px;
+  --mega-year-subtitle-size: 16px;
+  --menu-label: 15px;
   --token-content-wrap-max: 2080px;
   --token-content-inner-max: 1920px;
-}
-
-/* Header: tamaño de fuente fijo (no escalar con a-/a/a+) */
-.header-font-fixed {
-  --token-nav-font-size: 13px;
-  --mega-heading-size: 18px;
-  --mega-link-size: 13px;
-  --mega-link-line-height: 28px;
-  --menu-label: 13px;
-}
-
-/* Mega menú: subheaders tablet/móvil */
-@media (max-width: 1024px) {
-  .header-font-fixed {
-    --mega-heading-size: 17px;
-  }
-}
-@media (max-width: 768px) {
-  .header-font-fixed {
-    --mega-heading-size: 16px;
-  }
 }
 
 /* Comité Ejecutivo: cards de logo. Tamaño uniforme para todos (sin deformar logos). */
