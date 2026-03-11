@@ -122,9 +122,9 @@ export default function TopBarBerecLike({
       <div
         className="topbarInner mx-auto flex w-full items-center px-4 md:px-6 overflow-visible"
         style={{
-          maxWidth: "1280px",
-          paddingLeft: "24px",
-          paddingRight: "24px",
+          maxWidth: "var(--topbar-wrap-max, 1240px)",
+          paddingLeft: "var(--topbar-wrap-padding-x, 24px)",
+          paddingRight: "var(--topbar-wrap-padding-x, 24px)",
           height: "100%",
           gap: "24px",
           justifyContent: "space-between",

@@ -60,8 +60,11 @@ export default function HomeHeroInstitucional({
 
   return (
     <section
-      className="heroInstitucional relative w-full overflow-hidden min-h-[50vh] md:min-h-[54vh] lg:min-h-[58vh]"
-      style={{ fontFamily: "var(--token-font-body)" }}
+      className="heroInstitucional relative w-full overflow-hidden"
+      style={{
+        fontFamily: "var(--token-font-body)",
+        minHeight: "var(--hero-min-height, 58vh)",
+      }}
       aria-label="Hero principal"
     >
       <div
@@ -114,8 +117,15 @@ export default function HomeHeroInstitucional({
 
       {/* Contenido: bloque izquierda, proporción afinada al nuevo alto */}
       <div
-        className="heroInstitucionalContent relative z-10 flex min-h-[50vh] md:min-h-[54vh] lg:min-h-[58vh] flex-col items-center justify-center px-4 py-10 text-center md:items-start md:px-6 md:py-12 md:text-left lg:px-8"
-        style={{ marginTop: "-16px" }}
+        className="heroInstitucionalContent relative z-10 flex flex-col items-center justify-center text-center md:items-start md:text-left"
+        style={{
+          marginTop: "-16px",
+          minHeight: "var(--hero-min-height, 58vh)",
+          paddingTop: "var(--hero-content-padding-y, 3rem)",
+          paddingBottom: "var(--hero-content-padding-y, 3rem)",
+          paddingLeft: "var(--hero-content-padding-x, 2rem)",
+          paddingRight: "var(--hero-content-padding-x, 2rem)",
+        }}
       >
         <div
           className="w-full max-w-[720px] lg:max-w-[760px]"
@@ -136,7 +146,7 @@ export default function HomeHeroInstitucional({
             className="heroInstitucionalTitle mt-3 font-bold leading-[1.18] text-white md:mt-4"
             style={{
               fontFamily: "var(--token-font-heading)",
-              fontSize: "clamp(1.6rem, 4.2vw, 3.6rem)",
+              fontSize: "var(--hero-title-font, clamp(1.6rem, 4.2vw, 3.6rem))",
             }}
           >
             {title}
