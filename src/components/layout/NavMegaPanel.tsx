@@ -214,11 +214,11 @@ export default function NavMegaPanel({
                         groups.find((x) => x.label === g)!.items.push(child);
                       }
                       return (
-                        <div className="mt-4 space-y-5">
+                        <div className="mega-panel-year-groups mt-5 space-y-6">
                           {groups.map((group) => (
-                            <div key={group.label}>
+                            <div key={group.label} className="mega-panel-year-group">
                               <p
-                                className="mega-panel-year-subtitle mb-2 font-semibold uppercase tracking-wider"
+                                className="mega-panel-year-subtitle"
                                 style={{
                                   paddingLeft: "var(--mega-child-indent, 24px)",
                                 }}
@@ -226,21 +226,18 @@ export default function NavMegaPanel({
                                 {group.label}
                               </p>
                               <ul
-                                className="mega-panel-children list-none"
+                                className="mega-panel-editions-list list-none"
                                 style={{
                                   margin: 0,
+                                  marginTop: "8px",
                                   paddingLeft: "var(--mega-child-indent, 20px)",
-                                  borderLeft: "2px solid var(--regu-gray-100)",
+                                  borderLeft: "3px solid rgba(68, 137, 198, 0.2)",
                                 }}
                               >
                                 {group.items.map((child) => (
                                   <li
                                     key={child.label}
-                                    className="mega-panel-child-item"
-                                    style={{
-                                      margin: 0,
-                                      marginBottom: "var(--mega-child-spacing, 10px)",
-                                    }}
+                                    className="mega-panel-edition-item mega-panel-child-item"
                                   >
                                     <PanelLink
                                       link={child}

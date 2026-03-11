@@ -307,6 +307,70 @@
   background-color: rgba(68, 137, 198, 0.06);
 }
 
+/* Revista Digital / Planes: año como label secundario, ediciones como bloques escaneables */
+.mega-panel-year-groups .mega-panel-year-subtitle {
+  font-size: var(--mega-year-subtitle-size) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.1em !important;
+  color: var(--regu-blue) !important;
+  margin-bottom: 8px !important;
+}
+.mega-panel-edition-item {
+  margin-bottom: 10px !important;
+}
+.mega-panel-edition-item:last-child {
+  margin-bottom: 0 !important;
+}
+.mega-panel-edition-item .mega-panel-child-link {
+  display: block !important;
+  padding: 8px 8px 8px 14px !important;
+  margin: 0 !important;
+  border-left: 3px solid transparent !important;
+  border-radius: 0 4px 4px 0 !important;
+  transition: background-color 0.15s ease, border-left-color 0.15s ease, color 0.14s ease !important;
+}
+.mega-panel-edition-item .mega-panel-child-link:hover {
+  background-color: rgba(68, 137, 198, 0.08) !important;
+  border-left-color: rgba(68, 137, 198, 0.5) !important;
+}
+
+/* Gestión: tarjeta de revista seleccionada — featured card institucional, refinado */
+.gestion-card-selected {
+  background-color: rgba(68, 137, 198, 0.03) !important;
+  border: 1px solid rgba(68, 137, 198, 0.2) !important;
+  box-shadow: 0 4px 20px rgba(22, 61, 89, 0.07), 0 1px 3px rgba(22, 61, 89, 0.04) !important;
+  animation: gestion-card-selected-in 0.6s ease-out;
+}
+@keyframes gestion-card-selected-in {
+  0% {
+    opacity: 0.97;
+    box-shadow: 0 2px 12px rgba(22, 61, 89, 0.05);
+  }
+  100% {
+    opacity: 1;
+    box-shadow: 0 4px 20px rgba(22, 61, 89, 0.07), 0 1px 3px rgba(22, 61, 89, 0.04);
+  }
+}
+.gestion-revista-selected-badge {
+  letter-spacing: 0.04em;
+}
+
+/* Gestión: cards de documentos — hover elevación y transición */
+.gestion-doc-card-wrapper {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.gestion-doc-card {
+  transition: box-shadow 0.25s ease, border-color 0.2s ease, transform 0.25s ease;
+}
+.gestion-doc-card-wrapper:hover .gestion-doc-card:not(.gestion-card-selected) {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(22, 61, 89, 0.1), 0 4px 12px rgba(22, 61, 89, 0.06) !important;
+}
+.gestion-doc-card-wrapper:hover .gestion-doc-card.gestion-card-selected {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(22, 61, 89, 0.09), 0 2px 8px rgba(68, 137, 198, 0.08) !important;
+}
+
 /* Top bar: botón Suscribirse hover (BEREC) */
 .topbar-subscribe:hover {
   background-color: var(--token-accent) !important;

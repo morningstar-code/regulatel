@@ -5,7 +5,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import {
   FileText,
   Download,
-  Calendar,
   FileDown,
   Eye,
   X,
@@ -14,6 +13,8 @@ import {
   Search,
   Lock,
   ArrowLeft,
+  Check,
+  ClipboardList,
 } from "lucide-react";
 import { getRestrictedDocument, isRestrictedUnlocked } from "@/config/restrictedDocuments";
 import PageHero from "@/components/PageHero";
@@ -70,7 +71,8 @@ const fadeIn = {
 const SEARCH_DEBOUNCE_MS = 200;
 
 export default function Gestion() {
-  const allDocuments = useMergedGestionDocuments();
+  const rawDocuments = useMergedGestionDocuments();
+  const allDocuments = Array.isArray(rawDocuments) ? rawDocuments : [];
   const [searchParams, setSearchParams] = useSearchParams();
   const tipo = (searchParams.get("tipo") ?? "todo") as GestionTipo;
   const docId = searchParams.get("id") ?? null;
@@ -79,12 +81,14 @@ export default function Gestion() {
   const [previewDoc, setPreviewDoc] = useState<{ url: string; title: string } | null>(null);
   const [searchInput, setSearchInput] = useState(searchQuery);
   const contentRef = useRef<HTMLDivElement>(null);
+  const selectedRevistaRef = useRef<HTMLDivElement>(null);
 
   const filteredByTipo = filterByTipo(allDocuments, validTipo === "todo" ? null : validTipo);
   const filtered = filterBySearch(filteredByTipo, searchQuery);
-  const hasDocId = docId && filtered.some((d) => d.id === docId);
+  const hasDocId = Boolean(docId && filtered.some((d) => d.id === docId));
   /** Si hay ?id= y el doc existe, mostrar solo ese documento (enlace directo desde menú). */
   const displayList = docId && hasDocId ? filtered.filter((d) => d.id === docId) : filtered;
+  const isRevistaDeepLink = validTipo === "revista" && Boolean(docId) && hasDocId;
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -102,6 +106,15 @@ export default function Gestion() {
   useEffect(() => {
     setSearchInput(searchQuery);
   }, [searchQuery]);
+
+  useEffect(() => {
+    if (isRevistaDeepLink && selectedRevistaRef.current) {
+      const t = setTimeout(() => {
+        selectedRevistaRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 320);
+      return () => clearTimeout(t);
+    }
+  }, [isRevistaDeepLink, docId]);
 
   const setTipo = (value: GestionTipo) => {
     if (value === "todo") {
@@ -267,16 +280,25 @@ export default function Gestion() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                   <AnimatePresence mode="popLayout">
-                    {displayList.map((doc, index) => (
-                      <div key={doc.id} id={`doc-${doc.id}`} className="scroll-mt-24">
-                        <DocCard
-                          doc={doc}
-                          index={index}
-                          deepLink={`/gestion?tipo=${doc.category}&id=${doc.id}`}
-                          onPreview={() => setPreviewDoc({ url: doc.url, title: doc.title })}
-                        />
-                      </div>
-                    ))}
+                    {displayList.map((doc, index) => {
+                      const isSelectedRevista = isRevistaDeepLink && doc.id === docId;
+                      return (
+                        <div
+                          key={doc.id}
+                          id={`doc-${doc.id}`}
+                          className="scroll-mt-24"
+                          ref={isSelectedRevista ? selectedRevistaRef : undefined}
+                        >
+                          <DocCard
+                            doc={doc}
+                            index={index}
+                            deepLink={`/gestion?tipo=${doc.category}&id=${doc.id}`}
+                            onPreview={() => setPreviewDoc({ url: doc.url, title: doc.title })}
+                            isSelectedRevista={isSelectedRevista}
+                          />
+                        </div>
+                      );
+                    })}
                   </AnimatePresence>
                 </div>
               </>
@@ -440,94 +462,121 @@ function DocCard({
   index,
   deepLink,
   onPreview,
+  isSelectedRevista = false,
 }: {
   doc: GestionDocument;
   index: number;
   deepLink: string;
   onPreview: () => void;
+  isSelectedRevista?: boolean;
 }) {
   const isRevista = doc.category === "revista";
   const isRestrictedDoc = getRestrictedDocument(doc.id) !== null;
   const isUnlocked = isRestrictedDoc && isRestrictedUnlocked(doc.id);
   const isRestricted = isRestrictedDoc && !isUnlocked;
-  const Icon = isRevista ? BookOpen : doc.category === "planes-actas" ? Calendar : FileText;
   const accessUrl = `/acceso-documentos?doc=${encodeURIComponent(doc.id)}`;
+
+  const TypeIcon = isRestricted
+    ? Lock
+    : isRevista
+      ? BookOpen
+      : doc.category === "planes-actas"
+        ? ClipboardList
+        : FileText;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: index * 0.04 }}
-      whileHover={{ y: -4 }}
-      className="h-full"
+      className="h-full gestion-doc-card-wrapper"
     >
       <Card
-        className="h-full transition-all hover:shadow-lg border"
+        className={`gestion-doc-card h-full border ${isSelectedRevista ? "gestion-card-selected" : ""}`}
         style={{
-          borderColor: "var(--regu-gray-100)",
-          boxShadow: "0 4px 20px rgba(22, 61, 89, 0.06)",
+          borderColor: isSelectedRevista ? undefined : "var(--regu-gray-100)",
+          boxShadow: isSelectedRevista ? undefined : "0 4px 20px rgba(22, 61, 89, 0.06)",
           borderRadius: "var(--token-radius-card)",
         }}
       >
-        <CardContent className="p-5 flex flex-col h-full">
-          <div className="flex items-start justify-between gap-3 mb-3">
-            <div className="flex-1 min-w-0">
+        <CardContent className="p-6 flex flex-col h-full gap-4">
+          {isSelectedRevista && (
+            <div
+              className="gestion-revista-selected-badge inline-flex w-fit items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium"
+              style={{
+                color: "var(--regu-blue)",
+                backgroundColor: "rgba(68, 137, 198, 0.08)",
+                border: "1px solid rgba(68, 137, 198, 0.2)",
+              }}
+            >
+              <Check className="h-3.5 w-3.5 shrink-0 opacity-90" strokeWidth={2.5} aria-hidden />
+              <span className="tracking-wide">Revista seleccionada</span>
+            </div>
+          )}
+
+          <div className="flex items-start gap-3">
+            <div
+              className="gestion-doc-card-icon flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+              style={{
+                backgroundColor: "rgba(68, 137, 198, 0.08)",
+                color: "var(--regu-blue)",
+              }}
+              aria-hidden
+            >
+              <TypeIcon className="h-5 w-5" strokeWidth={1.75} />
+            </div>
+            <div className="min-w-0 flex-1">
               {(doc.quarter || doc.year) && (
                 <span
-                  className="inline-block px-2.5 py-1 rounded-lg text-xs font-semibold mb-2"
+                  className="gestion-doc-badge inline-block rounded-full px-2.5 py-1 text-xs font-semibold"
                   style={{
-                    backgroundColor: "rgba(68, 137, 198, 0.12)",
+                    backgroundColor: "rgba(68, 137, 198, 0.1)",
                     color: "var(--regu-blue)",
+                    border: "1px solid rgba(68, 137, 198, 0.18)",
                   }}
                 >
                   {doc.quarter ? `${doc.quarter} ${doc.year}` : doc.year}
                 </span>
               )}
-              <h3 className="text-base font-semibold leading-tight" style={{ color: "var(--regu-gray-900)" }}>
-                <Link
-                  to={isRestricted ? accessUrl : deepLink}
-                  className="hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--regu-blue)] focus-visible:ring-offset-2 rounded"
-                  style={{ color: "inherit" }}
-                >
-                  {doc.title}
-                </Link>
-              </h3>
-              {isRestricted && (
-                <div className="mt-1.5 flex items-center gap-1.5">
-                  <Lock className="w-3.5 h-3.5 shrink-0 opacity-85" style={{ color: "var(--regu-gray-500)" }} aria-hidden />
-                  <span className="text-xs font-medium" style={{ color: "var(--regu-gray-500)" }}>
-                    Acceso restringido
-                  </span>
-                </div>
-              )}
-            </div>
-            <div className="flex items-center gap-1.5 flex-shrink-0">
-              {isRestricted && (
-                <Lock className="w-5 h-5" style={{ color: "var(--regu-gray-500)" }} aria-hidden />
-              )}
-              <Icon
-                className="w-5 h-5"
-                style={{ color: "var(--regu-blue)" }}
-              />
             </div>
           </div>
-          <div className="flex gap-2 mt-auto flex-wrap">
+
+          <h3 className="gestion-doc-title text-lg font-bold leading-snug" style={{ color: "var(--regu-gray-900)" }}>
+            <Link
+              to={isRestricted ? accessUrl : deepLink}
+              className="hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--regu-blue)] focus-visible:ring-offset-2 rounded"
+              style={{ color: "inherit" }}
+            >
+              {doc.title}
+            </Link>
+          </h3>
+
+          {isRestricted && (
+            <div className="flex items-center gap-2 rounded-lg px-3 py-2" style={{ backgroundColor: "rgba(22, 61, 89, 0.04)" }}>
+              <Lock className="h-4 w-4 shrink-0" style={{ color: "var(--regu-gray-600)" }} aria-hidden />
+              <span className="text-sm font-medium" style={{ color: "var(--regu-gray-600)" }}>
+                Acceso restringido
+              </span>
+            </div>
+          )}
+
+          <div className="flex flex-wrap gap-2.5 pt-2 mt-auto">
             {isRestricted ? (
               <>
                 <Link
                   to={accessUrl}
-                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-white transition-colors hover:opacity-95"
+                  className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:opacity-95"
                   style={{ backgroundColor: "var(--regu-blue)" }}
                 >
-                  <Lock className="w-4 h-4" />
+                  <Lock className="w-4 h-4 shrink-0" />
                   Solicitar acceso
                 </Link>
                 <span
-                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium border border-[var(--regu-gray-100)] cursor-not-allowed opacity-70"
-                  style={{ color: "var(--regu-gray-500)" }}
+                  className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium border cursor-not-allowed opacity-60"
+                  style={{ borderColor: "var(--regu-gray-100)", color: "var(--regu-gray-500)" }}
                   title="Acceso restringido"
                 >
-                  <FileDown className="w-4 h-4" />
+                  <FileDown className="w-4 h-4 shrink-0" />
                   Descargar
                 </span>
               </>
@@ -535,10 +584,10 @@ function DocCard({
               <>
                 <button
                   onClick={onPreview}
-                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-white transition-colors hover:opacity-95"
+                  className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:opacity-95"
                   style={{ backgroundColor: "var(--regu-blue)" }}
                 >
-                  <Eye className="w-4 h-4" />
+                  <Eye className="w-4 h-4 shrink-0" />
                   Vista previa
                 </button>
                 <a
@@ -546,13 +595,13 @@ function DocCard({
                   download={!doc.url.startsWith("http")}
                   target={doc.url.startsWith("http") ? "_blank" : undefined}
                   rel={doc.url.startsWith("http") ? "noreferrer noopener" : undefined}
-                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium border transition-colors hover:bg-[var(--regu-offwhite)]"
+                  className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold border transition-colors hover:bg-[rgba(68,137,198,0.06)]"
                   style={{
                     borderColor: "var(--regu-blue)",
                     color: "var(--regu-blue)",
                   }}
                 >
-                  <FileDown className="w-4 h-4" />
+                  <FileDown className="w-4 h-4 shrink-0" />
                   Descargar
                 </a>
               </>
