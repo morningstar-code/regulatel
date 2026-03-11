@@ -30,7 +30,7 @@ export default function Home() {
     <>
       {/* Hero institucional/editorial: imagen de cooperación + badge + título + 2 CTAs (mapa disponible en /images/mapa-mundi-nuevo-home.png para otras secciones) */}
       <HomeHeroInstitucional
-        coverImageUrl={heroInstitucional.coverImageUrl}
+        coverImageUrls={heroInstitucional.coverImageUrls}
         badge={heroInstitucional.badge}
         title={heroInstitucional.title}
         titleHighlight={heroInstitucional.titleHighlight}

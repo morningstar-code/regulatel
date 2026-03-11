@@ -1,15 +1,17 @@
 /**
  * Hero institucional del home REGULATEL.
- * Fondo: composición institucional (conectividad regional) o imagen opcional.
+ * Fondo: slideshow de imágenes, imagen fija o composición SVG (conectividad regional).
  * Versión inicial desarrollada por Diego Cuervo (INDOTEL). 2026.
  */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import HeroInstitucionalBackground from "./HeroInstitucionalBackground";
 
+const HERO_SLIDESHOW_INTERVAL_MS = 5000;
+
 export interface HomeHeroInstitucionalProps {
-  /** Imagen de fondo del hero (opcional; si no se indica, se usa color sólido) */
-  coverImageUrl?: string;
+  /** Una o varias imágenes de fondo: varias = slideshow con transición suave */
+  coverImageUrls?: string[];
   /** Badge pequeño arriba del título (ej: Presidencia 2026) */
   badge: string;
   /** Título principal (parte en blanco) */
@@ -27,11 +29,10 @@ export interface HomeHeroInstitucionalProps {
 const HERO_BG_FALLBACK = "#163D59";
 
 /**
- * Hero institucional/editorial: imagen de fondo o color sólido + badge + título + descripción + 2 CTAs.
- * Estilo BEREC / UE / ITU.
+ * Hero institucional/editorial: slideshow o imagen de fondo + badge + título + descripción + 2 CTAs.
  */
 export default function HomeHeroInstitucional({
-  coverImageUrl,
+  coverImageUrls = [],
   badge,
   title,
   titleHighlight,
@@ -39,8 +40,19 @@ export default function HomeHeroInstitucional({
   primaryCta,
   secondaryCta,
 }: HomeHeroInstitucionalProps) {
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const showLoader = Boolean(coverImageUrl) && !imageLoaded;
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [loadedCount, setLoadedCount] = useState(0);
+  const hasImages = coverImageUrls.length > 0;
+  const isSlideshow = coverImageUrls.length > 1;
+  const showLoader = hasImages && loadedCount === 0;
+
+  useEffect(() => {
+    if (!isSlideshow) return;
+    const id = setInterval(() => {
+      setCurrentIndex((i) => (i + 1) % coverImageUrls.length);
+    }, HERO_SLIDESHOW_INTERVAL_MS);
+    return () => clearInterval(id);
+  }, [isSlideshow, coverImageUrls.length]);
 
   return (
     <section
@@ -48,27 +60,32 @@ export default function HomeHeroInstitucional({
       style={{ fontFamily: "var(--token-font-body)" }}
       aria-label="Hero principal"
     >
-      {/* Fondo: imagen opcional o composición institucional (conectividad regional). */}
       <div
         className="absolute inset-0"
         style={{ background: HERO_BG_FALLBACK }}
       >
-        {coverImageUrl ? (
+        {hasImages ? (
           <>
-            <img
-              src={coverImageUrl}
-              alt=""
-              className="absolute inset-0 h-full w-full object-cover"
-              style={{ objectPosition: "center 42%", filter: "none" }}
-              loading="eager"
-              onLoad={() => setImageLoaded(true)}
-              onError={(e) => {
-                setImageLoaded(true);
-                e.currentTarget.style.display = "none";
-                const parent = e.currentTarget.parentElement;
-                if (parent) parent.style.background = HERO_BG_FALLBACK;
-              }}
-            />
+            {coverImageUrls.map((url, i) => (
+              <img
+                key={url}
+                src={url}
+                alt=""
+                className="absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ease-in-out"
+                style={{
+                  objectPosition: "center 42%",
+                  filter: "none",
+                  opacity: i === currentIndex ? 1 : 0,
+                  zIndex: i === currentIndex ? 1 : 0,
+                }}
+                loading={i === 0 ? "eager" : "lazy"}
+                onLoad={() => setLoadedCount((c) => c + 1)}
+                onError={(e) => {
+                  setLoadedCount((c) => c + 1);
+                  e.currentTarget.style.display = "none";
+                }}
+              />
+            ))}
             {showLoader && (
               <div
                 className="heroCoverLoader absolute inset-0 z-[2] flex items-center justify-center"
@@ -82,8 +99,7 @@ export default function HomeHeroInstitucional({
             )}
           </>
         ) : null}
-        {/* Composición institucional: nodos y conexiones (telecom + cooperación regional). */}
-        {!coverImageUrl && <HeroInstitucionalBackground />}
+        {!hasImages && <HeroInstitucionalBackground />}
       </div>
 
       {/* Contenido: bloque izquierda, proporción afinada al nuevo alto */}

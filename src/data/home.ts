@@ -192,9 +192,10 @@ export const heroClean = {
   secondaryCta: { label: "VER PRÓXIMOS EVENTOS", href: "/eventos" },
 };
 
-/** Hero institucional/editorial: imagen de fondo o composición SVG (conectividad regional) + badge + título + 2 CTAs */
+/** Hero institucional/editorial: slideshow de imágenes o composición SVG + badge + título + 2 CTAs */
 export const heroInstitucional = {
-  coverImageUrl: "/images/1.jpg",
+  /** Varias URLs = slideshow; una sola = imagen fija; undefined = fondo SVG institucional */
+  coverImageUrls: ["/images/1.jpg", "/images/2.jpg"] as string[],
   badge: "Presidencia 2026",
   title: "Cooperación regulatoria para una transformación digital",
   titleHighlight: "inclusiva y segura",
