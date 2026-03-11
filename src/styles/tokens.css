@@ -121,7 +121,7 @@
   --menu-label: 13px;
   --mega-panel-bg: var(--regu-white);
   --mega-panel-border-bottom: 1px solid rgba(22, 61, 89, 0.12);
-  --mega-wrapper-max: 1480px;
+  --mega-wrapper-max: 1320px;
   --mega-padding-y-top: 32px;
   --mega-padding-y-bottom: 36px;
   --mega-padding-x: 40px;
@@ -153,6 +153,8 @@
   --mega-year-subtitle-size: 15px;
   /* Mega panel: límite al viewport (header + margen) para no cortar en Mac/Safari */
   --mega-panel-viewport-offset: 140px;
+  /* Altura máxima del panel: sensación dropdown, no overlay (55–65vh) */
+  --mega-panel-max-height: min(62vh, calc(100vh - 140px));
   /* Nav active/hover underline bar */
   --nav-underline-height: 2px;
   --nav-underline-width: 48px;

@@ -103,7 +103,7 @@ export default function NavMegaPanel({
         fontFamily: "var(--token-font-body)",
         background: "var(--mega-panel-bg)",
         borderBottom: "var(--mega-panel-border-bottom)",
-        maxHeight: "calc(100vh - var(--mega-panel-viewport-offset, 140px))",
+        maxHeight: "var(--mega-panel-max-height, 62vh)",
         overflowY: "auto",
       }}
     >
