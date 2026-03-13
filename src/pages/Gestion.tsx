@@ -448,7 +448,6 @@ function DocCard({
   onPreview: () => void;
   isSelectedRevista?: boolean;
 }) {
-  const isRevista = doc.category === "revista";
   const isRestrictedDoc = getRestrictedDocument(doc.id) !== null;
   const isUnlocked = isRestrictedDoc && isRestrictedUnlocked(doc.id);
   const isRestricted = isRestrictedDoc && !isUnlocked;
