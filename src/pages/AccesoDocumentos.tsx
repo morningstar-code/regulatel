@@ -1,6 +1,6 @@
 import { useState, FormEvent, useEffect } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
-import { Lock, ArrowLeft } from "lucide-react";
+import { Lock, ArrowLeft, Mail, KeyRound } from "lucide-react";
 import { getRestrictedDocument, markRestrictedUnlocked } from "@/config/restrictedDocuments";
 import { api } from "@/lib/api";
 
@@ -31,7 +31,6 @@ export default function AccesoDocumentos() {
         }
         return;
       }
-      // Quienes tienen rol admin en el panel tienen también acceso a actas restringidas
       const adminRes = await api.admin.session();
       if (cancelled) return;
       setCheckingSession(false);
@@ -43,7 +42,6 @@ export default function AccesoDocumentos() {
           navigate("/gestion?tipo=planes-actas", { replace: true });
         }
       }
-      // Si no hay sesión doc ni admin, el efecto termina y se muestra el formulario de login
     })();
     return () => {
       cancelled = true;
@@ -79,137 +77,163 @@ export default function AccesoDocumentos() {
   if (checkingSession) {
     return (
       <div
-        className="min-h-screen w-full flex items-center justify-center py-16"
-        style={{ fontFamily: "var(--token-font-body)", background: "linear-gradient(180deg, var(--regu-offwhite) 0%, var(--regu-gray-100) 100%)" }}
+        className="flex min-h-screen w-full items-center justify-center py-16"
+        style={{ fontFamily: "var(--token-font-body)", backgroundColor: "#FAFBFC" }}
       >
-        <p style={{ color: "var(--regu-gray-500)" }}>Verificando sesión…</p>
+        <p className="text-sm font-medium" style={{ color: "var(--regu-gray-500)" }}>
+          Verificando sesión…
+        </p>
       </div>
     );
   }
 
   return (
     <div
-      className="min-h-screen w-full py-16 md:py-24"
+      className="min-h-screen w-full"
       style={{
         fontFamily: "var(--token-font-body)",
-        background: "linear-gradient(180deg, var(--regu-offwhite) 0%, var(--regu-gray-100) 100%)",
+        backgroundColor: "#FAFBFC",
+        borderTop: "1px solid rgba(22,61,89,0.07)",
       }}
     >
-      <div className="mx-auto max-w-md px-4 md:px-6">
-        <div
-          className="rounded-2xl border bg-white p-8 shadow-[0_10px_40px_rgba(22,61,89,0.08)]"
-          style={{ borderColor: "var(--token-border)" }}
-        >
-          <div className="mb-6 flex items-center gap-3">
-            <div
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
-              style={{ backgroundColor: "rgba(22, 61, 89, 0.08)" }}
-            >
-              <Lock className="h-6 w-6" style={{ color: "var(--regu-blue)" }} aria-hidden />
-            </div>
-            <div>
-              <h1
-                className="text-xl font-bold"
-                style={{ color: "var(--regu-gray-900)", fontFamily: "var(--token-font-heading)" }}
-              >
-                Acceso restringido
-              </h1>
-              {document && (
-                <p className="mt-0.5 text-sm" style={{ color: "var(--regu-gray-500)" }}>
-                  {document.title}
-                </p>
-              )}
-            </div>
-          </div>
+      <div style={{ height: 4, background: "var(--regu-blue)", width: "100%" }} aria-hidden />
 
-          <p
-            className="mb-6 text-sm leading-relaxed"
-            style={{ color: "var(--regu-gray-700)" }}
+      <div className="mx-auto px-4 py-12 md:py-16" style={{ maxWidth: 440 }}>
+        <div className="mb-8 text-center">
+          <div
+            className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl"
+            style={{ backgroundColor: "rgba(68,137,198,0.12)" }}
           >
-            Este documento está disponible únicamente para usuarios autorizados.
+            <Lock className="h-7 w-7" style={{ color: "var(--regu-blue)" }} aria-hidden />
+          </div>
+          <h1
+            className="text-xl font-bold md:text-2xl"
+            style={{ color: "var(--regu-navy)", fontFamily: "var(--token-font-heading)" }}
+          >
+            Acceso a documentos restringidos
+          </h1>
+          <p className="mt-1 text-sm" style={{ color: "var(--regu-gray-500)" }}>
+            Planes y actas de asambleas · Solo usuarios autorizados
           </p>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label
-                htmlFor="acceso-email"
-                className="mb-1.5 block text-sm font-semibold"
-                style={{ color: "var(--regu-gray-900)" }}
-              >
-                Email
-              </label>
-              <input
-                id="acceso-email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-                placeholder="su@email.com"
-                className="w-full rounded-lg border px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-offset-0"
-                style={{
-                  borderColor: "var(--regu-gray-100)",
-                  color: "var(--regu-gray-900)",
-                }}
-                disabled={submitting}
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="acceso-password"
-                className="mb-1.5 block text-sm font-semibold"
-                style={{ color: "var(--regu-gray-900)" }}
-              >
-                Contraseña
-              </label>
-              <input
-                id="acceso-password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="current-password"
-                placeholder="Ingrese la contraseña"
-                className="w-full rounded-lg border px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-offset-0"
-                style={{
-                  borderColor: "var(--regu-gray-100)",
-                  color: "var(--regu-gray-900)",
-                }}
-                disabled={submitting}
-              />
-            </div>
-
-            {error && (
-              <p className="text-sm font-medium" style={{ color: "var(--news-accent)" }}>
-                {error}
-              </p>
-            )}
-
-            <div className="flex flex-col gap-3 pt-2 sm:flex-row">
-              <button
-                type="submit"
-                disabled={submitting}
-                className="inline-flex items-center justify-center rounded-lg px-5 py-3 text-sm font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-70"
-                style={{
-                  backgroundColor: "var(--regu-blue)",
-                  fontFamily: "var(--token-font-body)",
-                }}
-              >
-                {submitting ? "Verificando…" : "Ingresar"}
-              </button>
-              <Link
-                to="/gestion?tipo=planes-actas"
-                className="inline-flex items-center justify-center gap-2 rounded-lg border-2 px-5 py-3 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-offset-2"
-                style={{
-                  borderColor: "var(--regu-gray-100)",
-                  color: "var(--regu-gray-700)",
-                  fontFamily: "var(--token-font-body)",
-                }}
-              >
-                <ArrowLeft className="h-4 w-4" aria-hidden />
-                Volver
-              </Link>
-            </div>
-          </form>
+          {document && (
+            <p className="mt-2 text-sm font-medium" style={{ color: "var(--regu-blue)" }}>
+              {document.title}
+            </p>
+          )}
         </div>
+
+        <div
+          className="overflow-hidden rounded-2xl border bg-white shadow-[0_4px_20px_rgba(22,61,89,0.08)]"
+          style={{ borderColor: "rgba(22,61,89,0.10)", borderTop: "3px solid var(--regu-blue)" }}
+        >
+          <div className="p-6 md:p-8">
+            <p className="mb-6 text-sm leading-relaxed" style={{ color: "var(--regu-gray-600)" }}>
+              Este contenido está disponible únicamente para usuarios autorizados. Ingrese sus credenciales para continuar.
+            </p>
+
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <label
+                  htmlFor="acceso-email"
+                  className="mb-1.5 block text-[10px] font-bold uppercase tracking-wider"
+                  style={{ color: "var(--regu-gray-500)" }}
+                >
+                  Correo electrónico <span style={{ color: "var(--regu-blue)" }}>*</span>
+                </label>
+                <div className="relative">
+                  <Mail
+                    className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2"
+                    style={{ color: "var(--regu-gray-400)" }}
+                    aria-hidden
+                  />
+                  <input
+                    id="acceso-email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    autoComplete="email"
+                    placeholder="su@correo.com"
+                    className="w-full rounded-xl border py-3 pl-10 pr-4 text-base transition focus:outline-none focus:ring-2 focus:ring-[rgba(68,137,198,0.30)] disabled:opacity-70"
+                    style={{
+                      borderColor: "rgba(22,61,89,0.12)",
+                      backgroundColor: "#F4F6F8",
+                      color: "var(--regu-navy)",
+                    }}
+                    disabled={submitting}
+                  />
+                </div>
+              </div>
+              <div>
+                <label
+                  htmlFor="acceso-password"
+                  className="mb-1.5 block text-[10px] font-bold uppercase tracking-wider"
+                  style={{ color: "var(--regu-gray-500)" }}
+                >
+                  Contraseña <span style={{ color: "var(--regu-blue)" }}>*</span>
+                </label>
+                <div className="relative">
+                  <KeyRound
+                    className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2"
+                    style={{ color: "var(--regu-gray-400)" }}
+                    aria-hidden
+                  />
+                  <input
+                    id="acceso-password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    autoComplete="current-password"
+                    placeholder="Contraseña"
+                    className="w-full rounded-xl border py-3 pl-10 pr-4 text-base transition focus:outline-none focus:ring-2 focus:ring-[rgba(68,137,198,0.30)] disabled:opacity-70"
+                    style={{
+                      borderColor: "rgba(22,61,89,0.12)",
+                      backgroundColor: "#F4F6F8",
+                      color: "var(--regu-navy)",
+                    }}
+                    disabled={submitting}
+                  />
+                </div>
+              </div>
+
+              {error && (
+                <div
+                  className="rounded-xl px-4 py-3 text-sm font-medium"
+                  style={{ backgroundColor: "rgba(185,28,28,0.08)", color: "#B91C1C" }}
+                >
+                  {error}
+                </div>
+              )}
+
+              <div className="flex flex-col gap-3 pt-1 sm:flex-row">
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-bold text-white transition hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-[rgba(68,137,198,0.40)] focus:ring-offset-2 disabled:opacity-70"
+                  style={{ backgroundColor: "var(--regu-blue)" }}
+                >
+                  {submitting ? "Verificando…" : "Ingresar"}
+                </button>
+                <Link
+                  to="/gestion?tipo=planes-actas"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border-2 px-5 py-3.5 text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-[var(--regu-blue)] focus:ring-offset-2"
+                  style={{
+                    borderColor: "rgba(22,61,89,0.15)",
+                    color: "var(--regu-gray-700)",
+                  }}
+                >
+                  <ArrowLeft className="h-4 w-4" aria-hidden />
+                  Volver a Gestión
+                </Link>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <p className="mt-6 text-center text-xs" style={{ color: "var(--regu-gray-400)" }}>
+          <Link to="/contacto" className="underline hover:no-underline" style={{ color: "var(--regu-blue)" }}>
+            ¿Problemas de acceso? Contacte al administrador
+          </Link>
+        </p>
       </div>
     </div>
   );

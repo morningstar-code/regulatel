@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, Calendar } from "lucide-react";
 import EventCard from "@/components/home/EventCard";
 import { useEvents } from "@/contexts/AdminDataContext";
 import type { Event } from "@/types/event";
@@ -84,51 +84,101 @@ export default function Eventos() {
   );
 
   return (
-    <>
-      {/* Hero con fondo breadcrumb + overlay para legibilidad */}
-      <section
-        className="relative w-full overflow-hidden bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: "url('/images/breadcrumb.png')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          minHeight: "clamp(220px, 32vw, 320px)",
-        }}
-      >
-        <div className="relative z-[2] container mx-auto px-4 md:px-6 py-12 md:py-16 lg:py-20 max-w-6xl">
-          <h1
-            className="text-3xl md:text-4xl lg:text-5xl font-bold text-white tracking-tight"
-            style={{ fontFamily: "var(--token-font-heading)" }}
-          >
-            Eventos
-          </h1>
-          <p className="mt-2 text-lg text-white/90 max-w-2xl">
-            Cronograma de eventos y actividades de cooperación de REGULATEL y organizaciones aliadas.
-          </p>
-        </div>
-      </section>
+    <div
+      className="min-h-screen"
+      style={{
+        backgroundColor: "#FAFBFC",
+        borderTop: "1px solid rgba(22,61,89,0.07)",
+        fontFamily: "var(--token-font-body)",
+      }}
+    >
+      <div style={{ height: 4, background: "var(--regu-blue)", width: "100%" }} aria-hidden />
 
-      {/* Barra de filtros sticky */}
-      <div
-        className="sticky top-0 z-30 w-full border-b bg-white/95 backdrop-blur-sm py-4 shadow-sm"
-        style={{
-          fontFamily: "var(--token-font-body)",
-          borderColor: "var(--regu-gray-100)",
-        }}
-      >
-        <div className="container mx-auto px-4 md:px-6 max-w-6xl">
+      <div className="mx-auto px-4 pb-14 pt-10 md:px-6 md:pt-14" style={{ maxWidth: "var(--token-container-max)" }}>
+        <nav className="mb-6 flex items-center gap-2 text-sm" style={{ color: "var(--regu-gray-400)" }} aria-label="Breadcrumb">
+          <Link to="/" className="hover:underline" style={{ color: "var(--regu-gray-500)" }}>Inicio</Link>
+          <span aria-hidden>/</span>
+          <span style={{ color: "var(--regu-blue)", fontWeight: 600 }}>Eventos</span>
+        </nav>
+
+        <header className="mb-8">
+          <p
+            style={{
+              fontSize: "0.625rem",
+              fontWeight: 700,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: "var(--regu-gray-400)",
+              marginBottom: 10,
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+            }}
+          >
+            <Calendar size={12} style={{ color: "var(--regu-blue)" }} />
+            Cronograma REGULATEL
+          </p>
+          <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
+            <div
+              style={{
+                width: 4,
+                minHeight: 40,
+                borderRadius: 2,
+                background: "var(--regu-blue)",
+                flexShrink: 0,
+                marginTop: 2,
+              }}
+            />
+            <div>
+              <h1
+                style={{
+                  fontSize: "clamp(1.5rem, 3.5vw, 2.25rem)",
+                  fontWeight: 700,
+                  color: "var(--regu-navy)",
+                  lineHeight: 1.2,
+                  margin: 0,
+                  fontFamily: "var(--token-font-heading)",
+                }}
+              >
+                Eventos
+              </h1>
+              <p
+                style={{
+                  marginTop: 8,
+                  fontSize: "1rem",
+                  lineHeight: 1.6,
+                  color: "var(--regu-gray-500)",
+                  maxWidth: 560,
+                }}
+              >
+                Cumbres, talleres, seminarios y actividades de cooperación de REGULATEL y organizaciones aliadas.
+              </p>
+              <p className="mt-2 text-sm font-medium" style={{ color: "var(--regu-gray-500)" }}>
+                {filtered.length} {filtered.length === 1 ? "evento" : "eventos"} con los filtros actuales
+              </p>
+            </div>
+          </div>
+        </header>
+
+        {/* Filter bar card */}
+        <div
+          className="rounded-2xl border bg-white p-4 shadow-[0_2px_8px_rgba(22,61,89,0.06)]"
+          style={{
+            borderColor: "rgba(22,61,89,0.10)",
+            borderTop: "3px solid var(--regu-blue)",
+            marginBottom: 28,
+          }}
+        >
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-2">
               <Filter className="h-5 w-5" style={{ color: "var(--regu-blue)" }} aria-hidden />
-              <span className="text-sm font-semibold" style={{ color: "var(--regu-gray-900)" }}>
+              <span className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--regu-gray-500)" }}>
                 Filtros
               </span>
             </div>
-            {/* Tabs: Próximos | Pasados | Todos */}
             <div
               className="flex rounded-xl border p-0.5"
-              style={{ borderColor: "var(--regu-gray-200)" }}
+              style={{ borderColor: "rgba(22,61,89,0.12)" }}
               role="tablist"
               aria-label="Segmento de eventos"
             >
@@ -145,144 +195,135 @@ export default function Eventos() {
                   role="tab"
                   aria-selected={segment === value}
                   onClick={() => setSegment(value)}
-                  className="rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--regu-blue)] focus-visible:ring-offset-2"
+                  className="rounded-lg px-4 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--regu-blue)] focus:ring-offset-2"
                   style={{
                     backgroundColor: segment === value ? "var(--regu-blue)" : "transparent",
-                    color: segment === value ? "white" : "var(--regu-gray-700)",
+                    color: segment === value ? "#fff" : "var(--regu-gray-600)",
                   }}
                 >
                   {label}
                 </button>
               ))}
             </div>
-            {/* Año */}
             <select
               value={yearFilter}
               onChange={(e) => setYearFilter(e.target.value)}
               aria-label="Filtrar por año"
-              className="rounded-xl border px-3 py-2 text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-[var(--regu-blue)]"
+              className="rounded-xl border px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[var(--regu-blue)]"
               style={{
-                borderColor: "var(--regu-gray-100)",
-                color: "var(--regu-gray-900)",
+                borderColor: "rgba(22,61,89,0.12)",
+                backgroundColor: "#F4F6F8",
+                color: "var(--regu-navy)",
               }}
             >
               <option value="all">Todos los años</option>
               {years.map((y) => (
-                <option key={y} value={y}>
-                  {y}
-                </option>
+                <option key={y} value={y}>{y}</option>
               ))}
             </select>
-            {/* Búsqueda */}
-            <label htmlFor="eventos-search" className="sr-only">
-              Buscar por título, organizador o lugar
-            </label>
-            <div className="relative flex-1 min-w-[180px] max-w-xs">
-              <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5"
-                style={{ color: "var(--regu-gray-500)" }}
-                aria-hidden
-              />
+            <label htmlFor="eventos-search" className="sr-only">Buscar eventos</label>
+            <div className="relative min-w-0 flex-1 max-w-xs w-full">
+              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2" style={{ color: "var(--regu-gray-400)" }} aria-hidden />
               <input
                 id="eventos-search"
                 type="search"
-                placeholder="Buscar eventos..."
+                placeholder="Buscar por título, organizador o lugar..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-xl border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[var(--regu-blue)]"
+                className="w-full rounded-xl border py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-[rgba(68,137,198,0.30)]"
                 style={{
-                  borderColor: "var(--regu-gray-100)",
-                  color: "var(--regu-gray-900)",
+                  borderColor: "rgba(22,61,89,0.12)",
+                  backgroundColor: "#F4F6F8",
+                  color: "var(--regu-navy)",
                 }}
               />
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Contenido: grid de cards */}
-      <div
-        className="w-full py-10 md:py-14"
-        style={{
-          background: "linear-gradient(to bottom, var(--regu-offwhite), var(--regu-gray-100))",
-          fontFamily: "var(--token-font-body)",
-        }}
-      >
-        <div className="container px-4 md:px-6 mx-auto" style={{ maxWidth: "var(--token-container-max)" }}>
-          <AnimatePresence mode="wait">
-            {filtered.length > 0 ? (
-              <motion.div
-                key={`${segment}-${yearFilter}-${searchQuery}`}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5"
-                style={{ gap: "20px" }}
-              >
-                {filtered.map((event, index) => (
-                  <motion.div
-                    key={event.id}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.03 }}
-                  >
-                    <EventCard event={event} />
-                  </motion.div>
-                ))}
-              </motion.div>
-            ) : (
-              <motion.div
-                key="no-results"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="text-center py-12 rounded-2xl border bg-white"
-                style={{
-                  borderColor: "var(--regu-gray-100)",
-                  color: "var(--regu-gray-500)",
-                }}
-              >
-                <p className="text-lg font-medium">No se encontraron eventos</p>
-                <p className="mt-1 text-sm">
-                  {searchQuery.trim()
-                    ? "Pruebe con otro término de búsqueda."
-                    : "No hay eventos con los filtros seleccionados."}
-                </p>
-              </motion.div>
-            )}
-          </AnimatePresence>
+        <AnimatePresence mode="wait">
+          {filtered.length > 0 ? (
+            <motion.div
+              key={`${segment}-${yearFilter}-${searchQuery}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3"
+              style={{ gap: 24 }}
+            >
+              {filtered.map((event, index) => (
+                <motion.div
+                  key={event.id}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.03 }}
+                  className="eventListCardWrapper"
+                >
+                  <EventCard event={event} />
+                </motion.div>
+              ))}
+            </motion.div>
+          ) : (
+            <motion.div
+              key="no-results"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="rounded-2xl border bg-white py-16 text-center"
+              style={{
+                borderColor: "rgba(22,61,89,0.10)",
+                boxShadow: "0 2px 8px rgba(22,61,89,0.04)",
+                borderTop: "3px solid var(--regu-blue)",
+              }}
+            >
+              <p className="text-lg font-bold" style={{ color: "var(--regu-navy)" }}>No se encontraron eventos</p>
+              <p className="mt-2 text-sm" style={{ color: "var(--regu-gray-500)" }}>
+                {searchQuery.trim() ? "Pruebe con otro término de búsqueda o ajuste los filtros." : "No hay eventos con los filtros seleccionados."}
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-          {/* Bloque informativo */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
-            className="mt-12 rounded-2xl border p-6 md:p-8 bg-white"
-            style={{
-              borderColor: "var(--regu-gray-100)",
-              boxShadow: "0 4px 20px rgba(22, 61, 89, 0.06)",
-            }}
+        <div
+          className="mt-12 rounded-2xl border p-6 md:p-8"
+          style={{
+            backgroundColor: "#fff",
+            borderColor: "rgba(22,61,89,0.10)",
+            boxShadow: "0 2px 8px rgba(22,61,89,0.04)",
+            borderTop: "3px solid var(--regu-blue)",
+          }}
+        >
+          <h2 className="text-lg font-bold mb-3" style={{ color: "var(--regu-navy)", fontFamily: "var(--token-font-heading)" }}>
+            Sobre los Eventos de REGULATEL
+          </h2>
+          <div className="space-y-3 text-sm leading-relaxed" style={{ color: "var(--regu-gray-600)" }}>
+            <p>
+              REGULATEL organiza y participa en cumbres, talleres, seminarios y reuniones de trabajo con organizaciones aliadas como BEREC, ASIET, COMTELCA, CITEL, UIT, GSMA e IIC.
+            </p>
+            <p>
+              Estos eventos son espacios de diálogo, intercambio de experiencias y fortalecimiento de la cooperación regional en el sector de las telecomunicaciones.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-10 flex flex-wrap gap-4 border-t pt-8" style={{ borderColor: "rgba(22,61,89,0.08)" }}>
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 rounded-xl border-2 px-4 py-2.5 text-sm font-semibold transition hover:border-[var(--regu-blue)] hover:text-[var(--regu-blue)]"
+            style={{ borderColor: "rgba(22,61,89,0.12)", color: "var(--regu-gray-700)", textDecoration: "none" }}
           >
-            <h2 className="text-xl font-bold mb-4" style={{ color: "var(--regu-gray-900)" }}>
-              Sobre los Eventos de REGULATEL
-            </h2>
-            <div className="space-y-3 text-sm leading-relaxed" style={{ color: "var(--regu-gray-500)" }}>
-              <p>
-                REGULATEL organiza y participa activamente en una amplia gama de eventos a lo largo del
-                año, incluyendo cumbres, talleres, seminarios y reuniones de trabajo con organizaciones
-                aliadas como BEREC, ASIET, COMTELCA, CITEL, UIT, GSMA e IIC.
-              </p>
-              <p>
-                Estos eventos proporcionan espacios de diálogo, intercambio de experiencias y
-                fortalecimiento de la cooperación regional en temas estratégicos del sector de las
-                telecomunicaciones.
-              </p>
-            </div>
-          </motion.div>
+            ← Volver a inicio
+          </Link>
+          <Link
+            to="/noticias"
+            className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-95"
+            style={{ backgroundColor: "var(--regu-blue)", textDecoration: "none" }}
+          >
+            Ver noticias →
+          </Link>
         </div>
       </div>
-    </>
+    </div>
   );
 }

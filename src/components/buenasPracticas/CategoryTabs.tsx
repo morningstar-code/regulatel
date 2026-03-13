@@ -80,12 +80,6 @@ export default function CategoryTabs({
 }: CategoryTabsProps) {
   return (
     <div className="w-full">
-      <p
-        className="mb-3 text-xs font-semibold uppercase tracking-wider"
-        style={{ color: "#6B7280" }}
-      >
-        Categoría de análisis
-      </p>
       <div className="categoryTabs">
         {categories.map((category) => {
           const desc = categoryDescriptions[category];
@@ -119,3 +113,4 @@ export default function CategoryTabs({
     </div>
   );
 }
+

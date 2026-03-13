@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
 import { useEvents } from "@/contexts/AdminDataContext";
-import { formatEventDateRange } from "@/types/event";
+import { formatEventDateRange, EVENT_STATUS_LABEL } from "@/types/event";
 import type { Event } from "@/types/event";
+import { Calendar, MapPin, Building2, ArrowRight, ArrowLeft, ExternalLink } from "lucide-react";
 import { normalizeEvent } from "@/types/event";
 import { api } from "@/lib/api";
 
@@ -50,112 +51,170 @@ export default function EventoDetalle() {
   }
   if (loading || !event) {
     return (
-      <div className="flex min-h-[40vh] items-center justify-center" style={{ fontFamily: "var(--token-font-body)" }}>
-        <p style={{ color: "var(--regu-gray-500)" }}>Cargando evento…</p>
+      <div
+        className="flex min-h-[50vh] items-center justify-center"
+        style={{ backgroundColor: "#FAFBFC", fontFamily: "var(--token-font-body)" }}
+      >
+        <p className="text-sm font-medium" style={{ color: "var(--regu-gray-500)" }}>Cargando evento…</p>
       </div>
     );
   }
 
   const dateLabel = formatEventDateRange(event.startDate, event.endDate);
   const hasRegistrationUrl = Boolean(event.registrationUrl?.trim());
+  const isUpcoming = event.status === "upcoming";
 
   return (
-    <>
-      <section
-        className="relative w-full overflow-hidden bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: "url('/images/breadcrumb.png')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          minHeight: "clamp(200px, 28vw, 280px)",
-        }}
-      >
-        <div className="relative z-[2] container mx-auto px-4 md:px-6 py-10 md:py-14 max-w-6xl">
-          <nav className="text-sm text-white/80 mb-4">
-            <Link to="/eventos" className="hover:text-white transition-colors">
-              Eventos
-            </Link>
-            <span className="mx-2">/</span>
-            <span className="text-white">{event.title}</span>
-          </nav>
-          <h1
-            className="text-2xl md:text-3xl font-bold text-white tracking-tight"
-            style={{ fontFamily: "var(--token-font-heading)" }}
-          >
-            {event.title}
-          </h1>
-          <p className="mt-2 text-white/90">
-            {event.organizer} · {event.location} · {dateLabel}
-          </p>
-        </div>
-      </section>
+    <div
+      className="min-h-screen"
+      style={{
+        backgroundColor: "#FAFBFC",
+        borderTop: "1px solid rgba(22,61,89,0.07)",
+        fontFamily: "var(--token-font-body)",
+      }}
+    >
+      <div style={{ height: 4, background: "var(--regu-blue)", width: "100%" }} aria-hidden />
 
-      <div
-        className="w-full py-10 md:py-14"
-        style={{
-          background: "linear-gradient(to bottom, var(--regu-offwhite), var(--regu-gray-100))",
-          fontFamily: "var(--token-font-body)",
-        }}
-      >
-        <div className="mx-auto w-full max-w-3xl px-4 md:px-6" style={{ maxWidth: "var(--token-container-max)" }}>
-          <div
-            className="rounded-2xl border bg-white p-6 shadow-sm md:p-8"
-            style={{
-              borderColor: "var(--regu-gray-100)",
-              boxShadow: "0 4px 20px rgba(22, 61, 89, 0.06)",
-            }}
-          >
+      <div className="mx-auto px-4 pb-14 pt-8 md:px-6 md:pt-10" style={{ maxWidth: 820 }}>
+        <nav className="mb-6 flex items-center gap-2 text-sm" style={{ color: "var(--regu-gray-400)" }} aria-label="Breadcrumb">
+          <Link to="/" className="hover:underline" style={{ color: "var(--regu-gray-500)" }}>Inicio</Link>
+          <span aria-hidden>/</span>
+          <Link to="/eventos" className="hover:underline" style={{ color: "var(--regu-gray-500)" }}>Eventos</Link>
+          <span aria-hidden>/</span>
+          <span style={{ color: "var(--regu-blue)", fontWeight: 600 }}>{event.title}</span>
+        </nav>
+
+        <article
+          className="overflow-hidden rounded-2xl border bg-white"
+          style={{
+            borderColor: "rgba(22,61,89,0.10)",
+            boxShadow: "0 4px 20px rgba(22,61,89,0.08)",
+            borderTop: "3px solid var(--regu-blue)",
+          }}
+        >
+          <div className="p-6 md:p-8">
+            <div className="mb-4 flex flex-wrap items-center gap-2">
+              <span
+                className="inline-block rounded-sm px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider"
+                style={{
+                  backgroundColor: isUpcoming ? "rgba(68,137,198,0.12)" : "rgba(22,61,89,0.08)",
+                  color: isUpcoming ? "var(--regu-blue)" : "var(--regu-gray-600)",
+                }}
+              >
+                {EVENT_STATUS_LABEL[event.status]}
+              </span>
+              <span className="text-xs font-semibold tabular-nums" style={{ color: "var(--regu-gray-500)" }}>
+                {event.year}
+              </span>
+            </div>
+
+            <h1
+              style={{
+                fontSize: "clamp(1.35rem, 3vw, 1.85rem)",
+                fontWeight: 700,
+                color: "var(--regu-navy)",
+                lineHeight: 1.25,
+                marginBottom: 12,
+                fontFamily: "var(--token-font-heading)",
+              }}
+            >
+              {event.title}
+            </h1>
+
+            <div className="flex flex-wrap gap-4 text-sm" style={{ color: "var(--regu-gray-600)" }}>
+              <span className="flex items-center gap-1.5">
+                <Calendar size={14} style={{ color: "var(--regu-blue)" }} />
+                {dateLabel}
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Building2 size={14} style={{ color: "var(--regu-blue)" }} />
+                {event.organizer}
+              </span>
+              <span className="flex items-center gap-1.5">
+                <MapPin size={14} style={{ color: "var(--regu-blue)" }} />
+                {event.location}
+              </span>
+            </div>
+
             {event.imageUrl?.trim() && (
-              <div className="mb-6 overflow-hidden rounded-xl" style={{ aspectRatio: "16/9", backgroundColor: "var(--regu-gray-100)" }}>
-                <img
-                  src={event.imageUrl}
-                  alt=""
-                  className="h-full w-full object-cover"
-                />
+              <div
+                className="mt-6 overflow-hidden rounded-xl"
+                style={{ aspectRatio: "16/9", backgroundColor: "var(--regu-gray-100)" }}
+              >
+                <img src={event.imageUrl} alt="" className="h-full w-full object-cover" />
               </div>
             )}
+
             {event.description && (
-              <p className="mb-4 text-base leading-relaxed" style={{ color: "var(--regu-gray-700)" }}>
-                {event.description}
-              </p>
-            )}
-            {hasRegistrationUrl ? (
-              <a
-                href={event.registrationUrl!}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center rounded-xl px-5 py-3 text-sm font-semibold text-white transition hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--regu-blue)] focus-visible:ring-offset-2"
-                style={{ backgroundColor: "var(--regu-blue)" }}
-              >
-                Registrarse
-              </a>
-            ) : (
               <div
-                className="rounded-lg border border-amber-200 bg-amber-50/80 px-4 py-3 text-sm"
-                style={{ borderColor: "var(--regu-gray-200)", color: "var(--regu-gray-700)" }}
+                className="mt-6 border-t pt-6"
+                style={{ borderColor: "rgba(22,61,89,0.08)" }}
               >
-                <strong>Enlace de registro: por definir.</strong>
-                <p className="mt-1 text-sm opacity-90">
-                  El enlace de inscripción se publicará cuando esté disponible.
+                <h2
+                  className="mb-3 text-sm font-bold uppercase tracking-wider"
+                  style={{ color: "var(--regu-gray-500)" }}
+                >
+                  Descripción
+                </h2>
+                <p className="text-base leading-relaxed" style={{ color: "var(--regu-gray-700)" }}>
+                  {event.description}
                 </p>
               </div>
             )}
-            <div className="mt-6">
-              <Link
-                to="/eventos"
-                className="inline-flex items-center justify-center rounded-lg border-2 px-4 py-2.5 text-sm font-semibold transition hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--regu-blue)] focus-visible:ring-offset-2"
-                style={{
-                  borderColor: "var(--regu-blue)",
-                  color: "var(--regu-blue)",
-                }}
-              >
-                Volver a Eventos
-              </Link>
+
+            <div className="mt-8 flex flex-wrap items-center gap-4">
+              {hasRegistrationUrl ? (
+                <a
+                  href={event.registrationUrl!}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-bold text-white transition hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-[rgba(68,137,198,0.40)] focus:ring-offset-2"
+                  style={{ backgroundColor: "var(--regu-blue)" }}
+                >
+                  <ExternalLink size={16} />
+                  Registrarse
+                </a>
+              ) : (
+                <div
+                  className="rounded-xl border px-4 py-3 text-sm"
+                  style={{
+                    borderColor: "rgba(22,61,89,0.12)",
+                    backgroundColor: "rgba(68,137,198,0.06)",
+                    color: "var(--regu-gray-700)",
+                  }}
+                >
+                  <strong>Enlace de registro: por definir.</strong>
+                  <p className="mt-1 text-xs" style={{ color: "var(--regu-gray-500)" }}>
+                    El enlace de inscripción se publicará cuando esté disponible.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
+        </article>
+
+        <div
+          className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t pt-8"
+          style={{ borderColor: "rgba(22,61,89,0.08)" }}
+        >
+          <Link
+            to="/eventos"
+            className="inline-flex items-center gap-2 rounded-xl border-2 px-4 py-2.5 text-sm font-semibold transition hover:border-[var(--regu-blue)] hover:text-[var(--regu-blue)]"
+            style={{ borderColor: "rgba(22,61,89,0.12)", color: "var(--regu-gray-700)", textDecoration: "none" }}
+          >
+            <ArrowLeft size={16} />
+            Volver a Eventos
+          </Link>
+          <Link
+            to="/noticias"
+            className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-95"
+            style={{ backgroundColor: "var(--regu-blue)", textDecoration: "none" }}
+          >
+            Ver noticias
+            <ArrowRight size={16} />
+          </Link>
         </div>
       </div>
-    </>
+    </div>
   );
 }

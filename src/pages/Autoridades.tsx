@@ -8,14 +8,12 @@ function AuthorityCard({ authority, index }: { authority: (typeof authorities)[n
   return (
     <Link
       to={`/autoridades/${authority.slug}`}
-      className="authorityCard group relative flex flex-col items-center overflow-hidden rounded-2xl border bg-white text-center transition-all duration-200 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--regu-blue)] focus-visible:ring-offset-2"
+      className="authorityCard group relative flex flex-col items-center overflow-hidden rounded-2xl border bg-white text-center transition-all duration-200 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--regu-blue)] focus-visible:ring-offset-2 w-full min-h-0"
       style={{
         borderColor: "rgba(22,61,89,0.10)",
         boxShadow: isCenter
           ? "0 4px 12px rgba(22,61,89,0.08), 0 16px 40px rgba(22,61,89,0.12)"
           : "0 2px 6px rgba(22,61,89,0.04), 0 6px 20px rgba(22,61,89,0.07)",
-        flex: "1 1 0",
-        minWidth: "280px",
         maxWidth: "380px",
       }}
     >
@@ -128,8 +126,8 @@ export default function Autoridades() {
             </div>
           </div>
 
-          {/* Grid de autoridades */}
-          <div className="flex flex-col items-stretch justify-center gap-5 sm:flex-row sm:flex-wrap lg:flex-nowrap">
+          {/* Grid de autoridades: 1 col móvil, 2 tablet, 3 desktop */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6 justify-items-center">
             {authorities.map((authority, index) => (
               <AuthorityCard key={authority.id} authority={authority} index={index} />
             ))}

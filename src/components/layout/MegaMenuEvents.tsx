@@ -58,7 +58,7 @@ export default function MegaMenuEvents({
             <h3
               className="uppercase font-bold mb-3"
               style={{
-                fontSize: "0.6875rem",
+                fontSize: "0.875rem",
                 letterSpacing: "0.12em",
                 color: "var(--regu-blue)",
               }}
@@ -111,7 +111,7 @@ export default function MegaMenuEvents({
             <h3
               className="uppercase font-bold mb-3"
               style={{
-                fontSize: "0.6875rem",
+                fontSize: "0.875rem",
                 letterSpacing: "0.12em",
                 color: "var(--regu-gray-900)",
               }}
@@ -179,7 +179,7 @@ export default function MegaMenuEvents({
             <h3
               className="uppercase font-bold mb-4"
               style={{
-                fontSize: "0.6875rem",
+                fontSize: "0.875rem",
                 letterSpacing: "0.12em",
                 color: "var(--regu-blue)",
               }}
@@ -240,7 +240,7 @@ export default function MegaMenuEvents({
             <h3
               className="uppercase font-bold mb-4"
               style={{
-                fontSize: "0.75rem",
+                fontSize: "0.875rem",
                 letterSpacing: "0.12em",
                 color: "var(--regu-gray-900)",
               }}

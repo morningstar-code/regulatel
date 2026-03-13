@@ -1,76 +1,100 @@
 import { useParams, Link } from "react-router-dom";
-import { Home, ChevronRight } from "lucide-react";
 import {
   getAuthorityBySlug,
   getOtherAuthorities,
   type Authority,
 } from "@/data/authorities";
+import {
+  User,
+  Building2,
+  MapPin,
+  Calendar,
+  ArrowLeft,
+  ArrowRight,
+  ChevronRight,
+} from "lucide-react";
 
 function DetailHero({ a }: { a: Authority }) {
   return (
-    <div className="bg-[#FAFAFA] border-b border-[#E5E7EB]">
-      <div
-        className="mx-auto px-4 md:px-6 py-10 md:py-12"
-        style={{ maxWidth: "1100px" }}
-      >
-        <nav
-          className="flex flex-wrap items-center gap-1 md:gap-2 mb-8"
-          aria-label="Breadcrumb"
+    <div
+      className="overflow-hidden rounded-2xl border bg-white"
+      style={{
+        borderColor: "rgba(22,61,89,0.10)",
+        boxShadow: "0 4px 20px rgba(22,61,89,0.08)",
+        borderTop: "3px solid var(--regu-blue)",
+      }}
+    >
+      <div className="flex flex-col md:flex-row md:items-stretch gap-0">
+        {/* Foto */}
+        <div
+          className="relative flex-shrink-0 w-full md:w-[280px] md:min-h-[280px] bg-[var(--regu-gray-100)]"
+          style={{ aspectRatio: "1" }}
         >
-          <Link
-            to="/"
-            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[0.9375rem] font-semibold text-[#4489C6] hover:bg-[#4489C6]/10 hover:text-[#2563a8] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#4489C6] focus-visible:ring-offset-1"
+          <img
+            src={a.image}
+            alt=""
+            className="h-full w-full object-cover object-[center_top]"
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+              const next = e.currentTarget.nextElementSibling as HTMLElement | null;
+              if (next) next.classList.remove("hidden");
+            }}
+          />
+          <div
+            className="hidden h-full w-full items-center justify-center text-6xl font-bold"
+            style={{ backgroundColor: "rgba(68,137,198,0.08)", color: "var(--regu-blue)" }}
+            aria-hidden
           >
-            <Home className="w-4 h-4 shrink-0" aria-hidden />
-            Inicio
-          </Link>
-          <ChevronRight className="w-4 h-4 shrink-0 text-[#9CA3AF]" aria-hidden />
-          <Link
-            to="/autoridades"
-            className="inline-flex items-center rounded-lg px-3 py-1.5 text-[0.9375rem] font-semibold text-[#4489C6] hover:bg-[#4489C6]/10 hover:text-[#2563a8] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#4489C6] focus-visible:ring-offset-1"
-          >
-            Autoridades
-          </Link>
-          <ChevronRight className="w-4 h-4 shrink-0 text-[#9CA3AF]" aria-hidden />
-          <span className="inline-flex items-center rounded-lg px-3 py-1.5 text-[0.9375rem] font-bold text-[#111827] bg-[#E5E7EB]">
-            {a.name}
-          </span>
-        </nav>
-
-        <div className="flex flex-col md:flex-row md:items-start gap-8">
-          <div className="flex-shrink-0 flex justify-center md:justify-start">
-            <img
-              src={a.image}
-              alt={a.name}
-              className="w-[200px] h-[200px] md:w-[240px] md:h-[240px] rounded-lg object-cover bg-[#E5E7EB] aspect-square"
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-                const next = e.currentTarget.nextElementSibling as HTMLElement | null;
-                if (next) next.classList.remove("hidden");
-              }}
-            />
-            <div
-              className="hidden w-[200px] h-[200px] md:w-[240px] md:h-[240px] rounded-lg bg-[#E5E7EB] items-center justify-center text-[#9CA3AF] text-4xl aspect-square"
-              aria-hidden
-            >
-              —
-            </div>
+            {a.name.charAt(0)}
           </div>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-2xl md:text-3xl font-semibold text-[#111827] tracking-tight mb-3">
-              {a.name}
-            </h1>
-            <span className="inline-block text-xs uppercase tracking-[0.08em] text-[#6B7280] bg-[#E5E7EB] px-3 py-1.5 rounded mb-4">
+        </div>
+
+        {/* Meta */}
+        <div className="flex min-w-0 flex-1 flex-col justify-center p-6 md:p-8">
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <span
+              className="inline-block rounded-sm px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider"
+              style={{ backgroundColor: "rgba(68,137,198,0.12)", color: "var(--regu-blue)" }}
+            >
               {a.role}
             </span>
-            <p className="text-base text-[#374151] mb-1">
-              <span className="font-medium text-[#111827]">{a.institution}</span>
-              {a.country && ` · ${a.country}`}
-            </p>
             {a.period && (
-              <p className="text-sm text-[#6B7280]">{a.period}</p>
+              <span className="flex items-center gap-1 text-xs font-medium" style={{ color: "var(--regu-gray-500)" }}>
+                <Calendar size={12} />
+                {a.period}
+              </span>
             )}
           </div>
+          <h1
+            className="break-words"
+            style={{
+              fontSize: "clamp(1.5rem, 3vw, 2rem)",
+              fontWeight: 700,
+              color: "var(--regu-navy)",
+              lineHeight: 1.2,
+              marginBottom: 12,
+              fontFamily: "var(--token-font-heading)",
+            }}
+          >
+            {a.name}
+          </h1>
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm" style={{ color: "var(--regu-gray-600)" }}>
+            <span className="flex items-center gap-1.5">
+              <Building2 size={14} style={{ color: "var(--regu-blue)" }} />
+              {a.institution}
+            </span>
+            {a.country && (
+              <span className="flex items-center gap-1.5">
+                <MapPin size={14} style={{ color: "var(--regu-blue)" }} />
+                {a.country}
+              </span>
+            )}
+          </div>
+          {a.bio && (
+            <p className="mt-4 text-sm leading-relaxed line-clamp-3" style={{ color: "var(--regu-gray-600)" }}>
+              {a.bio}
+            </p>
+          )}
         </div>
       </div>
     </div>
@@ -78,19 +102,43 @@ function DetailHero({ a }: { a: Authority }) {
 }
 
 function BioSections({ a }: { a: Authority }) {
-  const sections = a.sections && a.sections.length > 0
-    ? a.sections
-    : [{ title: "Perfil", content: a.fullBio }];
+  const sections =
+    a.sections && a.sections.length > 0
+      ? a.sections
+      : [{ title: "Perfil", content: a.fullBio }];
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       {sections.map((sec, i) => (
-        <section key={i}>
-          <h2 className="text-lg font-semibold text-[#111827] mb-4">{sec.title}</h2>
-          <div className="text-[1.125rem] md:text-[1.25rem] text-[#1f2937] leading-[1.8] whitespace-pre-line md:text-justify max-w-[720px]">
-            {sec.content}
+        <div
+          key={i}
+          className="overflow-hidden rounded-2xl border bg-white"
+          style={{
+            borderColor: "rgba(22,61,89,0.10)",
+            boxShadow: "0 2px 8px rgba(22,61,89,0.04)",
+            borderTop: "3px solid var(--regu-blue)",
+          }}
+        >
+          <div className="p-6 md:p-8">
+            <h2
+              className="mb-4 flex items-center gap-2 text-base font-bold uppercase tracking-wider"
+              style={{ color: "var(--regu-gray-500)", fontFamily: "var(--token-font-heading)" }}
+            >
+              <span
+                className="h-5 w-[3px] flex-shrink-0 rounded-full"
+                style={{ backgroundColor: "var(--regu-blue)" }}
+                aria-hidden
+              />
+              {sec.title}
+            </h2>
+            <div
+              className="text-[0.9375rem] md:text-[1rem] leading-[1.75] whitespace-pre-line"
+              style={{ color: "var(--regu-gray-700)", maxWidth: "720px" }}
+            >
+              {sec.content}
+            </div>
           </div>
-        </section>
+        </div>
       ))}
     </div>
   );
@@ -102,35 +150,77 @@ function OtrasAutoridades({ currentSlug }: { currentSlug: string }) {
   if (others.length === 0) return null;
 
   return (
-    <section className="pt-16 border-t border-[#E5E7EB] mt-16">
-      <h2 className="text-xl font-semibold text-[#111827] mb-6">Otras autoridades</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {others.map((a) => (
+    <section className="pt-10 border-t" style={{ borderColor: "rgba(22,61,89,0.08)" }}>
+      <div className="mb-6 flex items-center gap-3">
+        <div
+          className="h-8 w-[3px] flex-shrink-0 rounded-full"
+          style={{ backgroundColor: "var(--regu-blue)" }}
+          aria-hidden
+        />
+        <h2
+          className="text-lg font-bold"
+          style={{ color: "var(--regu-navy)", fontFamily: "var(--token-font-heading)" }}
+        >
+          Otras autoridades
+        </h2>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {others.map((auth) => (
           <Link
-            key={a.id}
-            to={`/autoridades/${a.slug}`}
-            className="rounded-xl border border-[#E5E7EB] bg-white p-5 shadow-sm hover:shadow-md transition-shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-[#4489C6] focus-visible:ring-offset-2"
+            key={auth.id}
+            to={`/autoridades/${auth.slug}`}
+            className="group overflow-hidden rounded-2xl border bg-white transition-all hover:border-[rgba(22,61,89,0.18)] hover:shadow-[0_4px_12px_rgba(22,61,89,0.08)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--regu-blue)] focus-visible:ring-offset-2"
+            style={{
+              borderColor: "rgba(22,61,89,0.10)",
+              boxShadow: "0 2px 6px rgba(22,61,89,0.04)",
+              borderTop: "3px solid var(--regu-blue)",
+            }}
           >
-            <img
-              src={a.image}
-              alt={a.name}
-              className="w-full aspect-square max-w-[140px] mx-auto rounded-lg object-cover bg-[#E5E7EB] mb-3"
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-              }}
-            />
-            <h3 className="text-base font-semibold text-[#111827] line-clamp-2">{a.name}</h3>
-            <p className="text-xs uppercase tracking-wider text-[#6B7280] mt-1">{a.role}</p>
+            <div
+              className="relative w-full overflow-hidden bg-[var(--regu-gray-100)]"
+              style={{ aspectRatio: "1" }}
+            >
+              <img
+                src={auth.image}
+                alt=""
+                className="h-full w-full object-cover object-[center_top] transition-transform duration-300 group-hover:scale-[1.03]"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                  const next = e.currentTarget.nextElementSibling as HTMLElement | null;
+                  if (next) next.classList.remove("hidden");
+                }}
+              />
+              <div
+                className="absolute inset-0 hidden items-center justify-center text-4xl font-bold"
+                style={{ backgroundColor: "rgba(68,137,198,0.08)", color: "var(--regu-blue)" }}
+                aria-hidden
+              >
+                {auth.name.charAt(0)}
+              </div>
+            </div>
+            <div className="p-4">
+              <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--regu-blue)" }}>
+                {auth.role}
+              </p>
+              <h3 className="font-bold leading-tight line-clamp-2 group-hover:text-[var(--regu-blue)] transition-colors" style={{ color: "var(--regu-navy)", fontSize: "0.9375rem" }}>
+                {auth.name}
+              </h3>
+              <p className="mt-0.5 text-xs" style={{ color: "var(--regu-gray-500)" }}>
+                {auth.institution}
+                {auth.country && ` · ${auth.country}`}
+              </p>
+            </div>
           </Link>
         ))}
       </div>
-      <div className="mt-8">
+      <div className="mt-6">
         <Link
           to="/autoridades"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-[#4489C6] hover:underline"
+          className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-95"
+          style={{ backgroundColor: "var(--regu-blue)", textDecoration: "none" }}
         >
           Ver todas las autoridades
-          <ChevronRight className="w-4 h-4" />
+          <ArrowRight size={16} />
         </Link>
       </div>
     </section>
@@ -143,33 +233,94 @@ export default function AutoridadDetalle() {
 
   if (!authority) {
     return (
-      <div className="min-h-[50vh] flex flex-col items-center justify-center px-4">
-        <h1 className="text-2xl font-semibold text-[#111827] mb-2">No encontrada</h1>
-        <p className="text-[#6B7280] mb-6">La autoridad solicitada no existe.</p>
-        <Link
-          to="/autoridades"
-          className="text-[#4489C6] font-medium hover:underline"
-        >
-          Volver a Autoridades
-        </Link>
+      <div
+        className="relative min-h-[60vh] flex flex-col items-center justify-center px-4"
+        style={{ backgroundColor: "#FAFBFC", fontFamily: "var(--token-font-body)" }}
+      >
+        <div style={{ height: 4, background: "var(--regu-blue)", width: "100%", position: "absolute", top: 0, left: 0, right: 0 }} aria-hidden />
+        <div className="rounded-2xl border bg-white p-10 text-center" style={{ borderColor: "rgba(22,61,89,0.10)", boxShadow: "0 2px 8px rgba(22,61,89,0.04)", borderTop: "3px solid var(--regu-blue)", maxWidth: 440 }}>
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl" style={{ backgroundColor: "rgba(68,137,198,0.12)" }}>
+            <User size={28} style={{ color: "var(--regu-blue)" }} />
+          </div>
+          <h1 className="text-xl font-bold" style={{ color: "var(--regu-navy)", fontFamily: "var(--token-font-heading)" }}>
+            Autoridad no encontrada
+          </h1>
+          <p className="mt-2 text-sm" style={{ color: "var(--regu-gray-500)" }}>
+            La autoridad solicitada no existe o no está disponible.
+          </p>
+          <Link
+            to="/autoridades"
+            className="mt-6 inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold text-white"
+            style={{ backgroundColor: "var(--regu-blue)", textDecoration: "none" }}
+          >
+            <ArrowLeft size={16} />
+            Volver a Autoridades
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <>
-      <DetailHero a={authority} />
+    <div
+      className="min-h-screen"
+      style={{
+        backgroundColor: "#FAFBFC",
+        borderTop: "1px solid rgba(22,61,89,0.07)",
+        fontFamily: "var(--token-font-body)",
+      }}
+    >
+      <div style={{ height: 4, background: "var(--regu-blue)", width: "100%" }} aria-hidden />
 
-      <div
-        className="mx-auto px-4 md:px-6 py-12 md:py-16"
-        style={{ maxWidth: "1100px" }}
-      >
-        <div className="min-w-0">
+      <div className="mx-auto px-4 pb-14 pt-8 md:px-6 md:pt-10" style={{ maxWidth: 900 }}>
+        <nav
+          className="mb-6 flex items-center gap-2 text-sm"
+          style={{ color: "var(--regu-gray-400)" }}
+          aria-label="Breadcrumb"
+        >
+          <Link to="/" className="hover:underline" style={{ color: "var(--regu-gray-500)" }}>
+            Inicio
+          </Link>
+          <span aria-hidden>/</span>
+          <Link to="/autoridades" className="hover:underline" style={{ color: "var(--regu-gray-500)" }}>
+            Autoridades
+          </Link>
+          <span aria-hidden>/</span>
+          <span style={{ color: "var(--regu-blue)", fontWeight: 600 }}>
+            {authority.name}
+          </span>
+        </nav>
+
+        <DetailHero a={authority} />
+
+        <div className="mt-8 space-y-8">
           <BioSections a={authority} />
         </div>
 
         <OtrasAutoridades currentSlug={authority.slug} />
+
+        <div
+          className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t pt-8"
+          style={{ borderColor: "rgba(22,61,89,0.08)" }}
+        >
+          <Link
+            to="/autoridades"
+            className="inline-flex items-center gap-2 rounded-xl border-2 px-4 py-2.5 text-sm font-semibold transition hover:border-[var(--regu-blue)] hover:text-[var(--regu-blue)]"
+            style={{ borderColor: "rgba(22,61,89,0.12)", color: "var(--regu-gray-700)", textDecoration: "none" }}
+          >
+            <ArrowLeft size={16} />
+            Volver a Autoridades
+          </Link>
+          <Link
+            to="/comite-ejecutivo"
+            className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-95"
+            style={{ backgroundColor: "var(--regu-blue)", textDecoration: "none" }}
+          >
+            Comité Ejecutivo
+            <ChevronRight size={16} />
+          </Link>
+        </div>
       </div>
-    </>
+    </div>
   );
 }

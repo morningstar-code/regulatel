@@ -43,6 +43,7 @@ import QueSomos from '@/pages/quienes-somos/QueSomos';
 import VisionMision from '@/pages/quienes-somos/VisionMision';
 import ObjetivosYFunciones from '@/pages/quienes-somos/ObjetivosYFunciones';
 import ProtocolosYProcedimientos from '@/pages/quienes-somos/ProtocolosYProcedimientos';
+import NotFound from '@/pages/NotFound';
 
 function App() {
   return (
@@ -116,6 +117,7 @@ function App() {
           <Route path="/conatel-ve" element={<EnteRegulador />} />
           <Route path="/asep" element={<EnteRegulador />} />
           <Route path="/telcor" element={<EnteRegulador />} />
+          <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>
         </AdminDataProvider>
