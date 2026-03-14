@@ -51,7 +51,7 @@ export const gestionDocuments: GestionDocument[] = [
   {
     id: "plan-2025",
     title: "Plan de Trabajo REGULATEL 2025",
-    url: "https://www.regulatel.org/sites/default/files/gallery/gallery/Plan-trabajo-presidencia-Regulatel-2025-VF.pdf",
+    url: "/documents/Plan-de-trabajo-presidencia-Regulatel-2025.pdf",
     year: "2025",
     category: "planes-actas",
   },

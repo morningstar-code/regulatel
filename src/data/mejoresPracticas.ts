@@ -59,6 +59,7 @@ const COUNTRY_ISO: Record<string, string> = {
   italia: "it",
   méxico: "mx",
   mexico: "mx",
+  nicaragua: "ni",
   panamá: "pa",
   panama: "pa",
   paraguay: "py",

@@ -703,82 +703,17 @@
     "detailUrl": "https://regulatel.indotel.gob.do/pagina/detalle?id=176",
     "categories": [
       {
-        "name": "¿Esta seguro de que desea remover el archivo?",
-        "links": []
-      },
-      {
-        "name": "Argentina",
-        "links": []
-      },
-      {
-        "name": "Argentina",
-        "links": []
-      },
-      {
-        "name": "Argentina",
-        "links": []
-      },
-      {
-        "name": "Argentina",
-        "links": []
-      },
-      {
-        "name": "Argentina",
-        "links": []
-      },
-      {
-        "name": "Argentina",
-        "links": []
-      },
-      {
-        "name": "Argentina",
-        "links": []
-      },
-      {
-        "name": "Contáctanos",
+        "name": "Mejores prácticas regulatorias",
         "links": [
           {
-            "title": "Consultar portal institucional del INDOTEL",
-            "url": "https://indotel.gob.do/"
-          }
-        ]
-      },
-      {
-        "name": "Internacionales@indotel.gob.do",
-        "links": []
-      },
-      {
-        "name": "Internacionales@indotel.gob.do",
-        "links": []
-      },
-      {
-        "name": "Oficina en Republica Dominicana:",
-        "links": []
-      },
-      {
-        "name": "Av. Abraham Lincoln No. 962 , Santo Domingo, R.D 10148",
-        "links": []
-      },
-      {
-        "name": "Oficina en Republica Dominicana: (809) 200-9707",
-        "links": [
+            "title": "Ficha SUBTEL en REGULATEL",
+            "url": "https://regulatel.indotel.gob.do/pagina/detalle?id=176"
+          },
           {
-            "title": "Consultar portal institucional del INDOTEL",
-            "url": "https://indotel.gob.do/"
+            "title": "Subsecretaría de Telecomunicaciones (SUBTEL)",
+            "url": "https://www.subtel.gob.cl/"
           }
         ]
-      },
-      {
-        "name": "Oficina en Republica Dominicana: (809) 200-9707",
-        "links": []
-      },
-      {
-        "name": "Redes Sociales",
-        "links": []
-      },
-      {
-        "name": "App",
-        "links": []
       }
     ]
   },
@@ -1118,82 +1053,192 @@
     "detailUrl": "https://regulatel.indotel.gob.do/pagina/detalle?id=181",
     "categories": [
       {
-        "name": "¿Esta seguro de que desea remover el archivo?",
-        "links": []
-      },
-      {
-        "name": "Elemento vacio, para iniciación de elementos en sección",
-        "links": []
-      },
-      {
-        "name": "Elemento vacio, para iniciación de elementos en sección",
-        "links": []
-      },
-      {
-        "name": "Elemento vacio, para iniciación de elementos en sección",
-        "links": []
-      },
-      {
-        "name": "Elemento vacio, para iniciación de elementos en sección",
-        "links": []
-      },
-      {
-        "name": "Elemento vacio, para iniciación de elementos en sección",
-        "links": []
-      },
-      {
-        "name": "Elemento vacio, para iniciación de elementos en sección",
-        "links": []
-      },
-      {
-        "name": "Elemento vacio, para iniciación de elementos en sección",
-        "links": []
-      },
-      {
-        "name": "Contáctanos",
+        "name": "Espectro radioeléctrico",
         "links": [
           {
-            "title": "Consultar portal institucional del INDOTEL",
-            "url": "https://indotel.gob.do/"
+            "title": "Propuesta de Cronograma de Asignación de Espectro (CAE)",
+            "url": "https://www.sutel.go.cr/sites/default/files/12._05071-sutel-dgc-2020_actualizacion_cae_2021-2025.pdf"
+          },
+          {
+            "title": "Reforma Integral al Plan Nacional de Atribución de Frecuencias (PNAF)",
+            "url": "http://www.pgrweb.go.cr/scij/Busqueda/Normativa/Normas/nrm_texto_completo.aspx?param1=NRTC&nValor1=1&nValor2=94214&nValor3=125381&strTipM=TC"
+          },
+          {
+            "title": "Adendum VII Plan Nacional de Atribución de Frecuencias",
+            "url": "https://www.sutel.go.cr/sites/default/files/normativas/pnaf_con_reforma_n_42924-micitt_30-04-2021.pdf"
+          },
+          {
+            "title": "Consultar banda libre",
+            "url": "https://homologacion.sutel.go.cr/zf_ConsultaPublica/Index/bandalibre"
+          },
+          {
+            "title": "Recomendaciones de recuperación y asignación de espectro radioeléctrico",
+            "url": "https://www.sutel.go.cr/pagina/frecuencias-servicios-moviles"
           }
         ]
       },
       {
-        "name": "Internacionales@indotel.gob.do",
-        "links": []
-      },
-      {
-        "name": "Internacionales@indotel.gob.do",
-        "links": []
-      },
-      {
-        "name": "Oficina en Republica Dominicana:",
-        "links": []
-      },
-      {
-        "name": "Av. Abraham Lincoln No. 962 , Santo Domingo, R.D 10148",
-        "links": []
-      },
-      {
-        "name": "Oficina en Republica Dominicana: (809) 200-9707",
+        "name": "Competencia económica",
         "links": [
           {
-            "title": "Consultar portal institucional del INDOTEL",
-            "url": "https://indotel.gob.do/"
+            "title": "Ley General de Telecomunicaciones (Ley 8642)",
+            "url": "https://www.sutel.go.cr/sites/default/files/normativas/ley_general_de_telecomunicaciones.pdf"
+          },
+          {
+            "title": "Ley de Fortalecimiento de las Autoridades de Competencia (Ley 9736)",
+            "url": "https://www.sutel.go.cr/normatica/ley-9736-ley-de-fortalecimiento-de-las-autoridades-de-competencia"
+          },
+          {
+            "title": "Ley de Promoción de la Competencia y Defensa Efectiva del Consumidor (Ley 7472)",
+            "url": "https://www.pgrweb.go.cr/scij/Busqueda/Normativa/Normas/nrm_texto_completo.aspx?nValor1=1&nValor2=26481"
+          },
+          {
+            "title": "Reglamento a la Ley 9736, Fortalecimiento de las Autoridades de Competencia",
+            "url": "https://www.sutel.go.cr/normativas-competencia"
+          },
+          {
+            "title": "Reglamento de Régimen de Competencia en Telecomunicaciones",
+            "url": "https://www.sutel.go.cr/normativas-competencia"
+          },
+          {
+            "title": "Estudios de mercado en materia de competencia económica",
+            "url": "https://www.sutel.go.cr/estudios-mercado"
+          },
+          {
+            "title": "Guías de competencia",
+            "url": "https://www.sutel.go.cr/guias-competencia"
           }
         ]
       },
       {
-        "name": "Oficina en Republica Dominicana: (809) 200-9707",
-        "links": []
+        "name": "Protección del usuario",
+        "links": [
+          {
+            "title": "Reglamento sobre el régimen de protección al usuario final (RPUF)",
+            "url": "https://www.imprentanacional.go.cr/pub/2022/09/22/ALCA200_22_09_2022.pdf"
+          },
+          {
+            "title": "Reglamento de Prestación y Calidad de Servicios",
+            "url": "https://www.sutel.go.cr/sites/default/files/normativas/reglamento_prestacion_y_calidad_de_servicios.pdf"
+          },
+          {
+            "title": "Plataforma Validación de Celulares",
+            "url": "https://pvc.sutel.go.cr/"
+          },
+          {
+            "title": "Consulta Contratos de Adhesión",
+            "url": "https://www.sutel.go.cr/contratos-adhesion"
+          },
+          {
+            "title": "Mapas de cobertura de telefonía e Internet móvil",
+            "url": "https://mapas.sutel.go.cr/"
+          },
+          {
+            "title": "Visor de calidad con información de desempeño de redes fijas",
+            "url": "https://visorcalidad.sutel.go.cr/"
+          },
+          {
+            "title": "Evaluación nacional calidad de redes móviles",
+            "url": "https://www.sutel.go.cr/sites/default/files/informe_evaluacion_telefonia_e_internet_movil_2021.pdf"
+          },
+          {
+            "title": "Encuestas percepción calidad servicios",
+            "url": "https://www.sutel.go.cr/noticias/comunicados-de-prensa/usuarios-califican-la-calidad-de-los-servicios-de-telecomunicaciones"
+          }
+        ]
       },
       {
-        "name": "Redes Sociales",
-        "links": []
+        "name": "Accesibilidad",
+        "links": [
+          {
+            "title": "Programas del Fondo Nacional de Telecomunicaciones (Fonatel)",
+            "url": "https://www.sutel.go.cr/pagina/que-es-fonatel"
+          },
+          {
+            "title": "Avance de los programas del Fonatel",
+            "url": "https://www.sutel.go.cr/pagina/avance-de-los-proyectos-de-fonatel"
+          }
+        ]
       },
       {
-        "name": "App",
-        "links": []
+        "name": "Tecnologías emergentes",
+        "links": [
+          {
+            "title": "Principio de Neutralidad Tecnológica de la Ley General de Telecomunicaciones",
+            "url": "http://www.pgrweb.go.cr/SCIJ/Busqueda/Normativa/Normas/nrm_texto_completo.aspx?nValor1=1&nValor2=26314"
+          },
+          {
+            "title": "Obligaciones fundamentales de la SUTEL relacionadas con tecnologías emergentes",
+            "url": "http://www.pgrweb.go.cr/SCIJ/Busqueda/Normativa/Normas/nrm_texto_completo.aspx?nValor1=1&nValor2=26314"
+          }
+        ]
+      },
+      {
+        "name": "Compartición de infraestructura",
+        "links": [
+          {
+            "title": "Reglamento sobre el uso compartido de infraestructura para el soporte de redes públicas de telecomunicaciones",
+            "url": "http://www.pgrweb.go.cr/scij/Busqueda/Normativa/Normas/nrm_texto_completo.aspx?param1=NRTC&nValor1=1&nValor2=85283&nValor3=110234&strTipM=TC"
+          },
+          {
+            "title": "Solicitud de la oferta de uso compartido de infraestructura por referencia (OUC) (RCS-313-2020)",
+            "url": "https://www.sutel.go.cr/sites/default/files/rcs-313-2020_oferta_uso_compartido.pdf"
+          },
+          {
+            "title": "Registro Nacional de Telecomunicaciones",
+            "url": "https://consultarntplus.sutel.go.cr/"
+          },
+          {
+            "title": "Metodología para el cálculo de los precios por uso compartido de infraestructura de postería",
+            "url": "http://www.pgrweb.go.cr/scij/Busqueda/Normativa/Normas/nrm_texto_completo.aspx?nValor1=1&nValor2=83206"
+          },
+          {
+            "title": "Ofertas de Uso Compartido de Infraestructura",
+            "url": "http://www.pgrweb.go.cr/scij/Busqueda/Normativa/Normas/nrm_texto_completo.aspx?nValor1=1&nValor2=83206"
+          },
+          {
+            "title": "Sistema de Información Geográfica sobre Infraestructura Pasiva de telecomunicaciones",
+            "url": "http://www.pgrweb.go.cr/scij/Busqueda/Normativa/Normas/nrm_texto_completo.aspx?nValor1=1&nValor2=83206"
+          }
+        ]
+      },
+      {
+        "name": "Telecomunicaciones de emergencia",
+        "links": [
+          {
+            "title": "Artículo 122 Reglamento a la Ley General de Telecomunicaciones",
+            "url": "https://www.sutel.go.cr/sites/default/files/normativas/reglamento_a_la_ley_general_de_telecomunicaciones_decreto_ejecutivo_34765-minaet_y_sus_reformas.pdf"
+          },
+          {
+            "title": "Artículo 62 Reglamento de Acceso e Interconexión de Redes de telecomunicaciones",
+            "url": "https://www.sutel.go.cr/sites/default/files/normativas/reglamento_de_acceso_e_interconexion_de_redes_de_telecomunicaciones_0.pdf"
+          },
+          {
+            "title": "Plan Nacional de Numeración",
+            "url": "https://www.sutel.go.cr/sites/default/files/normativas/plan_nacional_de_numeracion_0.pdf"
+          }
+        ]
+      },
+      {
+        "name": "Homologación de productos y dispositivos",
+        "links": [
+          {
+            "title": "Modificación del procedimiento de homologación de terminales de telecomunicaciones móviles (RCS-358-2018)",
+            "url": "https://www.sutel.go.cr/sites/default/files/rcs-358-2018-_procedimiento_de_homologacion_de_terminales_moviles_gaceta_0.pdf"
+          },
+          {
+            "title": "Procedimiento para solicitar ante la SUTEL la homologación de dispositivos que operen en las bandas de uso libre (RCS-154-2018)",
+            "url": "https://www.sutel.go.cr/sites/default/files/rcs-154-2018_procedimiento_de_homologacion_de_equipos_de_banda_libre_1_0.pdf"
+          },
+          {
+            "title": "Actualización procedimiento y requisitos acreditación peritos equipos terminales móviles (RCS-286-2018)",
+            "url": "https://www.sutel.go.cr/sites/default/files/actualizacion_rcs-286-2018_procedimiento_para_la_acreditacion_de_peritos_2023.pdf"
+          },
+          {
+            "title": "Homologación de equipos",
+            "url": "https://homologacion.sutel.go.cr/zf_ConsultaPublica/Index/indexprincipal"
+          }
+        ]
       }
     ]
   },
@@ -4093,82 +4138,42 @@
     "detailUrl": "https://regulatel.indotel.gob.do/pagina/detalle?id=201",
     "categories": [
       {
-        "name": "¿Esta seguro de que desea remover el archivo?",
-        "links": []
-      },
-      {
-        "name": "El IFT y Regulatel",
-        "links": []
-      },
-      {
-        "name": "El IFT y Regulatel",
-        "links": []
-      },
-      {
-        "name": "El IFT y Regulatel",
-        "links": []
-      },
-      {
-        "name": "El IFT y Regulatel",
-        "links": []
-      },
-      {
-        "name": "El IFT y Regulatel",
-        "links": []
-      },
-      {
-        "name": "El IFT y Regulatel",
-        "links": []
-      },
-      {
-        "name": "El IFT y Regulatel",
-        "links": []
-      },
-      {
-        "name": "Contáctanos",
+        "name": "Mejores prácticas regulatorias",
         "links": [
           {
-            "title": "Consultar portal institucional del INDOTEL",
-            "url": "https://indotel.gob.do/"
+            "title": "Ficha CONATEL en REGULATEL",
+            "url": "https://regulatel.indotel.gob.do/pagina/detalle?id=201"
+          },
+          {
+            "title": "Comisión Nacional de Telecomunicaciones (CONATEL Venezuela)",
+            "url": "https://www.conatel.gob.ve/"
           }
         ]
-      },
+      }
+    ]
+  },
+  {
+    "country": "Nicaragua",
+    "entity": "Instituto Nicaragüense de Telecomunicaciones y Correos",
+    "acronym": "TELCOR",
+    "detailUrl": "https://regulatel.indotel.gob.do/pagina/mejores-practicas-regulatorias",
+    "categories": [
       {
-        "name": "Internacionales@indotel.gob.do",
-        "links": []
-      },
-      {
-        "name": "Internacionales@indotel.gob.do",
-        "links": []
-      },
-      {
-        "name": "Oficina en Republica Dominicana:",
-        "links": []
-      },
-      {
-        "name": "Av. Abraham Lincoln No. 962 , Santo Domingo, R.D 10148",
-        "links": []
-      },
-      {
-        "name": "Oficina en Republica Dominicana: (809) 200-9707",
+        "name": "Mejores prácticas regulatorias",
         "links": [
           {
-            "title": "Consultar portal institucional del INDOTEL",
-            "url": "https://indotel.gob.do/"
+            "title": "Portal REGULATEL - Mejores prácticas regulatorias",
+            "url": "https://regulatel.indotel.gob.do/pagina/mejores-practicas-regulatorias"
+          },
+          {
+            "title": "TELCOR - Instituto Nicaragüense de Telecomunicaciones y Correos",
+            "url": "https://www.telcor.gob.ni/"
+          },
+          {
+            "title": "Preguntas frecuentes - TELCOR",
+            "url": "https://www.telcor.gob.ni/pregunta-frecuentes/"
           }
         ]
-      },
-      {
-        "name": "Oficina en Republica Dominicana: (809) 200-9707",
-        "links": []
-      },
-      {
-        "name": "Redes Sociales",
-        "links": []
-      },
-      {
-        "name": "App",
-        "links": []
       }
     ]
   }
