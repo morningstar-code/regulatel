@@ -1,5 +1,8 @@
+/**
+ * Unificado: GET/POST /api/news y GET/PATCH/DELETE /api/news/:id (límite 12 serverless en Hobby).
+ */
 import type { IncomingMessage, ServerResponse } from "http";
-import { getNewsById, updateNews, deleteNews } from "../../server/lib/news.js";
+import { listNews, createNews, getNewsById, updateNews, deleteNews } from "../../server/lib/news.js";
 import { ensureAdmin } from "../../server/lib/adminAuth.js";
 import { logAudit } from "../../server/lib/auditLog.js";
 import { parseJsonBody } from "../../server/lib/parseBody.js";
@@ -12,16 +15,20 @@ function sendJson(res: ServerResponse, status: number, data: unknown) {
   res.end(JSON.stringify(data));
 }
 
+function getIdFromPath(req: IncomingMessage): string | null {
+  const pathname = (req.url ?? "").split("?")[0];
+  const parts = pathname.split("/").filter(Boolean);
+  const i = parts.indexOf("news");
+  if (i === -1 || i + 1 >= parts.length) return null;
+  return parts[i + 1] ?? null;
+}
+
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
-  const url = req.url ?? "";
-  const id = url.split("/").pop()?.split("?")[0] ?? "";
-  if (!id) {
-    sendJson(res, 400, { error: "Missing id" });
-    return;
-  }
+  const id = getIdFromPath(req);
+  const isBase = id == null || id === "";
 
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, PATCH, DELETE, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   if (req.method === "OPTIONS") {
     res.statusCode = 204;
@@ -35,6 +42,83 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   }
 
   try {
+    if (isBase) {
+      if (req.method === "GET") {
+        const items = await listNews();
+        sendJson(res, 200, items);
+        return;
+      }
+      if (req.method === "POST") {
+        const auth = await ensureAdmin(req);
+        const body = (await parseJsonBody(req)) as Record<string, unknown>;
+        const newId = typeof body.id === "string" ? body.id : "admin-" + Date.now();
+        const slug = typeof body.slug === "string" ? body.slug : "";
+        const title = typeof body.title === "string" ? body.title : "";
+        const date = typeof body.date === "string" ? body.date : new Date().toISOString().slice(0, 10);
+        const dateFormatted = typeof body.dateFormatted === "string" ? body.dateFormatted : date;
+        const category = typeof body.category === "string" ? body.category : "Noticias";
+        const excerpt = typeof body.excerpt === "string" ? body.excerpt : "";
+        const imageUrl = typeof body.imageUrl === "string" ? body.imageUrl : "";
+        const imageFileName = typeof body.imageFileName === "string" ? body.imageFileName : undefined;
+        const imageMimeType = typeof body.imageMimeType === "string" ? body.imageMimeType : undefined;
+        const imageSize = typeof body.imageSize === "number" ? body.imageSize : undefined;
+        const additionalImages = Array.isArray(body.additionalImages) ? (body.additionalImages as string[]) : [];
+        const additionalImageNames = Array.isArray(body.additionalImageNames) ? (body.additionalImageNames as (string | undefined)[]) : [];
+        const additionalImageMeta = Array.isArray(body.additionalImageMeta)
+          ? (body.additionalImageMeta as Array<{ fileName?: string; mimeType?: string; size?: number }>)
+          : [];
+        const bodyText = typeof body.content === "string" ? body.content : (typeof body.body === "string" ? body.body : "");
+        const author = typeof body.author === "string" ? body.author : undefined;
+        const link = typeof body.link === "string" ? body.link : undefined;
+        const videoUrl = typeof body.videoUrl === "string" ? body.videoUrl : undefined;
+        const published = body.published !== false;
+        const item = await createNews({
+          id: newId,
+          slug,
+          title,
+          date,
+          dateFormatted,
+          category,
+          excerpt,
+          imageUrl,
+          imageFileName,
+          imageMimeType,
+          imageSize,
+          additionalImages,
+          additionalImageNames,
+          additionalImageMeta,
+          body: bodyText,
+          author,
+          link,
+          videoUrl,
+          published,
+        });
+        await logAudit({
+          userId: auth.user.id,
+          userEmail: auth.user.email,
+          userName: auth.user.name,
+          action: "created",
+          resourceType: "news",
+          resourceId: item.id,
+          details: { title: item.title, slug: item.slug },
+        });
+        if (item.published) {
+          void notifySubscribersNewContent({
+            type: "noticia",
+            title: item.title,
+            excerpt: item.excerpt,
+            url: `/noticias/${item.slug}`,
+            date: item.dateFormatted || item.date,
+          }).then((r) => r.sent > 0 && console.log("[news] Notificación enviada a", r.sent, "suscriptores."));
+        }
+        sendJson(res, 201, item);
+        return;
+      }
+      res.statusCode = 405;
+      res.end("Method Not Allowed");
+      return;
+    }
+
     if (req.method === "GET") {
       const item = await getNewsById(id);
       if (!item) {
@@ -121,7 +205,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     res.statusCode = 405;
     res.end("Method Not Allowed");
   } catch (err) {
-    console.error("api/news/[id]", err);
+    console.error("api/news", err);
     const status = err instanceof Error && err.name === "UnauthorizedError" ? 401 : 500;
     sendJson(res, status, { error: err instanceof Error ? err.message : "Internal server error" });
   }
