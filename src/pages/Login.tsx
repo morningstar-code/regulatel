@@ -105,6 +105,11 @@ export default function Login() {
                       En Vercel: <strong>Settings → Environment Variables</strong> → añade <code className="bg-black/10 px-1 rounded">DATABASE_URL</code> con la cadena de conexión de Neon y vuelve a desplegar.
                     </p>
                   )}
+                  {configError && !configError.includes("DATABASE") && (
+                    <p className="text-xs mt-2">
+                      <strong>Diagnóstico:</strong> Abre en otra pestaña <code className="bg-black/10 px-1 rounded">{typeof window !== "undefined" ? `${window.location.origin}/api/health` : "/api/health"}</code>. Si da 404 o página en blanco → en Vercel <strong>Settings → General → Root Directory</strong> déjalo <strong>completamente vacío</strong> (borra incluso <code>./</code>), guarda y redeploya. Revisa también la pestaña Consola (F12) para ver los logs [REGULATEL API ERROR].
+                    </p>
+                  )}
                 </div>
               )}
               {bootstrapRequired && (

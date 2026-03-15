@@ -5,20 +5,51 @@
 const API_BASE = "";
 const API_PREFIX = "/api/route";
 
+const DEBUG_API = true; // Logs en consola para diagnosticar 401/404/HTML en producción
+
 async function request<T>(
   path: string,
   options?: { method?: string; headers?: HeadersInit; body?: unknown }
 ): Promise<{ data: T; ok: true } | { error: string; ok: false }> {
+  const url = `${API_BASE}${API_PREFIX}${path}`;
+  const method = options?.method ?? "GET";
   try {
     const bodySerialized =
       options?.body !== undefined ? JSON.stringify(options.body) : undefined;
     const init: RequestInit = {
-      method: options?.method ?? "GET",
+      method,
       headers: { "Content-Type": "application/json", ...options?.headers },
       body: bodySerialized,
       credentials: "include",
     };
-    const res = await fetch(`${API_BASE}${API_PREFIX}${path}`, init);
+    if (DEBUG_API && path.startsWith("/admin/session")) {
+      console.warn("[REGULATEL API] Llamando a", method, url);
+    }
+    const res = await fetch(url, init);
+    const text = await res.text();
+    const trimmed = text.trim();
+    const looksLikeHtml = trimmed.startsWith("<") || trimmed.startsWith("The page") || trimmed.startsWith("<!");
+
+    if (DEBUG_API && !res.ok) {
+      console.error("--- [REGULATEL API ERROR] ---");
+      console.error("URL:", method, url);
+      console.error("Status:", res.status, res.statusText);
+      if (trimmed) {
+        if (looksLikeHtml) {
+          console.error("Body (HTML):", trimmed.slice(0, 500));
+        } else {
+          try {
+            console.error("Body (JSON):", JSON.parse(trimmed) as unknown);
+          } catch {
+            console.error("Body (texto):", trimmed.slice(0, 500));
+          }
+        }
+      } else {
+        console.error("Body: (vacío)");
+      }
+      console.error("--- Si status=404: en otra pestaña abre tu-dominio.vercel.app/api/health — si también 404, la carpeta api/ no se despliega (Root Directory en Vercel debe estar VACÍO, sin ./) ---");
+    }
+
     if (res.status === 401) {
       try {
         window.dispatchEvent(new CustomEvent("auth:unauthorized"));
@@ -26,9 +57,6 @@ async function request<T>(
         // no-op
       }
     }
-    const text = await res.text();
-    const trimmed = text.trim();
-    const looksLikeHtml = trimmed.startsWith("<") || trimmed.startsWith("The page") || trimmed.startsWith("<!");
 
     let data: T | undefined;
     if (trimmed) {
@@ -58,6 +86,9 @@ async function request<T>(
     }
     return { ok: true, data: data as T };
   } catch (e) {
+    if (DEBUG_API) {
+      console.error("[API] Request failed:", method, url, e);
+    }
     return { ok: false, error: e instanceof Error ? e.message : "Network error" };
   }
 }
