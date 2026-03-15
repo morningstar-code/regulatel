@@ -43,10 +43,11 @@ const nav = [
 
 export default function AdminLayout() {
   const { isAdmin, isChecking, canManageUsers, user, logout } = useAuth();
-  const { contentSource, contentError } = useAdminData();
+  const { contentSource, contentError, recheckContentSource } = useAdminData();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [legacyDismissed, setLegacyDismissed] = useState(false);
+  const [rechecking, setRechecking] = useState(false);
 
   useEffect(() => {
     if (!isChecking && !isAdmin) {
@@ -235,7 +236,7 @@ export default function AdminLayout() {
       <main className="min-w-0 flex-1 p-6 pt-14 md:pt-6 md:p-8">
         {showLegacyBanner && (
           <div
-            className="mb-6 flex items-start justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+            className="mb-6 flex flex-wrap items-start justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
             role="alert"
           >
             <span>
@@ -243,14 +244,28 @@ export default function AdminLayout() {
               legacy solo para lectura pública.
               {contentError ? ` Motivo: ${contentError}` : ""}
             </span>
-            <button
-              type="button"
-              onClick={() => setLegacyDismissed(true)}
-              className="shrink-0 rounded px-2 py-1 text-amber-800 hover:bg-amber-100"
-              aria-label="Ocultar aviso"
-            >
-              <X className="h-4 w-4" />
-            </button>
+            <div className="flex shrink-0 items-center gap-2">
+              <button
+                type="button"
+                onClick={async () => {
+                  setRechecking(true);
+                  await recheckContentSource?.();
+                  setRechecking(false);
+                }}
+                disabled={rechecking}
+                className="rounded bg-amber-200 px-2 py-1 text-amber-900 hover:bg-amber-300 disabled:opacity-50"
+              >
+                {rechecking ? "Comprobando…" : "Reintentar"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setLegacyDismissed(true)}
+                className="rounded px-2 py-1 text-amber-800 hover:bg-amber-100"
+                aria-label="Ocultar aviso"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         )}
         <AdminBreadcrumbs />

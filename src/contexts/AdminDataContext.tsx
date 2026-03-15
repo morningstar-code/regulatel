@@ -63,6 +63,8 @@ function saveJson(key: string, value: unknown) {
 interface AdminDataContextValue {
   contentSource: "database" | "legacy" | "loading";
   contentError: string | null;
+  /** Vuelve a comprobar si la API/Neon está disponible (p. ej. desde el banner "Reintentar"). */
+  recheckContentSource: () => Promise<void>;
   adminNews: AdminNewsItem[];
   setAdminNews: (v: AdminNewsItem[] | ((prev: AdminNewsItem[]) => AdminNewsItem[])) => void;
   addNews: (item: Omit<AdminNewsItem, "id">) => Promise<void>;
@@ -109,48 +111,56 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   );
   const [adminDocuments, setAdminDocumentsState] = useState<GestionDocument[]>([]);
 
-  /** Neon = fuente activa. Si la API no está disponible, se usa legacy solo para lectura pública. */
-  useEffect(() => {
-    void (async () => {
-      const [newsRes, eventsRes, docsRes, cifrasRes] = await Promise.all([
-        api.news.list(),
-        api.events.list(),
-        api.documents.list(),
-        api.cifras.list(),
-      ]);
-      if (newsRes.ok && eventsRes.ok && docsRes.ok) {
-        const newsItems = Array.isArray(newsRes.data) ? (newsRes.data as AdminNewsItem[]) : [];
-        const eventItems = Array.isArray(eventsRes.data) ? (eventsRes.data as Event[]) : [];
-        const docItems = Array.isArray(docsRes.data) ? (docsRes.data as GestionDocument[]) : [];
-        setAdminNewsState(newsItems.map((n) => ({ ...n, published: n.published !== false })));
-        setEventsState(eventItems.map((e) => normalizeEvent(e)));
-        setAdminDocumentsState(docItems);
-        if (cifrasRes.ok && cifrasRes.data && typeof cifrasRes.data === "object") {
-          const raw = cifrasRes.data as Record<string, { gruposTrabajo: number; comitesEjecutivos: number; revistaDigital: number; paises: number }>;
-          const byYear: Record<number, CifrasAnuales> = {};
-          for (const [k, v] of Object.entries(raw)) {
-            const y = parseInt(k, 10);
-            if (!Number.isNaN(y) && v && typeof v.gruposTrabajo === "number") {
-              byYear[y] = {
-                gruposTrabajo: v.gruposTrabajo,
-                comitesEjecutivos: v.comitesEjecutivos,
-                revistaDigital: v.revistaDigital,
-                paises: v.paises,
-              };
-            }
-          }
-          setAdminCifrasPorAnoState(byYear);
+  /** Comprueba si la API/Neon está disponible. Si GET /api/settings responde JSON, se considera "database" aunque news/events/docs fallen. */
+  const checkContentSource = useCallback(async () => {
+    const [newsRes, eventsRes, docsRes, cifrasRes, settingsRes] = await Promise.all([
+      api.news.list(),
+      api.events.list(),
+      api.documents.list(),
+      api.cifras.list(),
+      api.settings.getAll(),
+    ]);
+    const newsItems = newsRes.ok && Array.isArray(newsRes.data) ? (newsRes.data as AdminNewsItem[]) : [];
+    const eventItems = eventsRes.ok && Array.isArray(eventsRes.data) ? (eventsRes.data as Event[]) : [];
+    const docItems = docsRes.ok && Array.isArray(docsRes.data) ? (docsRes.data as GestionDocument[]) : [];
+    setAdminNewsState(newsItems.map((n) => ({ ...n, published: n.published !== false })));
+    setEventsState(eventItems.map((e) => normalizeEvent(e)));
+    setAdminDocumentsState(docItems);
+    if (cifrasRes.ok && cifrasRes.data && typeof cifrasRes.data === "object") {
+      const raw = cifrasRes.data as Record<string, { gruposTrabajo: number; comitesEjecutivos: number; revistaDigital: number; paises: number }>;
+      const byYear: Record<number, CifrasAnuales> = {};
+      for (const [k, v] of Object.entries(raw)) {
+        const y = parseInt(k, 10);
+        if (!Number.isNaN(y) && v && typeof v.gruposTrabajo === "number") {
+          byYear[y] = {
+            gruposTrabajo: v.gruposTrabajo,
+            comitesEjecutivos: v.comitesEjecutivos,
+            revistaDigital: v.revistaDigital,
+            paises: v.paises,
+          };
         }
-        setContentSource("database");
-        setContentError(null);
-        return;
       }
-      setContentSource("legacy");
-      setContentError(
-        !newsRes.ok ? newsRes.error : !eventsRes.ok ? eventsRes.error : !docsRes.ok ? docsRes.error : "API no disponible"
-      );
-    })();
+      setAdminCifrasPorAnoState(byYear);
+    }
+    if (newsRes.ok && eventsRes.ok && docsRes.ok) {
+      setContentSource("database");
+      setContentError(null);
+      return;
+    }
+    if (settingsRes.ok) {
+      setContentSource("database");
+      setContentError(null);
+      return;
+    }
+    setContentSource("legacy");
+    setContentError(
+      !newsRes.ok ? newsRes.error : !eventsRes.ok ? eventsRes.error : !docsRes.ok ? docsRes.error : "API no disponible"
+    );
   }, []);
+
+  useEffect(() => {
+    void checkContentSource();
+  }, [checkContentSource]);
 
   useEffect(() => {
     saveJson(KEY_CIFRAS, adminCifras);
@@ -316,11 +326,18 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     setAdminDocumentsState((prev) => prev.filter((d) => d.id !== id));
   }, []);
 
+  const recheckContentSource = useCallback(async () => {
+    setContentSource("loading");
+    setContentError(null);
+    await checkContentSource();
+  }, [checkContentSource]);
+
   return (
     <AdminDataContext.Provider
       value={{
         contentSource,
         contentError,
+        recheckContentSource,
         adminNews,
         setAdminNews,
         addNews,
