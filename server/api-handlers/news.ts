@@ -1,13 +1,13 @@
 /**
- * Unificado: GET/POST /api/news y GET/PATCH/DELETE /api/news/:id (límite 12 serverless en Hobby).
+ * GET/POST /api/news y GET/PATCH/DELETE /api/news/:id
  */
 import type { IncomingMessage, ServerResponse } from "http";
-import { listNews, createNews, getNewsById, updateNews, deleteNews } from "../../server/lib/news.js";
-import { ensureAdmin } from "../../server/lib/adminAuth.js";
-import { logAudit } from "../../server/lib/auditLog.js";
-import { parseJsonBody } from "../../server/lib/parseBody.js";
-import { isDbConfigured } from "../../server/lib/db.js";
-import { notifySubscribersNewContent } from "../../server/lib/sendNewsletter.js";
+import { listNews, createNews, getNewsById, updateNews, deleteNews } from "../lib/news.js";
+import { ensureAdmin } from "../lib/adminAuth.js";
+import { logAudit } from "../lib/auditLog.js";
+import { parseJsonBody } from "../lib/parseBody.js";
+import { isDbConfigured } from "../lib/db.js";
+import { notifySubscribersNewContent } from "../lib/sendNewsletter.js";
 
 function sendJson(res: ServerResponse, status: number, data: unknown) {
   res.setHeader("Content-Type", "application/json");

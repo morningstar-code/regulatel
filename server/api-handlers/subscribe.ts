@@ -1,7 +1,7 @@
 import type { IncomingMessage, ServerResponse } from "http";
-import { addSubscriber } from "../server/lib/subscribers.js";
-import { parseJsonBody } from "../server/lib/parseBody.js";
-import { isDbConfigured } from "../server/lib/db.js";
+import { addSubscriber } from "../lib/subscribers.js";
+import { parseJsonBody } from "../lib/parseBody.js";
+import { isDbConfigured } from "../lib/db.js";
 
 function sendJson(res: ServerResponse, status: number, data: unknown) {
   res.setHeader("Content-Type", "application/json");

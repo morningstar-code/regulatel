@@ -1,6 +1,5 @@
 /**
- * Router unificado para /api/admin/* (session, users, audit, document-access-users).
- * Reduce 4 funciones a 1 para cumplir límite Vercel Hobby (12).
+ * Router para /api/admin/* (session, users, audit, document-access-users, media).
  */
 import type { IncomingMessage, ServerResponse } from "http";
 import crypto from "crypto";
@@ -10,13 +9,12 @@ import {
   loginAdmin,
   logoutAdmin,
   ensureAdmin,
-} from "../../server/lib/adminAuth.js";
-import { listAdminUsers, createAdminUser } from "../../server/lib/adminUsers.js";
-import { findAdminUserByIdentifier } from "../../server/lib/adminUsers.js";
-import { logAudit } from "../../server/lib/auditLog.js";
-import { listAuditLog, listAuditLogByResource } from "../../server/lib/auditLog.js";
-import { listBlobs, isBlobConfigured } from "../../server/lib/blob.js";
-import type { BlobListFolder } from "../../server/lib/blob.js";
+} from "../lib/adminAuth.js";
+import { listAdminUsers, createAdminUser, findAdminUserByIdentifier } from "../lib/adminUsers.js";
+import { logAudit } from "../lib/auditLog.js";
+import { listAuditLog, listAuditLogByResource } from "../lib/auditLog.js";
+import { listBlobs, isBlobConfigured } from "../lib/blob.js";
+import type { BlobListFolder } from "../lib/blob.js";
 import {
   ensureDocumentAccessSchema,
   listDocumentAccessUsers,
@@ -25,9 +23,9 @@ import {
   findDocumentAccessUserById,
   deleteDocumentAccessUser,
   updateDocumentAccessUser,
-} from "../../server/lib/documentAccess.js";
-import { parseJsonBody } from "../../server/lib/parseBody.js";
-import { isDbConfigured } from "../../server/lib/db.js";
+} from "../lib/documentAccess.js";
+import { parseJsonBody } from "../lib/parseBody.js";
+import { isDbConfigured } from "../lib/db.js";
 
 const SUPER_ADMIN_EMAILS = ["dcuervo@indotel.gob.do", "aarango@indotel.gob.do", "aarango@indotel.gob"];
 
@@ -60,7 +58,6 @@ function getAdminSubpath(req: IncomingMessage): string {
   return rest.split("/")[0] ?? "";
 }
 
-/** Path segments after /api/admin/ (e.g. ["document-access-users", "dau_xxx"]) */
 function getAdminPathSegments(req: IncomingMessage): string[] {
   const r = req as IncomingMessage & { query?: { path?: string[] } };
   if (Array.isArray(r.query?.path) && r.query.path.length > 0) {
@@ -303,7 +300,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
 
     sendJson(res, 404, { error: "Not found" });
   } catch (err) {
-    console.error("api/admin/[...path]", err);
+    console.error("api/admin", err);
     const status = err instanceof Error && err.name === "UnauthorizedError" ? 401 : 500;
     sendJson(res, status, { error: err instanceof Error ? err.message : "Error interno" });
   }

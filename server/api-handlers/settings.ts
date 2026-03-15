@@ -1,9 +1,9 @@
 import type { IncomingMessage, ServerResponse } from "http";
-import { getSetting, getAllSettings, setSetting } from "../server/lib/siteSettings.js";
-import { ensureAdmin } from "../server/lib/adminAuth.js";
-import { logAudit } from "../server/lib/auditLog.js";
-import { parseJsonBody } from "../server/lib/parseBody.js";
-import { isDbConfigured } from "../server/lib/db.js";
+import { getSetting, getAllSettings, setSetting } from "../lib/siteSettings.js";
+import { ensureAdmin } from "../lib/adminAuth.js";
+import { logAudit } from "../lib/auditLog.js";
+import { parseJsonBody } from "../lib/parseBody.js";
+import { isDbConfigured } from "../lib/db.js";
 
 function sendJson(res: ServerResponse, status: number, data: unknown) {
   res.setHeader("Content-Type", "application/json");

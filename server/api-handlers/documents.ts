@@ -1,12 +1,12 @@
 /**
- * Unificado: GET/POST /api/documents y GET/PATCH/DELETE /api/documents/:id (límite 12 serverless en Hobby).
+ * GET/POST /api/documents y GET/PATCH/DELETE /api/documents/:id
  */
 import type { IncomingMessage, ServerResponse } from "http";
-import { listDocuments, createDocument, getDocumentById, updateDocument, deleteDocument } from "../../server/lib/documents.js";
-import { ensureAdmin } from "../../server/lib/adminAuth.js";
-import { logAudit } from "../../server/lib/auditLog.js";
-import { parseJsonBody } from "../../server/lib/parseBody.js";
-import { isDbConfigured } from "../../server/lib/db.js";
+import { listDocuments, createDocument, getDocumentById, updateDocument, deleteDocument } from "../lib/documents.js";
+import { ensureAdmin } from "../lib/adminAuth.js";
+import { logAudit } from "../lib/auditLog.js";
+import { parseJsonBody } from "../lib/parseBody.js";
+import { isDbConfigured } from "../lib/db.js";
 
 function sendJson(res: ServerResponse, status: number, data: unknown) {
   res.setHeader("Content-Type", "application/json");

@@ -1,13 +1,13 @@
 /**
- * Unificado: GET/POST /api/events y GET/PATCH/DELETE /api/events/:id (límite 12 serverless en Hobby).
+ * GET/POST /api/events y GET/PATCH/DELETE /api/events/:id
  */
 import type { IncomingMessage, ServerResponse } from "http";
-import { listEvents, createEvent, getEventById, updateEvent, deleteEvent } from "../../server/lib/events.js";
-import { ensureAdmin } from "../../server/lib/adminAuth.js";
-import { logAudit } from "../../server/lib/auditLog.js";
-import { parseJsonBody } from "../../server/lib/parseBody.js";
-import { isDbConfigured } from "../../server/lib/db.js";
-import { notifySubscribersNewContent } from "../../server/lib/sendNewsletter.js";
+import { listEvents, createEvent, getEventById, updateEvent, deleteEvent } from "../lib/events.js";
+import { ensureAdmin } from "../lib/adminAuth.js";
+import { logAudit } from "../lib/auditLog.js";
+import { parseJsonBody } from "../lib/parseBody.js";
+import { isDbConfigured } from "../lib/db.js";
+import { notifySubscribersNewContent } from "../lib/sendNewsletter.js";
 
 function sendJson(res: ServerResponse, status: number, data: unknown) {
   res.setHeader("Content-Type", "application/json");

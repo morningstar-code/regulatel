@@ -1,7 +1,3 @@
-/**
- * Unificado: GET = verificar sesión, POST = login (email + contraseña).
- * Reduce una función serverless para cumplir límite Vercel Hobby (12).
- */
 import type { IncomingMessage, ServerResponse } from "http";
 import {
   ensureDocumentAccessSchema,
@@ -10,9 +6,9 @@ import {
   createDocumentAccessSession,
   setDocumentAccessCookie,
   getDocumentAccessSession,
-} from "../server/lib/documentAccess.js";
-import { parseJsonBody } from "../server/lib/parseBody.js";
-import { isDbConfigured } from "../server/lib/db.js";
+} from "../lib/documentAccess.js";
+import { parseJsonBody } from "../lib/parseBody.js";
+import { isDbConfigured } from "../lib/db.js";
 
 function sendJson(res: ServerResponse, status: number, data: unknown) {
   res.setHeader("Content-Type", "application/json");

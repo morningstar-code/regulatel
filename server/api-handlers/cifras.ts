@@ -1,12 +1,12 @@
 /**
- * Unificado: GET/PUT /api/cifras y DELETE /api/cifras/:year (límite 12 serverless en Hobby).
+ * GET/PUT /api/cifras y DELETE /api/cifras/:year
  */
 import type { IncomingMessage, ServerResponse } from "http";
-import { listCifras, upsertCifras, deleteCifrasForYear } from "../../server/lib/cifras.js";
-import { ensureAdmin } from "../../server/lib/adminAuth.js";
-import { logAudit } from "../../server/lib/auditLog.js";
-import { parseJsonBody } from "../../server/lib/parseBody.js";
-import { isDbConfigured } from "../../server/lib/db.js";
+import { listCifras, upsertCifras, deleteCifrasForYear } from "../lib/cifras.js";
+import { ensureAdmin } from "../lib/adminAuth.js";
+import { logAudit } from "../lib/auditLog.js";
+import { parseJsonBody } from "../lib/parseBody.js";
+import { isDbConfigured } from "../lib/db.js";
 
 function sendJson(res: ServerResponse, status: number, data: unknown) {
   res.setHeader("Content-Type", "application/json");
