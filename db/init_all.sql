@@ -1,8 +1,11 @@
--- REGULATEL Neon Postgres schema
--- Run this once to initialize the database (e.g. via Neon SQL Editor or psql).
--- Connection string must be set via DATABASE_URL (never in this file).
+-- =============================================================================
+-- REGULATEL: Todas las tablas para el panel de admin (Neon)
+-- =============================================================================
+-- Ejecuta este archivo completo en el SQL Editor de Neon (copiar y pegar todo).
+-- Crea o actualiza todas las tablas necesarias. Seguro para base nueva o existente.
+-- =============================================================================
 
--- News (admin-created articles; static news remain in code)
+-- News
 CREATE TABLE IF NOT EXISTS news (
   id TEXT PRIMARY KEY,
   slug TEXT NOT NULL,
@@ -26,12 +29,11 @@ CREATE TABLE IF NOT EXISTS news (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
-
 CREATE INDEX IF NOT EXISTS idx_news_slug ON news(slug);
 CREATE INDEX IF NOT EXISTS idx_news_date ON news("date" DESC);
 CREATE INDEX IF NOT EXISTS idx_news_published ON news(published) WHERE published = true;
 
--- Events (admin-managed; seed used only when DB empty)
+-- Events
 CREATE TABLE IF NOT EXISTS events (
   id TEXT PRIMARY KEY,
   title TEXT NOT NULL,
@@ -53,11 +55,10 @@ CREATE TABLE IF NOT EXISTS events (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
-
 CREATE INDEX IF NOT EXISTS idx_events_start_date ON events(start_date DESC);
 CREATE INDEX IF NOT EXISTS idx_events_year ON events(year);
 
--- Documents (admin-added; static docs remain in code)
+-- Documents
 CREATE TABLE IF NOT EXISTS documents (
   id TEXT PRIMARY KEY,
   title TEXT NOT NULL,
@@ -71,11 +72,10 @@ CREATE TABLE IF NOT EXISTS documents (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
-
 CREATE INDEX IF NOT EXISTS idx_documents_category ON documents(category);
 CREATE INDEX IF NOT EXISTS idx_documents_year ON documents(year);
 
--- Site-wide CMS content (hero, carousel, quick links, navigation)
+-- Site settings (hero, carousel, navegación, etc.)
 CREATE TABLE IF NOT EXISTS site_settings (
   key TEXT PRIMARY KEY,
   value JSONB NOT NULL DEFAULT '{}',
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS site_settings (
 );
 CREATE INDEX IF NOT EXISTS idx_site_settings_updated ON site_settings(updated_at);
 
--- Suscriptores a actualizaciones (noticias, eventos)
+-- Suscriptores
 CREATE TABLE IF NOT EXISTS subscribers (
   id TEXT PRIMARY KEY,
   email TEXT NOT NULL UNIQUE,
@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS subscribers (
 CREATE INDEX IF NOT EXISTS idx_subscribers_email ON subscribers(lower(email));
 CREATE INDEX IF NOT EXISTS idx_subscribers_active ON subscribers(unsubscribed_at) WHERE unsubscribed_at IS NULL;
 
--- REGULATEL en cifras (por año): grupos de trabajo, comités, revista, países
+-- REGULATEL en cifras
 CREATE TABLE IF NOT EXISTS cifras (
   year INTEGER PRIMARY KEY,
   grupos_trabajo INTEGER NOT NULL DEFAULT 0,
@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS cifras (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Admin authentication
+-- Admin users y sesiones
 CREATE TABLE IF NOT EXISTS admin_users (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
@@ -116,7 +116,6 @@ CREATE TABLE IF NOT EXISTS admin_users (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
-
 CREATE INDEX IF NOT EXISTS idx_admin_users_email ON admin_users(email);
 CREATE INDEX IF NOT EXISTS idx_admin_users_username ON admin_users(username);
 CREATE INDEX IF NOT EXISTS idx_admin_users_active ON admin_users(is_active);
@@ -132,29 +131,31 @@ CREATE TABLE IF NOT EXISTS admin_sessions (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
-
 CREATE INDEX IF NOT EXISTS idx_admin_sessions_user_id ON admin_sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_admin_sessions_expires_at ON admin_sessions(expires_at);
 
--- Auditoría: quién hizo qué (crear, actualizar, eliminar, subir, incl. REGULATEL en cifras)
--- Si la tabla ya existía sin 'cifras', ejecutar en Neon: ALTER TABLE admin_audit_log DROP CONSTRAINT IF EXISTS admin_audit_log_resource_type_check; ALTER TABLE admin_audit_log ADD CONSTRAINT admin_audit_log_resource_type_check CHECK (resource_type IN ('news', 'event', 'document', 'upload', 'admin_user', 'cifras'));
+-- Auditoría
 CREATE TABLE IF NOT EXISTS admin_audit_log (
   id TEXT PRIMARY KEY,
   user_id TEXT NOT NULL,
   user_email TEXT NOT NULL,
   user_name TEXT,
   action TEXT NOT NULL CHECK (action IN ('created', 'updated', 'deleted', 'uploaded')),
-  resource_type TEXT NOT NULL CHECK (resource_type IN ('news', 'event', 'document', 'upload', 'admin_user', 'cifras', 'site_settings')),
+  resource_type TEXT NOT NULL,
   resource_id TEXT,
   details JSONB DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
-
 CREATE INDEX IF NOT EXISTS idx_audit_created_at ON admin_audit_log(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_audit_user_id ON admin_audit_log(user_id);
 CREATE INDEX IF NOT EXISTS idx_audit_resource ON admin_audit_log(resource_type, resource_id);
 
--- Galería: álbumes e imágenes (admin)
+-- Constraint de resource_type (si la tabla ya existía sin él o con lista antigua)
+ALTER TABLE admin_audit_log DROP CONSTRAINT IF EXISTS admin_audit_log_resource_type_check;
+ALTER TABLE admin_audit_log ADD CONSTRAINT admin_audit_log_resource_type_check
+  CHECK (resource_type IN ('news', 'event', 'document', 'upload', 'admin_user', 'cifras', 'site_settings'));
+
+-- Galería
 CREATE TABLE IF NOT EXISTS gallery_albums (
   id TEXT PRIMARY KEY,
   slug TEXT NOT NULL UNIQUE,
@@ -177,7 +178,7 @@ CREATE TABLE IF NOT EXISTS gallery_images (
 CREATE INDEX IF NOT EXISTS idx_gallery_images_album ON gallery_images(album_id);
 CREATE INDEX IF NOT EXISTS idx_gallery_images_sort ON gallery_images(album_id, sort_order);
 
--- Usuarios con acceso solo a documentos restringidos (actas). No acceden al panel admin.
+-- Document access (usuarios solo documentos)
 CREATE TABLE IF NOT EXISTS document_access_users (
   id TEXT PRIMARY KEY,
   email TEXT NOT NULL UNIQUE,
@@ -201,3 +202,19 @@ CREATE TABLE IF NOT EXISTS document_access_sessions (
 );
 CREATE INDEX IF NOT EXISTS idx_document_access_sessions_user_id ON document_access_sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_document_access_sessions_expires_at ON document_access_sessions(expires_at);
+
+-- Columnas que pudieron faltar en bases antiguas
+ALTER TABLE news
+  ADD COLUMN IF NOT EXISTS image_mime_type TEXT,
+  ADD COLUMN IF NOT EXISTS image_size INTEGER,
+  ADD COLUMN IF NOT EXISTS additional_image_meta JSONB DEFAULT '[]';
+
+ALTER TABLE events
+  ADD COLUMN IF NOT EXISTS image_file_name TEXT,
+  ADD COLUMN IF NOT EXISTS image_mime_type TEXT,
+  ADD COLUMN IF NOT EXISTS image_size INTEGER;
+
+ALTER TABLE documents
+  ADD COLUMN IF NOT EXISTS file_name TEXT,
+  ADD COLUMN IF NOT EXISTS file_type TEXT,
+  ADD COLUMN IF NOT EXISTS file_size INTEGER;
