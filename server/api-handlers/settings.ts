@@ -49,6 +49,8 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
         return;
       }
       const all = await getAllSettings();
+      const keys = Object.keys(all);
+      console.warn("[REGULATEL API server] GET all settings — filas en DB:", keys.length, "claves:", keys.join(", ") || "(ninguna)");
       sendJson(res, 200, all);
       return;
     }
@@ -62,6 +64,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
         return;
       }
       const result = await setSetting(key, body.value ?? {});
+      console.warn("[REGULATEL API server] PUT settings guardado key:", key);
       await logAudit({
         userId: auth.user.id,
         userEmail: auth.user.email,

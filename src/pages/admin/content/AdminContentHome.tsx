@@ -93,7 +93,8 @@ export default function AdminContentHome() {
     const res = await api.settings.set("home_hero", hero);
     setSaving(null);
     if (res.ok) {
-      console.warn("[REGULATEL] Save hero: OK — guardado en base de datos.");
+      const echoed = res.data as { key?: string } | undefined;
+      console.warn("[REGULATEL] Save hero: OK. Servidor devolvió key:", echoed?.key ?? "(no key)");
       showMessage("ok", "Hero guardado correctamente.");
     } else {
       console.error("[REGULATEL] Save hero FALLÓ:", res.error);

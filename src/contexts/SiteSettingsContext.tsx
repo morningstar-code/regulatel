@@ -55,8 +55,13 @@ async function fetchSettings(retry = false): Promise<Omit<SiteSettingsState, "re
     return { ...defaultState, loading: false };
   }
   const d = res.data;
+  const keys = Object.keys(d);
   const hasHero = d.home_hero && typeof d.home_hero === "object";
-  console.warn("[REGULATEL] Settings OK: usando datos del CMS.", hasHero ? "home_hero: sí" : "home_hero: no");
+  console.warn("[REGULATEL] Settings OK: claves recibidas del API:", keys.length ? keys.join(", ") : "(ninguna)");
+  console.warn("[REGULATEL] home_hero en respuesta:", d.home_hero == null ? "ausente/null/undefined" : typeof d.home_hero === "object" ? "objeto OK" : "tipo inesperado: " + typeof d.home_hero);
+  if (!hasHero && keys.length > 0) {
+    console.error("[REGULATEL] El API devolvió 200 con claves", keys, "pero home_hero no viene o no es objeto. ¿El PUT guardó en otra tabla/instancia?");
+  }
   return {
     homeHero:
       d.home_hero && typeof d.home_hero === "object"

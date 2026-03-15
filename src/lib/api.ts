@@ -82,6 +82,9 @@ async function request<T>(
       const errMsg = data && typeof data === "object" && "error" in data ? String((data as { error: string }).error) : res.statusText;
       return { ok: false, error: errMsg };
     }
+    if (isSettings && data != null && typeof data === "object" && !Array.isArray(data)) {
+      console.warn("[REGULATEL API] Body del GET settings — claves:", Object.keys(data as Record<string, unknown>));
+    }
     return { ok: true, data: data as T };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "Network error" };
