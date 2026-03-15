@@ -100,7 +100,7 @@ export default function AdminContentGaleria() {
     const reader = new FileReader();
     reader.onload = async () => {
       const dataUrl = reader.result as string;
-      const res = await fetch("/api/route/uploads", {
+      const res = await fetch("/api/uploads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

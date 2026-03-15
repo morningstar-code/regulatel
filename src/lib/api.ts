@@ -1,10 +1,8 @@
 /**
- * API client for backend (Neon Postgres).
- * All requests go to /api/route/* so they hit the single serverless function on Vercel
- * (avoids depending on rewrites that can return HTML instead of JSON).
+ * API client for backend (Neon Postgres). Uses /api/* (single catch-all at api/[[...path]].ts on Vercel).
  */
 const API_BASE = "";
-const API_PREFIX = "/api/route";
+const API_PREFIX = "/api";
 
 async function request<T>(
   path: string,

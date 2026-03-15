@@ -1,18 +1,21 @@
 # API en Vercel – Una sola función
 
-Para evitar 404 en `/api/news`, `/api/events`, `/api/documents`, `/api/cifras` y que lo que guardas en el admin se persista:
+Para evitar 404 y el error "El servidor devolvió una página en lugar de datos":
 
-1. **Una sola serverless function**  
-   Toda la API pasa por `api/route/[...path].ts`. En `vercel.json` hay un rewrite:
-   - `/api/:path*` → `/api/route/:path*`  
-   Así, peticiones como `/api/settings`, `/api/news`, etc. llegan al mismo handler.
+1. **Router en la raíz de `api/`**  
+   Un único handler `api/[[...path]].ts` atiende **todas** las rutas `/api/*` (admin/session, news, settings, etc.). El frontend llama directamente a `/api/admin/session`, `/api/news`, etc. No se usa rewrite.
 
 2. **Handlers en `server/api-handlers/`**  
-   La lógica (settings, news, events, documents, cifras, admin, uploads, subscribe, document-access) está en `server/api-handlers/`. El router solo importa y despacha por el primer segmento del path.
+   La lógica está en `server/api-handlers/`. El router solo importa y despacha por el primer segmento del path.
 
-3. **Comprobar en producción**  
-   - Abre `https://tu-dominio.vercel.app/api/health`. Debe devolver `{ "ok": true, "api": true }`.  
-   - Si ves 404 en `/api/news` o en otras rutas, revisa en Vercel: **Settings → General → Root Directory** que esté **vacío** (raíz del repo). Si está en un subdirectorio, la carpeta `api/` no se despliega.
+3. **Root Directory en Vercel (muy importante)**  
+   Si ves HTML en lugar de JSON o 404 en `/api/*`:
+   - En Vercel: **Settings → General → Root Directory** debe estar **vacío** (raíz del repositorio).
+   - Si Root Directory apunta a un subcarpeta (ej. `frontend`), la carpeta `api/` no se incluye en el despliegue y todas las peticiones /api/* devuelven el SPA (index.html).
 
-4. **Variables de entorno en Vercel**  
-   Asegúrate de tener en el proyecto: `DATABASE_URL`, `BLOB_READ_WRITE_TOKEN` (y las que use el admin). Sin `DATABASE_URL`, la API responderá 503 y no se guardará nada en base de datos.
+4. **Comprobar en producción**  
+   - Abre `https://tu-dominio.vercel.app/api/health`. Debe devolver JSON: `{ "ok": true, "api": true }`.  
+   - Si devuelve HTML o 404, repasa el punto 3 y redeploya.
+
+5. **Variables de entorno**  
+   Configura en Vercel: `DATABASE_URL`, `BLOB_READ_WRITE_TOKEN`. Sin `DATABASE_URL`, el login y el admin responderán 503.
