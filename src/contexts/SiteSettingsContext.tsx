@@ -50,7 +50,8 @@ async function fetchSettings(retry = false): Promise<Omit<SiteSettingsState, "re
       await new Promise((r) => setTimeout(r, 1500));
       return fetchSettings(true);
     }
-    console.error("[REGULATEL] El home usará datos ESTÁTICOS. La API no devolvió settings (motivo:", res.error ?? "sin datos", "). Revisa la consola [REGULATEL API] arriba.");
+    const errMsg = !res.ok ? res.error : "sin datos";
+    console.error("[REGULATEL] El home usará datos ESTÁTICOS. La API no devolvió settings (motivo:", errMsg, "). Revisa la consola [REGULATEL API] arriba.");
     return { ...defaultState, loading: false };
   }
   const d = res.data;
