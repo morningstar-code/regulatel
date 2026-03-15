@@ -1,12 +1,12 @@
-# API en Vercel – Una sola función
+# API en Vercel – Producción
 
-Para evitar 404 y el error "El servidor devolvió una página en lugar de datos":
+Para que el admin y la API funcionen en Vercel:
 
-1. **Router que sí funciona en Vercel (Vite)**  
-   El frontend llama a **`/api/route/*`** (ej. `/api/route/admin/session`, `/api/route/news`). Esas peticiones las atiende **`api/route/[...path].ts`**. El handler en la raíz `api/[[...path]].ts` a menudo da 404 en proyectos Vite; por eso se usa la ruta explícita `/api/route/`.
+1. **Ruta única que Vercel sí sirve**  
+   El frontend llama a **`/api/route?path=...`** (ej. `GET /api/route?path=admin/session`, `GET /api/route?path=news`). Esas peticiones las atiende el archivo **`api/route.ts`** (un solo archivo, sin subcarpeta). Vercel no sirve bien los catch-all en subcarpeta (`api/route/[...path].ts`), por eso se usa query `?path=`.
 
 2. **Handlers en `server/api-handlers/`**  
-   La lógica está en `server/api-handlers/`. El router solo importa y despacha por el primer segmento del path.
+   La lógica está en `server/api-handlers/`. `api/route.ts` lee el query `path`, reescribe `req.url` a `/api/...` y despacha al handler correspondiente.
 
 3. **Root Directory en Vercel (muy importante)**  
    Si ves HTML en lugar de JSON o 404 en `/api/*`:
